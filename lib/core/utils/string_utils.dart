@@ -176,18 +176,24 @@ class StringUtils {
         .toList();
   }
 
-  /// 從文字中提取可能的電話號碼
+  /// 從文字中提取可能的電話號碼（支援國際格式）
   static List<String> extractPhoneNumbers(String text) {
     if (text.isEmpty) return [];
     
+    // 支援多種國際電話格式的正則表達式
     final phoneRegex = RegExp(
-      r'(?:\+886\s*)?(?:\(?\d{2}\)?\s*)?[\d\s\-]{8,}',
+      r'(?:\+?[\d\s\-\(\)]{7,})',
     );
     
     return phoneRegex
         .allMatches(text)
         .map((match) => match.group(0)!.trim())
-        .where((phone) => phone.replaceAll(RegExp(r'[^\d]'), '').length >= 8)
+        .where((phone) {
+          // 移除所有非數字字元來計算長度
+          final digitsOnly = phone.replaceAll(RegExp(r'[^\d]'), '');
+          // 電話號碼至少要有7位數字
+          return digitsOnly.length >= 7;
+        })
         .toList();
   }
 }
