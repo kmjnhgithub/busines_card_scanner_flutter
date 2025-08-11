@@ -74,3 +74,22 @@ android/**/*.properties
 /docs
 /.claude
 CLAUDE.md
+
+# Dependency lock files
+pubspec.lock
+
+# iOS configuration files
+ios/Flutter/Debug.xcconfig
+ios/Flutter/Release.xcconfig
+ios/Podfile
+**/Debug.xcconfig
+**/Release.xcconfig
+**/Podfile
+
+# Build runner generated files (but keep build.yaml configuration)
+lib/**/*.g.dart
+lib/**/*.freezed.dart
+lib/**/*.gr.dart
+
+# Test coverage
+coverage/

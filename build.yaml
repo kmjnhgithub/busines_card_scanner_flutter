@@ -1,0 +1,34 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        options:
+          schema: drift
+          store_date_time_values_as_text: false
+          new_sql_code_generation: true
+          generate_connect_constructor: true
+      
+      riverpod_generator:
+        options:
+          build_extensions:
+            "lib/{{path}}.dart": "lib/{{path}}.g.dart"
+      
+      freezed:
+        options:
+          map_props: true
+          from_json: true
+          to_json: true
+          equal: true
+          copy_with: true
+      
+      json_serializable:
+        options:
+          any_map: true
+          checked: true
+          explicit_to_json: true
+          field_rename: snake
+          include_if_null: false
+
+global_options:
+  build_runner:
+    build_cache: true
