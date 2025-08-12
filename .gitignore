@@ -93,3 +93,8 @@ lib/**/*.gr.dart
 
 # Test coverage
 coverage/
+
+# Debug and temporary files
+test_debug.dart
+*_debug.dart
+*.debug
