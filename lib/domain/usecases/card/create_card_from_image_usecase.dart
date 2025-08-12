@@ -5,6 +5,7 @@ import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dar
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
+import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
 
 /// CreateCardFromImageUseCase - 從圖片建立名片的業務用例
 /// 
@@ -130,7 +131,7 @@ class CreateCardFromImageUseCase {
 
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
-      if (e is RepositoryException) {
+      if (e is Failure) {
         rethrow;
       }
       
@@ -254,7 +255,9 @@ class CreateCardFromImageUseCase {
 
   /// 從解析資料建立 BusinessCard 實體
   BusinessCard _createBusinessCardFromParsedData(ParsedCardData parsedData) {
-    return parsedData.toBusinessCard(id: ''); // 讓儲存時分配新 ID
+    // 生成臨時 ID，儲存時會由 Repository 分配實際的持久化 ID
+    final tempId = 'temp-${DateTime.now().millisecondsSinceEpoch}';
+    return parsedData.toBusinessCard(id: tempId);
   }
 
   /// 儲存名片
