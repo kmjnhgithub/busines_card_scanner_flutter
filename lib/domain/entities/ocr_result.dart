@@ -228,10 +228,6 @@ class OCRResult extends Equatable {
   @override
   String toString() {
     // 基於安全考量，不在 toString 中包含完整的原始文字和圖片資料
-    final textPreview = rawText.length > 50 
-        ? '${rawText.substring(0, 50)}...' 
-        : rawText;
-    
     return 'OCRResult('
            'id: $id, '
            'confidence: ${confidence.toStringAsFixed(2)}, '

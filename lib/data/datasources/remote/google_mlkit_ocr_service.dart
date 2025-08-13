@@ -55,10 +55,13 @@ class GoogleMLKitOCRService implements OCRService {
   final SecurityService _securityService;
   final Uuid _uuid;
   
-  // 引擎狀態
+  // 引擎狀態（為未來健康檢查功能預留）
   String _currentEngineId = _engineId;
+  // ignore: unused_field
   DateTime _lastHealthCheck = DateTime.now();
+  // ignore: unused_field
   bool _isEngineHealthy = true;
+  // ignore: unused_field
   String? _lastError;
   
   /// 建構函式

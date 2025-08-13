@@ -17,7 +17,8 @@ class EnhancedSecureStorage {
   final FlutterSecureStorage _secureStorage;
   final String _keyPrefix = 'api_key_';
   
-  /// 加密用的金鑰長度
+  /// 加密用的金鑰長度（為未來加密增強功能預留）
+  // ignore: unused_field
   static const int _keyLength = 32; // 256 bits
   /// 初始化向量長度  
   static const int _ivLength = 12; // 96 bits for GCM
@@ -286,7 +287,7 @@ class EnhancedSecureStorage {
       final base64Encoded = base64Encode(combined);
       
       return Right(base64Encoded);
-    } on Exception catch (e) {
+    } on Exception {
       return const Left(InsufficientPermissionFailure(
         permission: 'secure_storage',
         operation: 'encryption',
@@ -314,7 +315,7 @@ class EnhancedSecureStorage {
       late Uint8List combined;
       try {
         combined = base64Decode(encryptedData);
-      } on Exception catch (e) {
+      } on Exception {
         return const Left(InsufficientPermissionFailure(
           permission: 'secure_storage',
           operation: 'data_validation',
@@ -355,7 +356,7 @@ class EnhancedSecureStorage {
       final decryptedText = utf8.decode(encryptedContent);
       
       return Right(decryptedText);
-    } on Exception catch (e) {
+    } on Exception {
       return const Left(InsufficientPermissionFailure(
         permission: 'secure_storage',
         operation: 'encryption',
