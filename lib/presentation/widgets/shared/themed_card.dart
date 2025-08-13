@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
+import 'package:flutter/material.dart';
 
 /// 主題化卡片元件尺寸類型
 enum ThemedCardSize {

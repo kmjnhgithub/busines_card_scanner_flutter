@@ -533,10 +533,9 @@ void main() {
         // Arrange
         when(() => mockSecurityService.validateContent(any()))
             .thenReturn(const Right('validated'));
-        // 創建一個永不完成的 Future 來模擬超時情況
-        final neverCompletingCompleter = Completer<RecognizedText>();
+        // 直接拋出 TimeoutException 來模擬超時情況
         when(() => mockTextRecognizer.processImage(any()))
-            .thenAnswer((_) => neverCompletingCompleter.future);
+            .thenThrow(TimeoutException('OCR 處理超時', Duration(seconds: 30)));
 
         // Act & Assert
         await expectLater(

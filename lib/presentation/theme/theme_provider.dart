@@ -1,8 +1,7 @@
+import 'package:busines_card_scanner_flutter/presentation/theme/app_theme.dart';
 import 'package:flutter/material.dart' hide ThemeMode;
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:busines_card_scanner_flutter/presentation/theme/app_theme.dart';
 
 /// 應用程式主題模式枚舉
 ///

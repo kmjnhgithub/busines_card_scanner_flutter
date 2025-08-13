@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('ToastMessage', () {
@@ -140,7 +139,6 @@ void main() {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(
-            parent: container,
             child: MaterialApp(
               home: Builder(
                 builder: (context) {
@@ -174,7 +172,6 @@ void main() {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(
-            parent: container,
             child: MaterialApp(
               home: Builder(
                 builder: (context) {
@@ -208,7 +205,6 @@ void main() {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(
-            parent: container,
             child: MaterialApp(
               home: Builder(
                 builder: (context) {
@@ -242,7 +238,6 @@ void main() {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(
-            parent: container,
             child: MaterialApp(
               home: Builder(
                 builder: (context) {
@@ -276,7 +271,6 @@ void main() {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(
-            parent: container,
             child: MaterialApp(
               home: Builder(
                 builder: (context) {
@@ -311,7 +305,6 @@ void main() {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(
-            parent: container,
             child: MaterialApp(
               home: Builder(
                 builder: (context) {

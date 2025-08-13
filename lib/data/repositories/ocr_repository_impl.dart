@@ -34,7 +34,7 @@ class OCRRepositoryImpl implements OCRRepository {
       if (cacheService.isCacheValid(cachedResult)) {
         return cachedResult;
       }
-    } catch (_) {
+    } on Exception {
       // 快取中沒有結果或取得失敗，繼續使用 OCR 服務
     }
 
@@ -44,7 +44,7 @@ class OCRRepositoryImpl implements OCRRepository {
     // 將結果存入快取
     try {
       await cacheService.cacheResult(cacheKey, result);
-    } catch (_) {
+    } on Exception {
       // 快取儲存失敗不影響主要功能
     }
     
@@ -67,7 +67,7 @@ class OCRRepositoryImpl implements OCRRepository {
       try {
         final result = await recognizeText(imageDataList[i], options: options);
         successful.add(result);
-      } catch (error) {
+      } on Exception catch (error) {
         failed.add(BatchOCRError(
           index: i,
           error: error.toString(),

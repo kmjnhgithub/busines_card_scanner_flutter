@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
+import 'package:flutter/material.dart';
 
 /// 應用程式文字樣式系統
 ///

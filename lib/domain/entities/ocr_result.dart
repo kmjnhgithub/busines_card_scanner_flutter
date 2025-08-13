@@ -148,7 +148,9 @@ class OCRResult extends Equatable {
   /// 
   /// 使用 StringUtils 的 extractEmails 方法
   List<String> extractEmails() {
-    if (!hasDetectedTexts()) return [];
+    if (!hasDetectedTexts()) {
+      return [];
+    }
     
     final allEmails = <String>[];
     for (final text in detectedTexts!) {
@@ -167,7 +169,9 @@ class OCRResult extends Equatable {
   /// 
   /// 使用 StringUtils 的 extractPhoneNumbers 方法
   List<String> extractPhoneNumbers() {
-    if (!hasDetectedTexts()) return [];
+    if (!hasDetectedTexts()) {
+      return [];
+    }
     
     final allPhones = <String>[];
     for (final text in detectedTexts!) {

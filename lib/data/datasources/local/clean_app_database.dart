@@ -65,7 +65,9 @@ class CardDao extends DatabaseAccessor<CleanAppDatabase> with _$CardDaoMixin {
   Future<domain.BusinessCard?> getBusinessCardById(int id) async {
     final query = select(businessCards)..where((tbl) => tbl.id.equals(id));
     final result = await query.getSingleOrNull();
-    if (result == null) return null;
+    if (result == null) {
+      return null;
+    }
     return _mapToDomainBusinessCard(result);
   }
 

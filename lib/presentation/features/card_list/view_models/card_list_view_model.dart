@@ -1,11 +1,10 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:freezed_annotation/freezed_annotation.dart';
-
 import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart' as domain;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'card_list_view_model.freezed.dart';
 
@@ -83,7 +82,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         error: null,
       );
       _applyFiltersAndSort();
-    } catch (error) {
+    } on Exception catch (error) {
       final errorMessage = error is Failure 
           ? error.userMessage 
           : error.toString();
@@ -120,7 +119,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         state = state.copyWith(error: '刪除名片失敗');
         return false;
       }
-    } catch (error) {
+    } on Exception catch (error) {
       final errorMessage = error is Failure 
           ? error.userMessage 
           : error.toString();

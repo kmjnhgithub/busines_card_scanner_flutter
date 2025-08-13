@@ -1,13 +1,12 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
-
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/pages/card_list_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/view_models/card_list_view_model.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 
 class MockGetCardsUseCase extends Mock implements GetCardsUseCase {}
 class MockDeleteCardUseCase extends Mock implements DeleteCardUseCase {}

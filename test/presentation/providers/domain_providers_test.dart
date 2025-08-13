@@ -124,9 +124,9 @@ void main() {
 
     group('Provider Lifecycle', () {
       test('should dispose UseCases correctly', () {
-        // Arrange
-        final useCase1 = container.read(getCardsUseCaseProvider);
-        final useCase2 = container.read(createCardFromImageUseCaseProvider);
+        // Arrange - 讀取 providers 以建立依賴
+        container.read(getCardsUseCaseProvider);
+        container.read(createCardFromImageUseCaseProvider);
 
         // Act & Assert - 驗證 dispose 不會拋出異常
         expect(() => container.dispose(), returnsNormally);

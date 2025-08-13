@@ -1,8 +1,8 @@
+import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
+import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
+import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
-import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
-import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 
 /// 應用程式主題配置
 ///

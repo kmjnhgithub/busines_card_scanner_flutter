@@ -142,7 +142,7 @@ class CreateCardFromOCRUseCase {
           autoCleanup: params.autoCleanup,
         ));
         successful.add(result);
-      } catch (e) {
+      } on Exception catch (e) {
         failed.add(CreateCardFromOCRBatchError(
           index: i,
           error: e.toString(),

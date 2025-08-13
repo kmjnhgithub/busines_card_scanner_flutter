@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// 主題化輸入框類型
 enum ThemedTextFieldType {
@@ -329,7 +328,9 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
 
   /// 獲取標籤文字
   String? _getLabelText() {
-    if (widget.label == null) return null;
+    if (widget.label == null) {
+      return null;
+    }
     return widget.required ? '${widget.label} *' : widget.label;
   }
 
@@ -343,7 +344,9 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
 
   /// 獲取鍵盤類型
   TextInputType _getKeyboardType() {
-    if (widget.keyboardType != null) return widget.keyboardType!;
+    if (widget.keyboardType != null) {
+      return widget.keyboardType!;
+    }
 
     switch (widget.type) {
       case ThemedTextFieldType.email:
@@ -375,7 +378,9 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
 
   /// 獲取輸入格式化器
   List<TextInputFormatter>? _getInputFormatters() {
-    if (widget.inputFormatters != null) return widget.inputFormatters;
+    if (widget.inputFormatters != null) {
+      return widget.inputFormatters;
+    }
 
     switch (widget.type) {
       case ThemedTextFieldType.phone:
@@ -413,7 +418,9 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
       }
     }
 
-    if (iconData == null) return null;
+    if (iconData == null) {
+      return null;
+    }
 
     return Icon(
       iconData,

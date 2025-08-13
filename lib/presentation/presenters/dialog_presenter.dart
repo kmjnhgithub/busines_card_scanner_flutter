@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
+import 'package:flutter/material.dart';
 
 /// 對話框類型
 enum DialogType {
@@ -388,7 +387,7 @@ class DialogStyleConfig {
 
 /// 自訂對話框 Widget
 class CustomDialog extends StatelessWidget {
-  const CustomDialog({super.key, required this.config});
+  const CustomDialog({required this.config, super.key});
 
   final DialogConfig config;
 

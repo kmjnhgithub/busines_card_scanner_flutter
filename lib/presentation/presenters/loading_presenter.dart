@@ -1,9 +1,8 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 載入狀態類型
 enum LoadingType {
@@ -66,8 +65,7 @@ class LoadingState {
 
   /// 建立帶進度的載入狀態
   static LoadingState withProgress({
-    String? message,
-    required double progress,
+    required double progress, String? message,
     LoadingType type = LoadingType.normal,
     bool canCancel = false,
     VoidCallback? onCancel,
@@ -84,9 +82,8 @@ class LoadingState {
 
   /// 建立可取消的載入狀態
   static LoadingState cancellable({
-    String? message,
+    required VoidCallback onCancel, String? message,
     LoadingType type = LoadingType.normal,
-    required VoidCallback onCancel,
   }) {
     return LoadingState(
       isLoading: true,
@@ -160,8 +157,7 @@ class LoadingPresenter extends StateNotifier<LoadingState> {
 
   /// 顯示帶進度的載入
   void showWithProgress({
-    String? message,
-    required double progress,
+    required double progress, String? message,
     LoadingType type = LoadingType.normal,
     bool canCancel = false,
     VoidCallback? onCancel,
@@ -177,9 +173,8 @@ class LoadingPresenter extends StateNotifier<LoadingState> {
 
   /// 顯示可取消的載入
   void showCancellable({
-    String? message,
+    required VoidCallback onCancel, String? message,
     LoadingType type = LoadingType.normal,
-    required VoidCallback onCancel,
   }) {
     state = LoadingState.cancellable(
       message: message,
@@ -325,7 +320,7 @@ class LoadingIndicator extends ConsumerWidget {
 
 /// 全螢幕載入覆蓋層 Widget
 class LoadingOverlay extends ConsumerWidget {
-  const LoadingOverlay({super.key, required this.child, this.backgroundColor});
+  const LoadingOverlay({required this.child, super.key, this.backgroundColor});
 
   /// 子 Widget
   final Widget child;
@@ -352,7 +347,7 @@ class LoadingOverlay extends ConsumerWidget {
 
 /// 載入卡片 Widget
 class LoadingCard extends StatelessWidget {
-  const LoadingCard({super.key, required this.loadingState});
+  const LoadingCard({required this.loadingState, super.key});
 
   final LoadingState loadingState;
 
@@ -499,8 +494,7 @@ extension LoadingProviderExtension on WidgetRef {
 
   /// 顯示帶進度的載入
   void showLoadingWithProgress({
-    String? message,
-    required double progress,
+    required double progress, String? message,
     LoadingType type = LoadingType.normal,
     bool canCancel = false,
     VoidCallback? onCancel,
@@ -516,9 +510,8 @@ extension LoadingProviderExtension on WidgetRef {
 
   /// 顯示可取消的載入
   void showCancellableLoading({
-    String? message,
+    required VoidCallback onCancel, String? message,
     LoadingType type = LoadingType.normal,
-    required VoidCallback onCancel,
   }) {
     loading.showCancellable(message: message, type: type, onCancel: onCancel);
   }

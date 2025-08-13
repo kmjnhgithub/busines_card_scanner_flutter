@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
-
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/widgets/card_list_item.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('CardListItem Widget Tests', () {

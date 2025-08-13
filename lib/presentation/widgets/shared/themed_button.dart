@@ -1,7 +1,6 @@
-import 'package:flutter/material.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
+import 'package:flutter/material.dart';
 
 /// 主題化按鈕類型
 enum ThemedButtonType {
@@ -604,7 +603,9 @@ class ThemedButtonGroup extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (children.isEmpty) return const SizedBox.shrink();
+    if (children.isEmpty) {
+      return const SizedBox.shrink();
+    }
 
     final separatedChildren = <Widget>[];
     for (int i = 0; i < children.length; i++) {

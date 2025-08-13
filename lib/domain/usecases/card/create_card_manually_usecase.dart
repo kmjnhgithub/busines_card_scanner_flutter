@@ -154,7 +154,7 @@ class CreateCardManuallyUseCase {
           autoCleanup: params.autoCleanup,
         ));
         successful.add(result);
-      } catch (e) {
+      } on Exception catch (e) {
         failed.add(CreateCardManuallyBatchError(
           index: i,
           error: e.toString(),
@@ -286,7 +286,7 @@ class CreateCardManuallyUseCase {
     try {
       final uri = Uri.parse(url);
       return uri.hasScheme && (uri.scheme == 'http' || uri.scheme == 'https');
-    } catch (e) {
+    } on FormatException {
       return false;
     }
   }

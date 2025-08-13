@@ -131,9 +131,9 @@ void main() {
       });
 
       test('should handle provider disposal correctly', () {
-        // Act
-        final database = container.read(appDatabaseProvider);
-        final storage = container.read(enhancedSecureStorageProvider);
+        // Act - 讀取 providers 以建立依賴
+        container.read(appDatabaseProvider);
+        container.read(enhancedSecureStorageProvider);
         
         // Assert - 驗證 dispose 不會拋出異常
         expect(() => container.dispose(), returnsNormally);

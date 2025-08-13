@@ -462,7 +462,9 @@ class EnhancedSecureStorage {
 
   /// 常數時間比較（防止時序攻擊）
   bool _constantTimeEquals(List<int> a, List<int> b) {
-    if (a.length != b.length) return false;
+    if (a.length != b.length) {
+      return false;
+    }
     
     int result = 0;
     for (int i = 0; i < a.length; i++) {

@@ -50,8 +50,8 @@ void main() {
       });
 
       test('should dispose correctly without memory leaks', () {
-        // Arrange
-        final eventBus = container.read(eventBusProvider);
+        // Arrange - 讀取 provider 以建立依賴
+        container.read(eventBusProvider);
         
         // Act & Assert - should not throw
         expect(() => container.dispose(), returnsNormally);

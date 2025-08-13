@@ -32,7 +32,7 @@ class CardRepositoryImpl implements CardRepository {
       // 嘗試執行簡單查詢來檢查資料庫健康狀態
       await _database.cardDao.getAllBusinessCards();
       return true;
-    } on Exception catch (e) {
+    } on Exception {
       return false;
     }
   }
@@ -332,7 +332,7 @@ class CardRepositoryImpl implements CardRepository {
       try {
         final savedCard = await saveCard(card);
         successful.add(savedCard);
-      } catch (e) {
+      } on Exception catch (e) {
         failed.add(BatchOperationError(
           itemId: card.id,
           error: e.toString(),
@@ -364,7 +364,7 @@ class CardRepositoryImpl implements CardRepository {
             error: 'Card not found',
           ));
         }
-      } catch (e) {
+      } on Exception catch (e) {
         failed.add(BatchOperationError(
           itemId: cardId,
           error: e.toString(),

@@ -1,7 +1,6 @@
 // test/data/repositories/card_repository_impl_test.dart
 
 import 'package:busines_card_scanner_flutter/data/datasources/local/clean_app_database.dart';
-import 'package:drift/drift.dart' hide isNotNull;
 import 'package:busines_card_scanner_flutter/data/repositories/card_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';

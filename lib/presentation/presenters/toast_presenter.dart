@@ -1,9 +1,8 @@
+import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
+import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
+import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
-import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
-import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 
 /// Toast 訊息類型
 enum ToastType {
@@ -246,7 +245,7 @@ class ToastStyleConfig {
 ///
 /// 實際顯示 Toast 訊息的 Widget
 class ToastWidget extends ConsumerWidget {
-  const ToastWidget({super.key, required this.toast, this.onDismiss});
+  const ToastWidget({required this.toast, super.key, this.onDismiss});
 
   /// Toast 訊息
   final ToastMessage toast;
