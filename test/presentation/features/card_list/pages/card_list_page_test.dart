@@ -8,6 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../helpers/test_helpers.dart';
+
 class MockGetCardsUseCase extends Mock implements GetCardsUseCase {}
 
 class MockDeleteCardUseCase extends Mock implements DeleteCardUseCase {}
@@ -86,8 +88,9 @@ void main() {
 
     /// 建立測試用的 Widget
     Widget createTestWidget() {
-      return const ProviderScope(
-        child: MaterialApp(home: CardListPage()),
+      return TestHelpers.createTestWidget(
+        container: container,
+        child: const CardListPage(),
       );
     }
 
@@ -383,23 +386,20 @@ void main() {
 
     group('載入狀態', () {
       testWidgets('初始載入時應該顯示載入指示器', (tester) async {
-        // 設定延遲回應
+        // 設定延遲回應以確保載入狀態持續足夠時間
         when(() => mockGetCardsUseCase.execute(any())).thenAnswer((_) async {
-          await Future.delayed(const Duration(milliseconds: 500));
+          await Future.delayed(TestDelays.medium);
           return testCards;
         });
 
         await tester.pumpWidget(createTestWidget());
 
-        // 讓初始幀渲染完成
-        await tester.pump();
+        // 測試載入狀態 - 使用輔助函數避免超時
+        await TestHelpers.testLoadingState(tester);
 
         // 檢查載入狀態（應該有載入指示器或載入中文字）
-        final hasLoadingIndicator = find
-            .byType(CircularProgressIndicator)
-            .evaluate()
-            .isNotEmpty;
-        final hasLoadingText = find.text('載入中...').evaluate().isNotEmpty;
+        final hasLoadingIndicator = TestFinders.loadingIndicator().evaluate().isNotEmpty;
+        final hasLoadingText = TestFinders.loadingText().evaluate().isNotEmpty;
 
         expect(
           hasLoadingIndicator || hasLoadingText,
@@ -407,11 +407,26 @@ void main() {
           reason: 'Should show either loading indicator or loading text',
         );
 
-        // 等待載入完成
-        await tester.pumpAndSettle();
+        // 使用帶超時保護的等待
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 載入完成後應該顯示內容
         expect(find.text('張三'), findsOneWidget);
+      });
+
+      testWidgets('載入失敗時應該顯示錯誤訊息', (tester) async {
+        // 設定失敗回應
+        when(() => mockGetCardsUseCase.execute(any())).thenThrow(
+          Exception('載入失敗'),
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        
+        // 使用帶超時保護的等待
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
+
+        // 應該顯示錯誤訊息
+        expect(TestFinders.errorMessage('Exception: 載入失敗'), findsOneWidget);
       });
     });
   });
