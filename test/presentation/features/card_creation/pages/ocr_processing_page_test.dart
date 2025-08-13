@@ -6,7 +6,6 @@ import 'package:busines_card_scanner_flutter/presentation/features/card_creation
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/ocr_processing_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/loading_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
-import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -86,7 +85,7 @@ void main() {
       testWidgets('初始狀態下應該顯示圖片載入', (WidgetTester tester) async {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
-          processingStep: OCRProcessingStep.idle,
+          
         );
 
         // Act
@@ -102,7 +101,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
           processingStep: OCRProcessingStep.imageLoaded,
-          imageData: null,
         );
 
         // Act
@@ -118,7 +116,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
           processingStep: OCRProcessingStep.ocrProcessing,
-          imageData: null,
         );
 
         // Act
@@ -134,7 +131,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -152,7 +148,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.aiProcessing,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -169,7 +164,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.completed,
-          imageData: null,
           ocrResult: testOCRResult,
           parsedCard: testBusinessCard,
         );
@@ -189,7 +183,6 @@ void main() {
         // Arrange
         const errorMessage = 'OCR 處理失敗';
         mockOCRProcessingViewModel.state = const OCRProcessingState(
-          processingStep: OCRProcessingStep.idle,
           error: errorMessage,
         );
 
@@ -207,7 +200,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
           processingStep: OCRProcessingStep.ocrProcessing,
-          imageData: null,
         );
 
         // Act
@@ -232,7 +224,6 @@ void main() {
         );
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: lowConfidenceOCR,
           confidence: 0.85,
         );
@@ -252,7 +243,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
           processingStep: OCRProcessingStep.imageLoaded,
-          imageData: null,
         );
 
         // Act
@@ -270,7 +260,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
           confidence: 0.85,
         );
@@ -290,7 +279,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -310,7 +298,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -333,7 +320,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -352,7 +338,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -373,7 +358,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.completed,
-          imageData: null,
           ocrResult: testOCRResult,
           parsedCard: testBusinessCard,
         );
@@ -393,8 +377,6 @@ void main() {
       testWidgets('錯誤狀態下點擊重試按鈕應該重新開始處理', (WidgetTester tester) async {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
-          processingStep: OCRProcessingStep.idle,
-          imageData: null,
           error: 'OCR 處理失敗',
         );
 
@@ -415,7 +397,6 @@ void main() {
         // Arrange - OCR 處理中
         mockOCRProcessingViewModel.state = const OCRProcessingState(
           processingStep: OCRProcessingStep.ocrProcessing,
-          imageData: null,
         );
 
         // Act
@@ -428,7 +409,6 @@ void main() {
         // Arrange - 更新為 AI 處理中
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.aiProcessing,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -443,7 +423,6 @@ void main() {
         // Arrange - 非編輯狀態
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -458,7 +437,6 @@ void main() {
         // Arrange - 編輯狀態
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
         );
 
@@ -474,7 +452,6 @@ void main() {
         // Arrange - 無警告
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
           confidence: 0.5,
         );
@@ -489,7 +466,6 @@ void main() {
         // Arrange - 顯示警告
         mockOCRProcessingViewModel.state = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrCompleted,
-          imageData: null,
           ocrResult: testOCRResult,
           confidence: 0.85,
         );
@@ -508,7 +484,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
           processingStep: OCRProcessingStep.imageLoaded,
-          imageData: null,
         );
 
         // Act
@@ -524,7 +499,6 @@ void main() {
         // Arrange
         mockOCRProcessingViewModel.state = const OCRProcessingState(
           processingStep: OCRProcessingStep.imageLoaded,
-          imageData: null,
         );
 
         // Act
@@ -540,9 +514,8 @@ void main() {
 
       testWidgets('處理中狀態應該禁用返回按鈕', (WidgetTester tester) async {
         // Arrange
-        final processingState = const OCRProcessingState(
+        const processingState = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrProcessing,
-          imageData: null,
         );
 
         // Act
@@ -564,7 +537,6 @@ void main() {
         // Arrange
         final completedState = OCRProcessingState(
           processingStep: OCRProcessingStep.completed,
-          imageData: null,
           parsedCard: testBusinessCard,
         );
 
@@ -581,9 +553,8 @@ void main() {
 
       testWidgets('進度指示器應該有語義描述', (WidgetTester tester) async {
         // Arrange
-        final processingState = const OCRProcessingState(
+        const processingState = OCRProcessingState(
           processingStep: OCRProcessingStep.ocrProcessing,
-          imageData: null,
         );
 
         // Act

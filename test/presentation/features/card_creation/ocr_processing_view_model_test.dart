@@ -106,9 +106,6 @@ void main() {
 
     group('初始化狀態', () {
       test('初始狀態應該正確設定', () {
-        final viewModel = container.read(
-          ocrProcessingViewModelProvider.notifier,
-        );
         final state = container.read(ocrProcessingViewModelProvider);
 
         expect(state.imageData, isNull);

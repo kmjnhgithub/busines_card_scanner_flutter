@@ -179,7 +179,6 @@ class AppDimensions {
       color: Color(0x0A000000),
       offset: Offset(0, 1),
       blurRadius: 2,
-      spreadRadius: 0,
     ),
   ];
 
@@ -189,7 +188,6 @@ class AppDimensions {
       color: Color(0x14000000),
       offset: Offset(0, 2),
       blurRadius: 8,
-      spreadRadius: 0,
     ),
   ];
 
@@ -199,7 +197,6 @@ class AppDimensions {
       color: Color(0x1F000000),
       offset: Offset(0, 4),
       blurRadius: 16,
-      spreadRadius: 0,
     ),
   ];
 
@@ -209,7 +206,6 @@ class AppDimensions {
       color: Color(0x29000000),
       offset: Offset(0, 8),
       blurRadius: 24,
-      spreadRadius: 0,
     ),
   ];
 

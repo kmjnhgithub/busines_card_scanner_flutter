@@ -36,7 +36,7 @@ void main() {
         company: '公司A',
         email: 'zhang@companya.com',
         phone: '0912345678',
-        createdAt: DateTime(2024, 1, 1),
+        createdAt: DateTime(2024),
       ),
       BusinessCard(
         id: '2',
@@ -86,9 +86,8 @@ void main() {
 
     /// 建立測試用的 Widget
     Widget createTestWidget() {
-      return ProviderScope(
-        overrides: [],
-        child: MaterialApp(home: const CardListPage()),
+      return const ProviderScope(
+        child: MaterialApp(home: CardListPage()),
       );
     }
 

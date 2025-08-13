@@ -137,7 +137,6 @@ void main() {
                         ToastHelper.showSnackBar(
                           context,
                           'Info message',
-                          type: ToastType.info,
                         );
                       },
                       child: const Text('Show Info'),
@@ -271,7 +270,6 @@ void main() {
                         ToastHelper.showSnackBar(
                           context,
                           'Custom message',
-                          type: ToastType.info,
                           duration: const Duration(milliseconds: 100),
                         );
                       },
@@ -305,7 +303,6 @@ void main() {
                         ToastHelper.showSnackBar(
                           context,
                           'Temporary message',
-                          type: ToastType.info,
                           duration: const Duration(milliseconds: 100),
                         );
                       },

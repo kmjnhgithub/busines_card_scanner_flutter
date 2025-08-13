@@ -413,18 +413,8 @@ void main() {
       });
 
       test('should reject whitespace-only OCR text', () async {
-        // Arrange - OCRResult 會在建構時就驗證，所以我們直接測試 UseCase 的驗證
-        // 使用一個有效的 OCR 但 rawText 被修改的方式來測試
-        final validOCR = OCRResult(
-          id: 'whitespace-ocr',
-          rawText: 'valid text', // 先用有效文字建立
-          confidence: 0.8,
-          processingTimeMs: 1000,
-          processedAt: DateTime.now(),
-        );
-
-        // 使用反射或直接測試 UseCase 內部的驗證邏輯
-        // 因為 OCRResult 已經有安全驗證，我們測試 UseCase 對空文字的處理
+        // Arrange - 測試 UseCase 對空文字內容的處理
+        // OCRResult 本身已有驗證，我們直接測試 UseCase 內部的邏輯
 
         // Act & Assert - 測試 UseCase 本身對空文字的處理
         expect(

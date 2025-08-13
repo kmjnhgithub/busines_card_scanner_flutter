@@ -514,7 +514,6 @@ void main() {
               ),
             );
           } catch (e) {
-            print('詳細錯誤: $e');
             rethrow;
           }
 
@@ -680,11 +679,6 @@ void main() {
 
       test('should preprocess image when enabled', () async {
         // Arrange - 啟用圖片預處理
-        final preprocessedData = Uint8List.fromList([
-          0xFF, 0xD8, 0xFF, 0xE0, // JPEG header
-          ...List.filled(800, 0x01), // 模擬預處理後的圖片
-        ]);
-
         // Mock 預處理結果
         mockOCRRepository.setMockOCRResult(
           OCRResult(
@@ -819,12 +813,7 @@ void main() {
       });
 
       test('should validate and sanitize AI results', () async {
-        // Arrange - AI 回傳需要清理的資料
-        final unsafeRawData = {
-          'name': '<script>alert("XSS")</script>王大明',
-          'email': 'javascript:alert("hack")@evil.com',
-          'phone': '02-1234-<img src=x onerror=alert(1)>5678',
-        };
+        // Arrange - AI 處理含有危險內容的原始資料並回傳清理後結果
 
         final safeParsedData = ParsedCardData(
           name: '王大明', // 已清理
@@ -850,9 +839,7 @@ void main() {
       });
 
       test('should track detailed processing metrics', () async {
-        // Arrange - 設定各階段處理時間
-        final startTime = DateTime.now();
-
+        // Arrange - 執行帶有指標追蹤的處理
         final result = await useCase.execute(
           CreateCardFromImageParams(
             imageData: testImageData,

@@ -169,15 +169,9 @@ class AppTheme {
     primaryContainer: AppColors.primaryVariant,
     secondary: AppColors.secondary,
     secondaryContainer: AppColors.secondaryVariant,
-    surface: AppColors.surface,
-    background: AppColors.background,
     error: AppColors.error,
-    onPrimary: Colors.white,
     onSecondary: Colors.white,
     onSurface: AppColors.primaryText,
-    onBackground: AppColors.primaryText,
-    onError: Colors.white,
-    brightness: Brightness.light,
   );
 
   // ==================== 深色主題色彩方案 ====================
@@ -188,14 +182,10 @@ class AppTheme {
     secondary: AppColors.secondary,
     secondaryContainer: AppColors.secondaryVariant,
     surface: AppColors.surfaceDark,
-    background: AppColors.backgroundDark,
     error: AppColors.error,
     onPrimary: Colors.white,
     onSecondary: Colors.white,
-    onSurface: AppColors.primaryTextDark,
-    onBackground: AppColors.primaryTextDark,
     onError: Colors.white,
-    brightness: Brightness.dark,
   );
 
   // ==================== 文字主題 ====================
@@ -463,7 +453,6 @@ class AppTheme {
         disabledForegroundColor: AppColors.disabledText,
         side: const BorderSide(
           color: AppColors.primary,
-          width: AppDimensions.borderMedium,
         ),
         padding: AppDimensions.paddingButton,
         minimumSize: const Size(0, AppDimensions.buttonHeightMedium),
@@ -482,7 +471,6 @@ class AppTheme {
         disabledForegroundColor: AppColors.disabledTextDark,
         side: const BorderSide(
           color: AppColors.primary,
-          width: AppDimensions.borderMedium,
         ),
         padding: AppDimensions.paddingButton,
         minimumSize: const Size(0, AppDimensions.buttonHeightMedium),
@@ -667,8 +655,8 @@ class AppTheme {
       backgroundColor: AppColors.cardBackground,
       surfaceTintColor: AppColors.cardBackground,
       indicatorColor: AppColors.primary.withValues(alpha: 0.12),
-      labelTextStyle: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return AppTextStyles.withColor(
             AppTextStyles.labelSmall,
             AppColors.primary,
@@ -679,8 +667,8 @@ class AppTheme {
           AppColors.secondaryText,
         );
       }),
-      iconTheme: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: AppColors.primary);
         }
         return const IconThemeData(color: AppColors.secondaryText);
@@ -693,8 +681,8 @@ class AppTheme {
       backgroundColor: AppColors.cardBackgroundDark,
       surfaceTintColor: AppColors.cardBackgroundDark,
       indicatorColor: AppColors.primary.withValues(alpha: 0.12),
-      labelTextStyle: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      labelTextStyle: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return AppTextStyles.withColor(
             AppTextStyles.labelSmall,
             AppColors.primary,
@@ -705,8 +693,8 @@ class AppTheme {
           AppColors.secondaryTextDark,
         );
       }),
-      iconTheme: MaterialStateProperty.resolveWith((states) {
-        if (states.contains(MaterialState.selected)) {
+      iconTheme: WidgetStateProperty.resolveWith((states) {
+        if (states.contains(WidgetState.selected)) {
           return const IconThemeData(color: AppColors.primary);
         }
         return const IconThemeData(color: AppColors.secondaryTextDark);

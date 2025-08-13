@@ -251,24 +251,12 @@ void main() {
               .toList();
 
           for (final featureDir in featureDirs) {
-            final featureName = featureDir.path.split('/').last;
+            // final featureName = featureDir.path.split('/').last;
 
-            // 檢查基本資料夾結構
-            final expectedSubdirs = [
-              'pages',
-              'view_models',
-              'widgets',
-              'providers',
-            ];
-
-            for (final expectedSubdir in expectedSubdirs) {
-              final subdirPath = '${featureDir.path}/$expectedSubdir';
-              // 只有當功能模組存在時才檢查（目前可能還沒有功能模組）
-              if (featureDir.listSync().isNotEmpty) {
-                // TODO: 當功能模組實作時啟用此檢查
-                // expect(Directory(subdirPath).existsSync(), isTrue,
-                //     reason: 'Feature $featureName should have $expectedSubdir directory');
-              }
+            // TODO: 當功能模組實作時啟用基本資料夾結構檢查
+            // 預期的子目錄包括: 'pages', 'view_models', 'widgets', 'providers'
+            if (featureDir.listSync().isNotEmpty) {
+              // TODO: 當功能模組實作時檢查子目錄結構
             }
           }
         }
@@ -277,12 +265,12 @@ void main() {
 
     group('Dependency Injection Rules', () {
       test('Repository interfaces should be in Domain layer', () {
-        final repositoryInterfaces = fileImports.keys
-            .where(
-              (file) =>
-                  file.contains('repository') && file.contains('/domain/'),
-            )
-            .toList();
+        // final repositoryInterfaces = fileImports.keys
+        //     .where(
+        //       (file) =>
+        //           file.contains('repository') && file.contains('/domain/'),
+        //     )
+        //     .toList();
 
         // 目前還沒有 repository 實作，這個測試將在後續 Phase 中生效
         // expect(repositoryInterfaces.isNotEmpty, isTrue,
@@ -290,14 +278,14 @@ void main() {
       });
 
       test('Repository implementations should be in Data layer', () {
-        final repositoryImpls = fileImports.keys
-            .where(
-              (file) =>
-                  file.contains('repository') &&
-                  file.contains('/data/') &&
-                  file.contains('_impl'),
-            )
-            .toList();
+        // final repositoryImpls = fileImports.keys
+        //     .where(
+        //       (file) =>
+        //           file.contains('repository') &&
+        //           file.contains('/data/') &&
+        //           file.contains('_impl'),
+        //     )
+        //     .toList();
 
         // 目前還沒有 repository 實作，這個測試將在後續 Phase 中生效
         // expect(repositoryImpls.isNotEmpty, isTrue,

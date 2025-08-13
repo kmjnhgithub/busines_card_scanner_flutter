@@ -59,9 +59,8 @@ class LoadingState {
   static const LoadingState idle = LoadingState(isLoading: false);
 
   /// 建立基本載入狀態
-  const LoadingState.loading([String? message])
+  const LoadingState.loading([this.message])
       : isLoading = true,
-        message = message,
         type = LoadingType.normal,
         progress = null,
         canCancel = false,

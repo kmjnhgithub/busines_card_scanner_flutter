@@ -115,7 +115,6 @@ class ThemedCard extends StatelessWidget {
               color: enabled
                   ? actualBorderColor
                   : AppColors.withOpacity(actualBorderColor, 0.3),
-              width: AppDimensions.borderMedium,
             )
           : null,
       boxShadow: showShadow && enabled ? config.shadows : null,
@@ -253,7 +252,6 @@ class BusinessCardPreviewCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ThemedCard(
-      size: ThemedCardSize.medium,
       onTap: onTap,
       onLongPress: onLongPress,
       isLoading: isLoading,
@@ -329,7 +327,6 @@ class StatsCard extends StatelessWidget {
     final theme = Theme.of(context);
 
     return ThemedCard(
-      size: ThemedCardSize.medium,
       onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

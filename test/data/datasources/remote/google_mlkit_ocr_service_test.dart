@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
 import 'package:busines_card_scanner_flutter/core/services/security_service.dart';
@@ -8,7 +7,6 @@ import 'package:busines_card_scanner_flutter/data/datasources/remote/google_mlki
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 import 'package:dartz/dartz.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image/image.dart' as img;
@@ -59,7 +57,6 @@ Uint8List _createValidTestImageData({
     width: width,
     height: height,
     format: format,
-    numChannels: 3,
   );
   
   // 填充一些顏色以模擬真實圖像內容
@@ -87,8 +84,6 @@ Uint8List _createValidJpegTestImageData({
   final image = img.Image(
     width: width,
     height: height,
-    format: img.Format.uint8,
-    numChannels: 3,
   );
   
   // 填充藍色背景以模擬名片
@@ -282,7 +277,7 @@ void main() {
         // Arrange - 創建一個超過20MB的圖像資料（按照bytes計算，不是實際解析）
         final oversizedData = Uint8List(25 * 1024 * 1024); // 25MB
         // 添加有效的 JPEG 標頭以通過格式檢查
-        final validJpegHeader = _createValidJpegTestImageData(width: 100, height: 100);
+        final validJpegHeader = _createValidJpegTestImageData();
         oversizedData.setRange(0, validJpegHeader.length, validJpegHeader);
 
         // Act & Assert
@@ -698,7 +693,7 @@ void main() {
           // 直接拋出 TimeoutException 來模擬超時情況
           when(
             () => mockTextRecognizer.processImage(any()),
-          ).thenThrow(TimeoutException('OCR 處理超時', Duration(seconds: 30)));
+          ).thenThrow(TimeoutException('OCR 處理超時', const Duration(seconds: 30)));
 
           // Act & Assert
           await expectLater(

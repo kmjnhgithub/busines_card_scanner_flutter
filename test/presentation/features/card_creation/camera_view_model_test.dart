@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
@@ -7,7 +6,6 @@ import 'package:busines_card_scanner_flutter/presentation/presenters/loading_pre
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart';
 import 'package:camera/camera.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -34,8 +32,8 @@ void main() {
 
     // 測試資料
     final testImageData = Uint8List.fromList([1, 2, 3, 4, 5]);
-    final testImagePath = '/test/path/image.jpg';
-    final mockCameraDescription = const CameraDescription(
+    const testImagePath = '/test/path/image.jpg';
+    const mockCameraDescription = CameraDescription(
       name: 'mock_camera',
       lensDirection: CameraLensDirection.back,
       sensorOrientation: 0,
@@ -69,7 +67,6 @@ void main() {
 
     group('相機初始化', () {
       test('初始狀態應該正確設定', () {
-        final viewModel = container.read(cameraViewModelProvider.notifier);
         final state = container.read(cameraViewModelProvider);
 
         expect(state.cameraController, isNull);
@@ -85,7 +82,7 @@ void main() {
           () => mockCameraController.initialize(),
         ).thenAnswer((_) async => Future.value());
         when(() => mockCameraController.value).thenReturn(
-          CameraValue(
+          const CameraValue(
             isInitialized: true,
             isRecordingVideo: false,
             isRecordingPaused: false,
@@ -147,13 +144,13 @@ void main() {
         final mockXFile = MockXFile();
         when(() => mockXFile.path).thenReturn(testImagePath);
         when(
-          () => mockXFile.readAsBytes(),
+          mockXFile.readAsBytes,
         ).thenAnswer((_) async => testImageData);
         when(
           () => mockCameraController.takePicture(),
         ).thenAnswer((_) async => mockXFile);
         when(() => mockCameraController.value).thenReturn(
-          CameraValue(
+          const CameraValue(
             isInitialized: true,
             isRecordingVideo: false,
             isRecordingPaused: false,
@@ -196,7 +193,7 @@ void main() {
       test('拍照失敗時應該設定錯誤狀態', () async {
         // Arrange
         when(() => mockCameraController.value).thenReturn(
-          CameraValue(
+          const CameraValue(
             isInitialized: true,
             isRecordingVideo: false,
             isRecordingPaused: false,
@@ -246,7 +243,6 @@ void main() {
           ocrResult: mockOCRResult,
           processingSteps: ['OCR 處理完成'],
           warnings: [],
-          metrics: null,
         );
         when(
           () => mockProcessImageUseCase.execute(any()),
@@ -288,7 +284,7 @@ void main() {
       test('切換閃光燈模式應該更新狀態', () async {
         // Arrange
         when(() => mockCameraController.value).thenReturn(
-          CameraValue(
+          const CameraValue(
             isInitialized: true,
             isRecordingVideo: false,
             isRecordingPaused: false,
@@ -360,7 +356,7 @@ void main() {
         // Arrange
         const offset = Offset(0.5, 0.5);
         when(() => mockCameraController.value).thenReturn(
-          CameraValue(
+          const CameraValue(
             isInitialized: true,
             isRecordingVideo: false,
             isRecordingPaused: false,

@@ -15,7 +15,7 @@ void main() {
       phone: '0912345678',
       address: '台北市信義區',
       website: 'https://www.tech.com',
-      createdAt: DateTime(2024, 1, 1),
+      createdAt: DateTime(2024),
     );
 
     final minimumCard = BusinessCard(
@@ -139,7 +139,7 @@ void main() {
 
       testWidgets('onMoreActions = null 時不應該顯示更多按鈕', (tester) async {
         await tester.pumpWidget(
-          createTestWidget(card: testCard, onMoreActions: null),
+          createTestWidget(card: testCard),
         );
 
         expect(find.byIcon(Icons.more_vert), findsNothing);

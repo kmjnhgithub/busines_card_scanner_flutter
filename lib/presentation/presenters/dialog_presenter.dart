@@ -299,7 +299,6 @@ class DialogPresenter {
         title: title,
         content: content,
         type: DialogType.warning,
-        barrierDismissible: true,
         buttons: [
           DialogButton(
             text: cancelText ?? '取消',

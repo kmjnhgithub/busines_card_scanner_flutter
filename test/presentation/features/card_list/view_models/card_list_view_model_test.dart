@@ -49,7 +49,6 @@ void main() {
     group('初始狀態', () {
       test('應該有正確的初始狀態', () {
         // Act
-        final viewModel = container.read(cardListViewModelProvider.notifier);
         final state = container.read(cardListViewModelProvider);
 
         // Assert
@@ -72,8 +71,8 @@ void main() {
           jobTitle: '經理',
           email: 'zhang@example.com',
           phone: '0912345678',
-          createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
         ),
         BusinessCard(
           id: '2',
@@ -390,8 +389,8 @@ void main() {
           jobTitle: '經理',
           email: 'zhang@example.com',
           phone: '0912345678',
-          createdAt: DateTime(2024, 1, 1),
-          updatedAt: DateTime(2024, 1, 1),
+          createdAt: DateTime(2024),
+          updatedAt: DateTime(2024),
         ),
         BusinessCard(
           id: '2',
@@ -454,7 +453,7 @@ void main() {
         final state = container.read(cardListViewModelProvider);
         expect(
           state.filteredCards.first.createdAt,
-          equals(DateTime(2024, 1, 1)),
+          equals(DateTime(2024)),
         );
         expect(
           state.filteredCards.last.createdAt,

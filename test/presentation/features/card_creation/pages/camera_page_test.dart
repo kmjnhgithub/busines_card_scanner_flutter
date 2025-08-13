@@ -1,11 +1,8 @@
-import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/camera_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/camera_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/loading_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
-import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -37,7 +34,7 @@ void main() {
     late MockNavigatorObserver mockNavigatorObserver;
 
     // 測試資料
-    final mockCameraDescription = const CameraDescription(
+    const mockCameraDescription = CameraDescription(
       name: 'test_camera',
       lensDirection: CameraLensDirection.back,
       sensorOrientation: 0,
@@ -52,7 +49,7 @@ void main() {
 
       // 設定基本的相機控制器 value
       when(() => mockCameraController.value).thenReturn(
-        CameraValue(
+        const CameraValue(
           isInitialized: true,
           isRecordingVideo: false,
           isRecordingPaused: false,
@@ -136,7 +133,6 @@ void main() {
         const errorMessage = '相機初始化失敗';
         mockCameraViewModel.state = const CameraState(
           error: errorMessage,
-          isLoading: false,
         );
 
         // Act
@@ -170,7 +166,6 @@ void main() {
         mockCameraViewModel.state = CameraState(
           isInitialized: true,
           cameraController: mockCameraController,
-          flashMode: FlashMode.auto,
         );
 
         // Act
@@ -290,7 +285,6 @@ void main() {
         // Arrange
         mockCameraViewModel.state = const CameraState(
           error: '相機錯誤',
-          isLoading: false,
         );
 
         // Act

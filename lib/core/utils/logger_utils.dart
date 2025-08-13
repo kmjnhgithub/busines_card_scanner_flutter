@@ -15,10 +15,10 @@ class LoggerUtils {
   LoggerUtils._();
 
   /// 當前日誌等級（生產環境建議設為 info 以上）
-  static LogLevel _currentLevel = LogLevel.debug;
+  static LogLevel logLevel = LogLevel.debug;
 
   /// 是否啟用日誌記錄
-  static bool _isEnabled = true;
+  static bool enabled = true;
 
   /// 敏感關鍵字列表（會被自動遮蔽）
   static final List<String> _sensitiveKeywords = [
@@ -33,21 +33,6 @@ class LoggerUtils {
     'apikey',
   ];
 
-  /// 獲取目前日誌等級
-  static LogLevel get logLevel => _currentLevel;
-
-  /// 設定日誌等級
-  static set logLevel(LogLevel level) {
-    _currentLevel = level;
-  }
-
-  /// 獲取是否啟用日誌
-  static bool get enabled => _isEnabled;
-
-  /// 啟用/停用日誌記錄
-  static set enabled(bool isEnabled) {
-    _isEnabled = isEnabled;
-  }
 
   /// Debug 日誌
   static void debug(
@@ -171,7 +156,7 @@ class LoggerUtils {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    if (!_isEnabled || level.index < _currentLevel.index) {
+    if (!enabled || level.index < logLevel.index) {
       return;
     }
 

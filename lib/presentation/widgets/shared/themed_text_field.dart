@@ -507,7 +507,7 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
     final config = _getTextFieldConfig(widget.size);
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(config.borderRadius),
-      borderSide: BorderSide(color: color, width: AppDimensions.borderMedium),
+      borderSide: BorderSide(color: color),
     );
   }
 
@@ -515,48 +515,48 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
   _TextFieldConfig _getTextFieldConfig(ThemedTextFieldSize size) {
     switch (size) {
       case ThemedTextFieldSize.small:
-        return _TextFieldConfig(
+        return const _TextFieldConfig(
           height: AppDimensions.textFieldHeightSmall,
           contentPadding: EdgeInsets.symmetric(
             horizontal: AppDimensions.space3,
             vertical: AppDimensions.space2,
           ),
           borderRadius: AppDimensions.radiusSmall,
-          textStyle: const TextStyle(fontSize: 14),
-          labelStyle: const TextStyle(fontSize: 12),
-          hintStyle: const TextStyle(fontSize: 14),
-          helperStyle: const TextStyle(fontSize: 11),
-          errorStyle: const TextStyle(fontSize: 11),
-          counterStyle: const TextStyle(fontSize: 11),
+          textStyle: TextStyle(fontSize: 14),
+          labelStyle: TextStyle(fontSize: 12),
+          hintStyle: TextStyle(fontSize: 14),
+          helperStyle: TextStyle(fontSize: 11),
+          errorStyle: TextStyle(fontSize: 11),
+          counterStyle: TextStyle(fontSize: 11),
         );
 
       case ThemedTextFieldSize.medium:
-        return _TextFieldConfig(
+        return const _TextFieldConfig(
           height: AppDimensions.textFieldHeight,
           contentPadding: AppDimensions.paddingTextField,
           borderRadius: AppDimensions.radiusMedium,
-          textStyle: const TextStyle(fontSize: 16),
-          labelStyle: const TextStyle(fontSize: 14),
-          hintStyle: const TextStyle(fontSize: 16),
-          helperStyle: const TextStyle(fontSize: 12),
-          errorStyle: const TextStyle(fontSize: 12),
-          counterStyle: const TextStyle(fontSize: 12),
+          textStyle: TextStyle(fontSize: 16),
+          labelStyle: TextStyle(fontSize: 14),
+          hintStyle: TextStyle(fontSize: 16),
+          helperStyle: TextStyle(fontSize: 12),
+          errorStyle: TextStyle(fontSize: 12),
+          counterStyle: TextStyle(fontSize: 12),
         );
 
       case ThemedTextFieldSize.large:
-        return _TextFieldConfig(
+        return const _TextFieldConfig(
           height: AppDimensions.textFieldHeightLarge,
           contentPadding: EdgeInsets.symmetric(
             horizontal: AppDimensions.space5,
             vertical: AppDimensions.space4,
           ),
           borderRadius: AppDimensions.radiusLarge,
-          textStyle: const TextStyle(fontSize: 18),
-          labelStyle: const TextStyle(fontSize: 16),
-          hintStyle: const TextStyle(fontSize: 18),
-          helperStyle: const TextStyle(fontSize: 14),
-          errorStyle: const TextStyle(fontSize: 14),
-          counterStyle: const TextStyle(fontSize: 14),
+          textStyle: TextStyle(fontSize: 18),
+          labelStyle: TextStyle(fontSize: 16),
+          hintStyle: TextStyle(fontSize: 18),
+          helperStyle: TextStyle(fontSize: 14),
+          errorStyle: TextStyle(fontSize: 14),
+          counterStyle: TextStyle(fontSize: 14),
         );
     }
   }
@@ -606,7 +606,6 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
         );
 
       case ThemedTextFieldValidationState.normal:
-      default:
         return baseColors;
     }
   }

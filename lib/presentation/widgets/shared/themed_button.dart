@@ -136,7 +136,7 @@ class ThemedButton extends StatelessWidget {
     final colorScheme = _getColorScheme(context, type);
 
     // 建立按鈕內容
-    Widget buttonContent = _buildButtonContent(context, config, colorScheme);
+    final Widget buttonContent = _buildButtonContent(context, config, colorScheme);
 
     // 建立按鈕
     Widget button = _buildButton(context, config, colorScheme, buttonContent);
@@ -153,7 +153,7 @@ class ThemedButton extends StatelessWidget {
 
     // 添加提示文字
     if (tooltip != null) {
-      button = Tooltip(message: tooltip!, child: button);
+      button = Tooltip(message: tooltip, child: button);
     }
 
     // 添加語義標籤
@@ -275,7 +275,6 @@ class ThemedButton extends StatelessWidget {
             foregroundColor: foregroundColor ?? colorScheme.foreground,
             side: BorderSide(
               color: borderColor ?? colorScheme.border,
-              width: AppDimensions.borderMedium,
             ),
             padding: actualPadding,
             shape: RoundedRectangleBorder(
@@ -325,11 +324,11 @@ class ThemedButton extends StatelessWidget {
       case ThemedButtonSize.small:
         return const _ButtonConfig(
           height: AppDimensions.buttonHeightSmall,
-          padding: const EdgeInsets.symmetric(
+          padding: EdgeInsets.symmetric(
             horizontal: AppDimensions.space3,
             vertical: AppDimensions.space1,
           ),
-          textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+          textStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
           iconSize: AppDimensions.iconSmall,
           borderRadius: AppDimensions.radiusSmall,
           elevation: 1,
@@ -341,7 +340,7 @@ class ThemedButton extends StatelessWidget {
         return const _ButtonConfig(
           height: AppDimensions.buttonHeightMedium,
           padding: AppDimensions.paddingButton,
-          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+          textStyle: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           iconSize: AppDimensions.iconMedium,
           borderRadius: AppDimensions.radiusMedium,
           elevation: 2,
@@ -356,7 +355,7 @@ class ThemedButton extends StatelessWidget {
             horizontal: AppDimensions.space8,
             vertical: AppDimensions.space4,
           ),
-          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           iconSize: AppDimensions.iconLarge,
           borderRadius: AppDimensions.radiusLarge,
           elevation: 3,
@@ -365,13 +364,13 @@ class ThemedButton extends StatelessWidget {
         );
 
       case ThemedButtonSize.extraLarge:
-        return _ButtonConfig(
+        return const _ButtonConfig(
           height: AppDimensions.buttonHeightExtraLarge,
           padding: EdgeInsets.symmetric(
             horizontal: AppDimensions.space10,
             vertical: AppDimensions.space5,
           ),
-          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          textStyle: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           iconSize: AppDimensions.iconLarge,
           borderRadius: AppDimensions.radiusLarge,
           elevation: 4,
@@ -391,7 +390,7 @@ class ThemedButton extends StatelessWidget {
 
     switch (type) {
       case ThemedButtonType.primary:
-        return _ButtonColorScheme(
+        return const _ButtonColorScheme(
           background: AppColors.primary,
           foreground: Colors.white,
           border: AppColors.primary,
@@ -409,7 +408,7 @@ class ThemedButton extends StatelessWidget {
         );
 
       case ThemedButtonType.outline:
-        return _ButtonColorScheme(
+        return const _ButtonColorScheme(
           background: Colors.transparent,
           foreground: AppColors.primary,
           border: AppColors.primary,
@@ -417,7 +416,7 @@ class ThemedButton extends StatelessWidget {
         );
 
       case ThemedButtonType.text:
-        return _ButtonColorScheme(
+        return const _ButtonColorScheme(
           background: Colors.transparent,
           foreground: AppColors.primary,
           border: Colors.transparent,
@@ -529,7 +528,6 @@ class DangerButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ThemedButton(
       text: text,
-      type: ThemedButtonType.primary,
       size: size,
       onPressed: onPressed,
       isLoading: isLoading,
@@ -561,7 +559,6 @@ class SuccessButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ThemedButton(
       text: text,
-      type: ThemedButtonType.primary,
       size: size,
       onPressed: onPressed,
       isLoading: isLoading,
