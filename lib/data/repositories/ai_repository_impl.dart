@@ -48,7 +48,7 @@ class AIRepositoryImpl implements AIRepository {
           hints: hints,
         );
         successful.add(result);
-      } catch (e) {
+      } on Exception catch (e) {
         failed.add(BatchParseError(
           index: i,
           error: e.toString(),
@@ -116,10 +116,10 @@ class AIRepositoryImpl implements AIRepository {
         quotaResetAt: DateTime.now().add(const Duration(hours: 24)),
         checkedAt: DateTime.now(),
       );
-    } catch (e) {
+    } on Exception catch (e) {
       return AIServiceStatus(
         isAvailable: false,
-        error: 'Service unavailable',
+        error: 'Service unavailable: ${e.toString()}',
         responseTimeMs: 0,
         remainingQuota: 0,
         quotaResetAt: DateTime.now().add(const Duration(hours: 24)),

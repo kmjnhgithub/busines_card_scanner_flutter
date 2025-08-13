@@ -342,7 +342,7 @@ class LoadingOverlay extends ConsumerWidget {
         child,
         if (loadingState.isLoading)
           Container(
-            color: backgroundColor ?? AppColors.scannerOverlay.withOpacity(0.5),
+            color: backgroundColor ?? AppColors.scannerOverlay.withValues(alpha: 0.5),
             child: Center(child: LoadingCard(loadingState: loadingState)),
           ),
       ],

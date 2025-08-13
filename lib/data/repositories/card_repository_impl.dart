@@ -32,7 +32,7 @@ class CardRepositoryImpl implements CardRepository {
       // 嘗試執行簡單查詢來檢查資料庫健康狀態
       await _database.cardDao.getAllBusinessCards();
       return true;
-    } catch (e) {
+    } on Exception catch (e) {
       return false;
     }
   }

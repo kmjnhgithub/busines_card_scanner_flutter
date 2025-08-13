@@ -523,11 +523,11 @@ class GoogleMLKitOCRService implements OCRService {
     try {
       final image = img.decodeImage(imageData);
       if (image == null) {
-        return const ui.Size(0, 0);
+        return ui.Size.zero;
       }
       return ui.Size(image.width.toDouble(), image.height.toDouble());
     } on Exception {
-      return const ui.Size(0, 0);
+      return ui.Size.zero;
     }
   }
 
@@ -564,10 +564,17 @@ class GoogleMLKitOCRService implements OCRService {
 
   /// 將例外轉換為 Repository 例外並拋出
   Never _throwRepositoryException(Object error, int processingTimeMs) {
-    if (error is OCRProcessingFailure ||
-        error is UnsupportedImageFormatFailure ||
-        error is ImageTooLargeFailure ||
-        error is DataSourceFailure) {
+    // 如果已經是正確的 Repository 異常類型，直接重新拋出
+    if (error is OCRProcessingFailure) {
+      throw error;
+    }
+    if (error is UnsupportedImageFormatFailure) {
+      throw error;
+    }
+    if (error is ImageTooLargeFailure) {
+      throw error;
+    }
+    if (error is DataSourceFailure) {
       throw error;
     }
     

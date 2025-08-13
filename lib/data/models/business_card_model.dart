@@ -46,8 +46,8 @@ class BusinessCardModel with _$BusinessCardModel {
       if (json['updated_at'] != null) {
         DateTime.parse(json['updated_at'].toString());
       }
-    } catch (e) {
-      throw const FormatException('BusinessCardModel requires valid date format for created_at and updated_at');
+    } on FormatException catch (e) {
+      throw FormatException('BusinessCardModel requires valid date format for created_at and updated_at: ${e.message}');
     }
 
     // 設定預設時間值

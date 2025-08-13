@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:busines_card_scanner_flutter/presentation/providers/event_bus_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -128,8 +130,8 @@ void main() {
         expect(userEvents.first.data, equals('user_data'));
         
         // Cleanup
-        testSubscription.cancel();
-        userSubscription.cancel();
+        unawaited(testSubscription.cancel());
+        unawaited(userSubscription.cancel());
       });
     });
 

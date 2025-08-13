@@ -582,20 +582,20 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     );
 
     if (confirmed == true) {
+      // 保存 context 到局部變量以避免跨異步使用
+      final currentContext = context;
       final success = await viewModel.deleteCard(card.id);
       if (!mounted) {
         return;
       }
       
-      // 保存 context 到局部變量以避免跨異步使用
-      final currentContext = context;
-      if (success) {
+      if (success && mounted) {
         ToastHelper.showSnackBar(
           currentContext,
           '名片已刪除',
           type: ToastType.success,
         );
-      } else {
+      } else if (!success && mounted) {
         ToastHelper.showSnackBar(
           currentContext,
           '刪除名片失敗',

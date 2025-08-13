@@ -715,22 +715,5 @@ class AppTheme {
   }
 
   // ==================== 系統覆蓋樣式 ====================
-
-  static const SystemUiOverlayStyle _lightSystemOverlayStyle =
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.dark,
-        statusBarBrightness: Brightness.light,
-        systemNavigationBarColor: AppColors.cardBackground,
-        systemNavigationBarIconBrightness: Brightness.dark,
-      );
-
-  static const SystemUiOverlayStyle _darkSystemOverlayStyle =
-      SystemUiOverlayStyle(
-        statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-        systemNavigationBarColor: AppColors.cardBackgroundDark,
-        systemNavigationBarIconBrightness: Brightness.light,
-      );
+  // 注意：System overlay styles 已移動到各個具體使用的地方，避免未使用的全域定義
 }

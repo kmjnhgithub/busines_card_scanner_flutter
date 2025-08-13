@@ -97,9 +97,10 @@ class OpenAIServiceImpl implements OpenAIService {
       return _parseResponse(response.data);
     } on DioException catch (e) {
       throw _handleDioException(e);
-    } catch (e) {
-      throw const AIServiceUnavailableFailure(
+    } on Exception catch (e) {
+      throw AIServiceUnavailableFailure(
         userMessage: 'AI service is temporarily unavailable',
+        reason: 'Unexpected error: $e',
       );
     }
   }
@@ -117,7 +118,7 @@ class OpenAIServiceImpl implements OpenAIService {
       try {
         final result = await parseCardFromText(ocrTexts[i], hints: hints);
         successful.add(result);
-      } catch (e) {
+      } on Exception catch (e) {
         failed.add(BatchParseError(
           index: i,
           error: e.toString(),
@@ -181,13 +182,13 @@ class OpenAIServiceImpl implements OpenAIService {
         quotaResetAt: resetTime,
         checkedAt: startTime,
       );
-    } catch (e) {
+    } on Exception catch (e) {
       final endTime = DateTime.now();
       final responseTime = endTime.difference(startTime).inMilliseconds.toDouble();
       
       return AIServiceStatus(
         isAvailable: false,
-        error: 'Service check failed',
+        error: 'Service check failed: ${e.toString()}',
         responseTimeMs: responseTime,
         remainingQuota: 0,
         quotaResetAt: DateTime.now(),
@@ -261,9 +262,10 @@ $ocrText
       final parsedData = jsonDecode(content) as Map<String, dynamic>;
       
       return _sanitizeAndValidateResult(parsedData);
-    } catch (e) {
-      throw const AIServiceUnavailableFailure(
+    } on Exception catch (e) {
+      throw AIServiceUnavailableFailure(
         userMessage: 'Failed to parse AI response',
+        reason: 'Parse error: $e',
       );
     }
   }

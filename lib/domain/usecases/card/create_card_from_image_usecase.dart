@@ -169,7 +169,7 @@ class CreateCardFromImageUseCase {
           trackMetrics: params.trackMetrics,
         ));
         return MapEntry(entry.key, result);
-      } catch (error) {
+      } on Exception catch (error) {
         return MapEntry(entry.key, error);
       }
     });

@@ -126,7 +126,6 @@ class ThemedButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final config = _getButtonConfig(size);
     final colorScheme = _getColorScheme(context, type);
 
@@ -329,7 +328,7 @@ class ThemedButton extends StatelessWidget {
       case ThemedButtonSize.small:
         return _ButtonConfig(
           height: AppDimensions.buttonHeightSmall,
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.space3,
             vertical: AppDimensions.space1,
           ),

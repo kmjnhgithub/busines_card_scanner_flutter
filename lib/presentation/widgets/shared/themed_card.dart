@@ -95,7 +95,6 @@ class ThemedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     // 根據尺寸獲取配置
     final config = _getCardConfig(size);

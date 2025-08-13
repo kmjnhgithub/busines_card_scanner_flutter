@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 /// 抽象基類別，定義所有錯誤的基本結構
-abstract class Failure extends Equatable {
+/// 實作 Exception 介面以符合 Dart 最佳實踐
+abstract class Failure extends Equatable implements Exception {
   const Failure({required this.userMessage, required this.internalMessage});
 
   /// 使用者友善的錯誤訊息，不包含敏感資訊

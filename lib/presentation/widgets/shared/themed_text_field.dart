@@ -535,7 +535,6 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
     ThemedTextFieldValidationState state,
   ) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
 
     final baseColors = _TextFieldColorScheme(
       border: AppColors.getBorderColor(theme.brightness),

@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 /// Domain層獨立的錯誤基底類別
-abstract class DomainFailure extends Equatable {
+/// 繼承 Exception 以符合 Dart 最佳實踐和靜態分析要求
+abstract class DomainFailure extends Equatable implements Exception {
   const DomainFailure({
     required this.userMessage,
     required this.internalMessage,
