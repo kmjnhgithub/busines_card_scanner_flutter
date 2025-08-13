@@ -100,7 +100,10 @@ void main() {
         // Assert
         final state = container.read(cardListViewModelProvider);
         expect(state.cards, equals(testCards));
-        expect(state.filteredCards, equals(testCards));
+        // 預設按 dateCreated descending 排序，所以順序會是 [李四, 張三]
+        expect(state.filteredCards.length, equals(testCards.length));
+        expect(state.filteredCards.first.id, equals('2')); // 李四 (2024-01-02, 較新的日期)
+        expect(state.filteredCards.last.id, equals('1')); // 張三 (2024-01-01, 較舊的日期)
         expect(state.isLoading, false);
         expect(state.error, null);
 
@@ -403,8 +406,9 @@ void main() {
         final state = container.read(cardListViewModelProvider);
         expect(state.sortBy, equals(CardListSortBy.name));
         expect(state.sortOrder, equals(SortOrder.ascending));
-        expect(state.filteredCards.first.name, equals('李四'));
-        expect(state.filteredCards.last.name, equals('張三'));
+        // 在 Unicode 排序中，'張' (U+5F35) < '李' (U+674E)，所以張三在前
+        expect(state.filteredCards.first.name, equals('張三'));
+        expect(state.filteredCards.last.name, equals('李四'));
       });
 
       test('應該根據公司名稱排序', () async {
@@ -445,8 +449,9 @@ void main() {
 
         // Assert
         final state = container.read(cardListViewModelProvider);
-        expect(state.filteredCards.first.name, equals('張三'));
-        expect(state.filteredCards.last.name, equals('李四'));
+        // 降序：'李' > '張'，所以李四在前
+        expect(state.filteredCards.first.name, equals('李四'));
+        expect(state.filteredCards.last.name, equals('張三'));
       });
 
       test('排序後搜尋應該保持排序順序', () async {
@@ -461,7 +466,7 @@ void main() {
         // Assert
         final state = container.read(cardListViewModelProvider);
         expect(state.filteredCards.length, equals(2));
-        expect(state.filteredCards.first.name, equals('李四')); // Should maintain sort order
+        expect(state.filteredCards.first.name, equals('張三')); // Should maintain sort order (ascending by name)
       });
     });
 

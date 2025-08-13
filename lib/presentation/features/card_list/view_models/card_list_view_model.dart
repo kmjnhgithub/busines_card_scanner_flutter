@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:dartz/dartz.dart';
 
+import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
-import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart' as domain;
 
 part 'card_list_view_model.freezed.dart';
@@ -84,9 +84,12 @@ class CardListViewModel extends StateNotifier<CardListState> {
       );
       _applyFiltersAndSort();
     } catch (error) {
+      final errorMessage = error is Failure 
+          ? error.userMessage 
+          : error.toString();
       state = state.copyWith(
         isLoading: false,
-        error: error.toString(),
+        error: errorMessage,
       );
     }
   }
@@ -118,7 +121,10 @@ class CardListViewModel extends StateNotifier<CardListState> {
         return false;
       }
     } catch (error) {
-      state = state.copyWith(error: error.toString());
+      final errorMessage = error is Failure 
+          ? error.userMessage 
+          : error.toString();
+      state = state.copyWith(error: errorMessage);
       return false;
     }
   }
