@@ -239,7 +239,7 @@ void main() {
     });
 
     testWidgets('padding 設定時應該添加內邊距', (tester) async {
-      const testPadding = EdgeInsets.all(16.0);
+      const testPadding = EdgeInsets.all(16);
       await tester.pumpWidget(createWrapperTestWidget(padding: testPadding));
 
       expect(find.byType(Padding), findsOneWidget);

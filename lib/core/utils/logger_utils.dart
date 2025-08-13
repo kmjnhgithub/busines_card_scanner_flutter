@@ -37,7 +37,7 @@ class LoggerUtils {
   static LogLevel get logLevel => _currentLevel;
 
   /// 設定日誌等級
-  static void setLogLevel(LogLevel level) {
+  static set logLevel(LogLevel level) {
     _currentLevel = level;
   }
 
@@ -45,7 +45,7 @@ class LoggerUtils {
   static bool get enabled => _isEnabled;
 
   /// 啟用/停用日誌記錄
-  static void setEnabled(bool isEnabled) {
+  static set enabled(bool isEnabled) {
     _isEnabled = isEnabled;
   }
 

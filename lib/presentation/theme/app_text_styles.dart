@@ -35,7 +35,7 @@ class AppTextStyles {
   /// 大標題 - 用於主要頁面標題
   static const TextStyle headline1 = TextStyle(
     fontFamily: displayFontFamily,
-    fontSize: 32.0,
+    fontSize: 32,
     fontWeight: bold,
     letterSpacing: -0.5,
     height: 1.25,
@@ -45,7 +45,7 @@ class AppTextStyles {
   /// 中標題 - 用於節區標題
   static const TextStyle headline2 = TextStyle(
     fontFamily: displayFontFamily,
-    fontSize: 28.0,
+    fontSize: 28,
     fontWeight: bold,
     letterSpacing: -0.25,
     height: 1.29,
@@ -55,9 +55,9 @@ class AppTextStyles {
   /// 小標題 - 用於子節區標題
   static const TextStyle headline3 = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 24.0,
+    fontSize: 24,
     fontWeight: semiBold,
-    letterSpacing: 0.0,
+    letterSpacing: 0,
     height: 1.33,
     color: AppColors.primaryText,
   );
@@ -65,9 +65,9 @@ class AppTextStyles {
   /// 卡片標題 - 用於卡片和列表項標題
   static const TextStyle headline4 = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 20.0,
+    fontSize: 20,
     fontWeight: semiBold,
-    letterSpacing: 0.0,
+    letterSpacing: 0,
     height: 1.4,
     color: AppColors.primaryText,
   );
@@ -75,7 +75,7 @@ class AppTextStyles {
   /// 組件標題 - 用於小組件標題
   static const TextStyle headline5 = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 18.0,
+    fontSize: 18,
     fontWeight: semiBold,
     letterSpacing: 0.15,
     height: 1.44,
@@ -85,7 +85,7 @@ class AppTextStyles {
   /// 最小標題 - 用於表單標籤和小標題
   static const TextStyle headline6 = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 16.0,
+    fontSize: 16,
     fontWeight: medium,
     letterSpacing: 0.15,
     height: 1.5,
@@ -97,7 +97,7 @@ class AppTextStyles {
   /// 主副標題 - 用於重要的輔助資訊
   static const TextStyle subtitle1 = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 16.0,
+    fontSize: 16,
     fontWeight: regular,
     letterSpacing: 0.15,
     height: 1.5,
@@ -107,7 +107,7 @@ class AppTextStyles {
   /// 次副標題 - 用於一般的輔助資訊
   static const TextStyle subtitle2 = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 14.0,
+    fontSize: 14,
     fontWeight: medium,
     letterSpacing: 0.1,
     height: 1.57,
@@ -119,7 +119,7 @@ class AppTextStyles {
   /// 大正文 - 用於主要內容
   static const TextStyle bodyLarge = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 16.0,
+    fontSize: 16,
     fontWeight: regular,
     letterSpacing: 0.5,
     height: 1.5,
@@ -129,7 +129,7 @@ class AppTextStyles {
   /// 中正文 - 用於一般內容
   static const TextStyle bodyMedium = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 14.0,
+    fontSize: 14,
     fontWeight: regular,
     letterSpacing: 0.25,
     height: 1.57,
@@ -139,7 +139,7 @@ class AppTextStyles {
   /// 小正文 - 用於輔助內容
   static const TextStyle bodySmall = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 12.0,
+    fontSize: 12,
     fontWeight: regular,
     letterSpacing: 0.4,
     height: 1.67,
@@ -151,7 +151,7 @@ class AppTextStyles {
   /// 大標籤 - 用於按鈕文字
   static const TextStyle labelLarge = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 14.0,
+    fontSize: 14,
     fontWeight: medium,
     letterSpacing: 1.25,
     height: 1.43,
@@ -161,7 +161,7 @@ class AppTextStyles {
   /// 中標籤 - 用於標籤和小按鈕
   static const TextStyle labelMedium = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 12.0,
+    fontSize: 12,
     fontWeight: medium,
     letterSpacing: 1.5,
     height: 1.67,
@@ -171,7 +171,7 @@ class AppTextStyles {
   /// 小標籤 - 用於圖示標籤和輔助標籤
   static const TextStyle labelSmall = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 10.0,
+    fontSize: 10,
     fontWeight: medium,
     letterSpacing: 1.5,
     height: 1.6,
@@ -183,7 +183,7 @@ class AppTextStyles {
   /// 展示文字 - 用於重要數據展示
   static const TextStyle display = TextStyle(
     fontFamily: displayFontFamily,
-    fontSize: 40.0,
+    fontSize: 40,
     fontWeight: light,
     letterSpacing: -1.5,
     height: 1.2,
@@ -193,9 +193,9 @@ class AppTextStyles {
   /// 超大文字 - 用於首頁或啟動頁面
   static const TextStyle gigantic = TextStyle(
     fontFamily: displayFontFamily,
-    fontSize: 48.0,
+    fontSize: 48,
     fontWeight: extraBold,
-    letterSpacing: -2.0,
+    letterSpacing: -2,
     height: 1.17,
     color: AppColors.primary,
   );
@@ -203,7 +203,7 @@ class AppTextStyles {
   /// 提示文字 - 用於 placeholder 和 hint
   static const TextStyle hint = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 14.0,
+    fontSize: 14,
     fontWeight: regular,
     letterSpacing: 0.25,
     height: 1.57,
@@ -213,7 +213,7 @@ class AppTextStyles {
   /// 錯誤文字 - 用於錯誤訊息
   static const TextStyle error = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 12.0,
+    fontSize: 12,
     fontWeight: regular,
     letterSpacing: 0.4,
     height: 1.67,
@@ -223,7 +223,7 @@ class AppTextStyles {
   /// 成功文字 - 用於成功訊息
   static const TextStyle success = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 12.0,
+    fontSize: 12,
     fontWeight: regular,
     letterSpacing: 0.4,
     height: 1.67,
@@ -233,7 +233,7 @@ class AppTextStyles {
   /// 警告文字 - 用於警告訊息
   static const TextStyle warning = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 12.0,
+    fontSize: 12,
     fontWeight: regular,
     letterSpacing: 0.4,
     height: 1.67,
@@ -243,9 +243,9 @@ class AppTextStyles {
   /// 等寬文字 - 用於代碼、ID 和結構化數據
   static const TextStyle monospace = TextStyle(
     fontFamily: monospaceFontFamily,
-    fontSize: 14.0,
+    fontSize: 14,
     fontWeight: regular,
-    letterSpacing: 0.0,
+    letterSpacing: 0,
     height: 1.57,
     color: AppColors.primaryText,
   );
@@ -255,7 +255,7 @@ class AppTextStyles {
   /// 主要按鈕文字
   static const TextStyle primaryButton = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 16.0,
+    fontSize: 16,
     fontWeight: semiBold,
     letterSpacing: 0.5,
     height: 1.25,
@@ -265,7 +265,7 @@ class AppTextStyles {
   /// 次要按鈕文字
   static const TextStyle secondaryButton = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 16.0,
+    fontSize: 16,
     fontWeight: semiBold,
     letterSpacing: 0.5,
     height: 1.25,
@@ -275,7 +275,7 @@ class AppTextStyles {
   /// 文字按鈕
   static const TextStyle textButton = TextStyle(
     fontFamily: fontFamily,
-    fontSize: 14.0,
+    fontSize: 14,
     fontWeight: medium,
     letterSpacing: 1.25,
     height: 1.43,
@@ -349,13 +349,13 @@ class AppTextConstants {
 
   /// 標準字間距
   static const double letterSpacingTight = -0.5;
-  static const double letterSpacingNormal = 0.0;
-  static const double letterSpacingLoose = 1.0;
+  static const double letterSpacingNormal = 0;
+  static const double letterSpacingLoose = 1;
   static const double letterSpacingExtraLoose = 1.5;
 
   /// 段落間距
-  static const double paragraphSpacing = 16.0;
-  static const double sectionSpacing = 24.0;
+  static const double paragraphSpacing = 16;
+  static const double sectionSpacing = 24;
 
   /// 文字截斷樣式
   static const TextOverflow defaultOverflow = TextOverflow.ellipsis;

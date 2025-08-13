@@ -158,7 +158,7 @@ class ThemedCard extends StatelessWidget {
       width: AppDimensions.progressIndicatorSize,
       height: AppDimensions.progressIndicatorSize,
       child: CircularProgressIndicator(
-        strokeWidth: 2.0,
+        strokeWidth: 2,
         valueColor: AlwaysStoppedAnimation<Color>(
           loadingColor ?? Theme.of(context).primaryColor,
         ),

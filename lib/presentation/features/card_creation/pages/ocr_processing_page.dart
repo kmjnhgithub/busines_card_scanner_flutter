@@ -56,7 +56,7 @@ class _OCRProcessingPageState extends ConsumerState<OCRProcessingPage> {
       await ref
           .read(ocrProcessingViewModelProvider.notifier)
           .loadImage(imageData);
-    } catch (e) {
+    } on Exception catch (e) {
       debugPrint('載入圖片失敗: $e');
     }
   }
@@ -282,21 +282,24 @@ class _OCRProcessingPageState extends ConsumerState<OCRProcessingPage> {
                 height: 200,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: double.infinity,
-                    height: 200,
-                    color: AppColors.separator,
-                    child: const Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.broken_image,
-                          size: 48,
-                          color: AppColors.secondaryText,
-                        ),
-                        SizedBox(height: AppDimensions.space3),
-                        Text('圖片載入失敗', style: AppTextStyles.bodyMedium),
-                      ],
+                  return Semantics(
+                    label: '名片圖片預覽',
+                    child: Container(
+                      width: double.infinity,
+                      height: 200,
+                      color: AppColors.separator,
+                      child: const Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.broken_image,
+                            size: 48,
+                            color: AppColors.secondaryText,
+                          ),
+                          SizedBox(height: AppDimensions.space3),
+                          Text('圖片載入失敗', style: AppTextStyles.bodyMedium),
+                        ],
+                      ),
                     ),
                   );
                 },
@@ -601,10 +604,14 @@ class _OCRProcessingPageState extends ConsumerState<OCRProcessingPage> {
         // 保存按鈕
         SizedBox(
           width: double.infinity,
-          child: ThemedButton(
-            key: const Key('save_card_button'),
-            text: '保存名片',
-            onPressed: () => _navigateToEditPage(state.parsedCard!),
+          child: Semantics(
+            label: '保存名片',
+            button: true,
+            child: ThemedButton(
+              key: const Key('save_card_button'),
+              text: '保存名片',
+              onPressed: () => _navigateToEditPage(state.parsedCard!),
+            ),
           ),
         ),
       ],

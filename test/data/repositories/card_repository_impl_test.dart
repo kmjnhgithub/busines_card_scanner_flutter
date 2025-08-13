@@ -16,10 +16,13 @@ class MockCardDao extends Mock implements CardDao {}
 class FakeBusinessCardsCompanion extends Fake
     implements BusinessCardsCompanion {}
 
+class FakeBusinessCard extends Fake implements BusinessCard {}
+
 void main() {
   setUpAll(() {
     // Register fallback values for mocktail
     registerFallbackValue(FakeBusinessCardsCompanion());
+    registerFallbackValue(FakeBusinessCard());
   });
 
   group('CardRepositoryImpl', () {
@@ -48,6 +51,9 @@ void main() {
 
       // Mock cardDao getter
       when(() => mockDatabase.cardDao).thenReturn(mockCardDao);
+
+      // 設置基本的默認返回值
+      when(() => mockCardDao.getAllBusinessCards()).thenAnswer((_) async => []);
 
       repository = CardRepositoryImpl(mockDatabase);
     });

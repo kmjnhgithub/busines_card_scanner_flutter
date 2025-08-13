@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:busines_card_scanner_flutter/presentation/providers/event_bus_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:meta/meta.dart';
 
 /// 事件總線測試
 ///
@@ -338,11 +339,13 @@ void main() {
 // =============================================
 
 /// 基底事件類別
+@immutable
 abstract class BaseEvent {
   const BaseEvent();
 }
 
 /// 測試事件
+@immutable
 class TestEvent extends BaseEvent {
   final String data;
 
@@ -363,6 +366,7 @@ class TestEvent extends BaseEvent {
 }
 
 /// 使用者事件
+@immutable
 class UserEvent extends BaseEvent {
   final String data;
 
@@ -383,6 +387,7 @@ class UserEvent extends BaseEvent {
 }
 
 /// 領域事件：名片建立事件
+@immutable
 class CardCreatedEvent extends BaseEvent {
   final String cardId;
   final String cardName;

@@ -11,7 +11,7 @@ class AppDimensions {
   // ==================== 基礎間距單位 ====================
 
   /// 基礎間距單位 - 8dp/pt 作為設計系統的基礎
-  static const double baseUnit = 8.0;
+  static const double baseUnit = 8;
 
   /// 最小間距 - 4dp/pt
   static const double space1 = baseUnit * 0.5; // 4.0
@@ -137,25 +137,25 @@ class AppDimensions {
   // ==================== 圓角半徑 ====================
 
   /// 極小圓角
-  static const double radiusTiny = 2.0;
+  static const double radiusTiny = 2;
 
   /// 小圓角 - 用於按鈕、標籤
-  static const double radiusSmall = 4.0;
+  static const double radiusSmall = 4;
 
   /// 中圓角 - 用於輸入框、小卡片
-  static const double radiusMedium = 8.0;
+  static const double radiusMedium = 8;
 
   /// 大圓角 - 用於卡片、對話框
-  static const double radiusLarge = 12.0;
+  static const double radiusLarge = 12;
 
   /// 超大圓角 - 用於底部選單、大卡片
-  static const double radiusExtraLarge = 16.0;
+  static const double radiusExtraLarge = 16;
 
   /// 巨大圓角 - 用於圓形按鈕或特殊元件
-  static const double radiusGigantic = 24.0;
+  static const double radiusGigantic = 24;
 
   /// 圓形 - 完全圓形元件
-  static const double radiusCircular = 1000.0;
+  static const double radiusCircular = 1000;
 
   // ==================== 邊框寬度 ====================
 
@@ -163,13 +163,13 @@ class AppDimensions {
   static const double borderThin = 0.5;
 
   /// 標準邊框
-  static const double borderMedium = 1.0;
+  static const double borderMedium = 1;
 
   /// 粗邊框
-  static const double borderThick = 2.0;
+  static const double borderThick = 2;
 
   /// 焦點邊框 - 當元件獲得焦點時
-  static const double borderFocus = 2.0;
+  static const double borderFocus = 2;
 
   // ==================== 陰影配置 ====================
 
@@ -216,44 +216,44 @@ class AppDimensions {
   // ==================== 元件尺寸 ====================
 
   /// 圖示尺寸
-  static const double iconTiny = 12.0;
-  static const double iconSmall = 16.0;
-  static const double iconMedium = 24.0;
-  static const double iconLarge = 32.0;
-  static const double iconExtraLarge = 48.0;
+  static const double iconTiny = 12;
+  static const double iconSmall = 16;
+  static const double iconMedium = 24;
+  static const double iconLarge = 32;
+  static const double iconExtraLarge = 48;
 
   /// 按鈕高度
-  static const double buttonHeightSmall = 32.0;
-  static const double buttonHeightMedium = 40.0;
-  static const double buttonHeightLarge = 48.0;
-  static const double buttonHeightExtraLarge = 56.0;
+  static const double buttonHeightSmall = 32;
+  static const double buttonHeightMedium = 40;
+  static const double buttonHeightLarge = 48;
+  static const double buttonHeightExtraLarge = 56;
 
   /// 輸入框高度
-  static const double textFieldHeight = 48.0;
-  static const double textFieldHeightSmall = 40.0;
-  static const double textFieldHeightLarge = 56.0;
+  static const double textFieldHeight = 48;
+  static const double textFieldHeightSmall = 40;
+  static const double textFieldHeightLarge = 56;
 
   /// 列表項高度
-  static const double listItemHeight = 56.0;
-  static const double listItemHeightSmall = 48.0;
-  static const double listItemHeightLarge = 72.0;
+  static const double listItemHeight = 56;
+  static const double listItemHeightSmall = 48;
+  static const double listItemHeightLarge = 72;
 
   /// 應用程式欄高度
-  static const double appBarHeight = 56.0;
-  static const double appBarHeightLarge = 64.0;
+  static const double appBarHeight = 56;
+  static const double appBarHeightLarge = 64;
 
   /// 底部導航欄高度
-  static const double bottomNavigationHeight = 60.0;
+  static const double bottomNavigationHeight = 60;
 
   /// 標籤欄高度
-  static const double tabBarHeight = 48.0;
+  static const double tabBarHeight = 48;
 
   /// 分隔線高度
-  static const double separatorHeight = 1.0;
+  static const double separatorHeight = 1;
 
   /// 進度指示器尺寸
-  static const double progressIndicatorSize = 20.0;
-  static const double progressIndicatorSizeLarge = 40.0;
+  static const double progressIndicatorSize = 20;
+  static const double progressIndicatorSizeLarge = 40;
 
   // ==================== 動畫持續時間 ====================
 
@@ -272,39 +272,39 @@ class AppDimensions {
   // ==================== 斷點 (Breakpoints) ====================
 
   /// 手機斷點
-  static const double breakpointMobile = 480.0;
+  static const double breakpointMobile = 480;
 
   /// 平板斷點
-  static const double breakpointTablet = 768.0;
+  static const double breakpointTablet = 768;
 
   /// 桌面斷點
-  static const double breakpointDesktop = 1024.0;
+  static const double breakpointDesktop = 1024;
 
   /// 大桌面斷點
-  static const double breakpointLargeDesktop = 1440.0;
+  static const double breakpointLargeDesktop = 1440;
 
   // ==================== 特殊尺寸 ====================
 
   /// 名片掃描框最小尺寸
-  static const Size scannerFrameMinSize = Size(280.0, 180.0);
+  static const Size scannerFrameMinSize = Size(280, 180);
 
   /// 名片掃描框最大尺寸
-  static const Size scannerFrameMaxSize = Size(360.0, 240.0);
+  static const Size scannerFrameMaxSize = Size(360, 240);
 
   /// 名片預覽尺寸
-  static const Size cardPreviewSize = Size(320.0, 200.0);
+  static const Size cardPreviewSize = Size(320, 200);
 
   /// 名片縮圖尺寸
-  static const Size cardThumbnailSize = Size(80.0, 50.0);
+  static const Size cardThumbnailSize = Size(80, 50);
 
   /// 頭像尺寸
-  static const double avatarSizeSmall = 32.0;
-  static const double avatarSizeMedium = 48.0;
-  static const double avatarSizeLarge = 72.0;
+  static const double avatarSizeSmall = 32;
+  static const double avatarSizeMedium = 48;
+  static const double avatarSizeLarge = 72;
 
   /// 載入指示器尺寸
-  static const double loadingIndicatorSize = 24.0;
-  static const double loadingIndicatorSizeLarge = 48.0;
+  static const double loadingIndicatorSize = 24;
+  static const double loadingIndicatorSizeLarge = 48;
 
   // ==================== 輔助方法 ====================
 
@@ -346,8 +346,8 @@ class AppDimensions {
   /// 建立對稱內邊距
   static EdgeInsets symmetric({double? horizontal, double? vertical}) {
     return EdgeInsets.symmetric(
-      horizontal: horizontal ?? 0.0,
-      vertical: vertical ?? 0.0,
+      horizontal: horizontal ?? 0,
+      vertical: vertical ?? 0,
     );
   }
 
@@ -359,10 +359,10 @@ class AppDimensions {
     double? bottom,
   }) {
     return EdgeInsets.only(
-      left: left ?? 0.0,
-      top: top ?? 0.0,
-      right: right ?? 0.0,
-      bottom: bottom ?? 0.0,
+      left: left ?? 0,
+      top: top ?? 0,
+      right: right ?? 0,
+      bottom: bottom ?? 0,
     );
   }
 
@@ -379,10 +379,10 @@ class AppDimensions {
     double? bottomRight,
   }) {
     return BorderRadius.only(
-      topLeft: Radius.circular(topLeft ?? 0.0),
-      topRight: Radius.circular(topRight ?? 0.0),
-      bottomLeft: Radius.circular(bottomLeft ?? 0.0),
-      bottomRight: Radius.circular(bottomRight ?? 0.0),
+      topLeft: Radius.circular(topLeft ?? 0),
+      topRight: Radius.circular(topRight ?? 0),
+      bottomLeft: Radius.circular(bottomLeft ?? 0),
+      bottomRight: Radius.circular(bottomRight ?? 0),
     );
   }
 

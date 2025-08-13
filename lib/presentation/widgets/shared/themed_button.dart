@@ -180,7 +180,7 @@ class ThemedButton extends StatelessWidget {
         width: config.iconSize,
         height: config.iconSize,
         child: CircularProgressIndicator(
-          strokeWidth: 2.0,
+          strokeWidth: 2,
           valueColor: AlwaysStoppedAnimation<Color>(
             loadingColor ?? colorScheme.foreground,
           ),
@@ -323,7 +323,7 @@ class ThemedButton extends StatelessWidget {
   _ButtonConfig _getButtonConfig(ThemedButtonSize size) {
     switch (size) {
       case ThemedButtonSize.small:
-        return _ButtonConfig(
+        return const _ButtonConfig(
           height: AppDimensions.buttonHeightSmall,
           padding: const EdgeInsets.symmetric(
             horizontal: AppDimensions.space3,
@@ -338,7 +338,7 @@ class ThemedButton extends StatelessWidget {
         );
 
       case ThemedButtonSize.medium:
-        return _ButtonConfig(
+        return const _ButtonConfig(
           height: AppDimensions.buttonHeightMedium,
           padding: AppDimensions.paddingButton,
           textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
@@ -350,7 +350,7 @@ class ThemedButton extends StatelessWidget {
         );
 
       case ThemedButtonSize.large:
-        return _ButtonConfig(
+        return const _ButtonConfig(
           height: AppDimensions.buttonHeightLarge,
           padding: EdgeInsets.symmetric(
             horizontal: AppDimensions.space8,

@@ -152,7 +152,9 @@ class DialogPresenter {
           DialogButton(
             text: confirmText ?? '確定',
             onPressed: () {
-              Navigator.of(context).pop(true);
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop(true);
+              }
               onConfirm?.call();
             },
             isPrimary: true,
@@ -184,14 +186,18 @@ class DialogPresenter {
           DialogButton(
             text: cancelText ?? '取消',
             onPressed: () {
-              Navigator.of(context).pop(false);
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop(false);
+              }
               onCancel?.call();
             },
           ),
           DialogButton(
             text: confirmText ?? '確定',
             onPressed: () {
-              Navigator.of(context).pop(true);
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop(true);
+              }
               onConfirm?.call();
             },
             isPrimary: true,
@@ -224,14 +230,18 @@ class DialogPresenter {
             DialogButton(
               text: cancelText,
               onPressed: () {
-                Navigator.of(context).pop(false);
+                if (Navigator.of(context, rootNavigator: true).canPop()) {
+                  Navigator.of(context, rootNavigator: true).pop(false);
+                }
                 onCancel?.call();
               },
             ),
           DialogButton(
             text: confirmText ?? '確定',
             onPressed: () {
-              Navigator.of(context).pop(true);
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop(true);
+              }
               onConfirm?.call();
             },
             isPrimary: true,
@@ -261,7 +271,9 @@ class DialogPresenter {
           DialogButton(
             text: confirmText ?? '確定',
             onPressed: () {
-              Navigator.of(context).pop(true);
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop(true);
+              }
               onConfirm?.call();
             },
             isPrimary: true,
@@ -292,14 +304,18 @@ class DialogPresenter {
           DialogButton(
             text: cancelText ?? '取消',
             onPressed: () {
-              Navigator.of(context).pop(false);
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop(false);
+              }
               onCancel?.call();
             },
           ),
           DialogButton(
             text: deleteText ?? '刪除',
             onPressed: () {
-              Navigator.of(context).pop(true);
+              if (Navigator.of(context, rootNavigator: true).canPop()) {
+                Navigator.of(context, rootNavigator: true).pop(true);
+              }
               onDelete?.call();
             },
             isDestructive: true,
@@ -333,8 +349,8 @@ class DialogPresenter {
 
   /// 隱藏對話框
   static void hide(BuildContext context) {
-    if (Navigator.of(context).canPop()) {
-      Navigator.of(context).pop();
+    if (Navigator.of(context, rootNavigator: true).canPop()) {
+      Navigator.of(context, rootNavigator: true).pop();
     }
   }
 
@@ -422,7 +438,7 @@ class CustomDialog extends StatelessWidget {
       content:
           config.customWidget ??
           ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 320.0, minWidth: 280.0),
+            constraints: const BoxConstraints(maxWidth: 320, minWidth: 280),
             child: Text(
               config.content,
               style: AppTextStyles.bodyMedium.copyWith(
@@ -451,6 +467,7 @@ class CustomDialog extends StatelessWidget {
   Widget _buildButton(BuildContext context, DialogButton button) {
     if (button.isPrimary) {
       return ElevatedButton(
+        key: button.isDestructive ? const Key('delete_confirm_button') : null,
         onPressed: button.onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: button.isDestructive
@@ -462,6 +479,7 @@ class CustomDialog extends StatelessWidget {
       );
     } else {
       return TextButton(
+        key: button.text == '取消' ? const Key('cancel_button') : null,
         onPressed: button.onPressed,
         style: TextButton.styleFrom(
           foregroundColor: button.isDestructive

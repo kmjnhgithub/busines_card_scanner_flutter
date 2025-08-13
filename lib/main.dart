@@ -1,8 +1,7 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/pages/card_list_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_theme.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
   runApp(const ProviderScope(child: BusinessCardScannerApp()));
@@ -17,7 +16,6 @@ class BusinessCardScannerApp extends ConsumerWidget {
       title: 'Business Card Scanner',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
       home: const SplashScreen(),
       debugShowCheckedModeBanner: false,
     );

@@ -1,5 +1,5 @@
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart'
@@ -91,7 +91,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
       state = state.copyWith(isLoading: false, cards: cards, error: null);
       _applyFiltersAndSort();
     } on Exception catch (error) {
-      final errorMessage = error is Failure
+      final errorMessage = error is DomainFailure
           ? error.userMessage
           : error.toString();
       state = state.copyWith(isLoading: false, error: errorMessage);
@@ -124,7 +124,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         return false;
       }
     } on Exception catch (error) {
-      final errorMessage = error is Failure
+      final errorMessage = error is DomainFailure
           ? error.userMessage
           : error.toString();
       state = state.copyWith(error: errorMessage);

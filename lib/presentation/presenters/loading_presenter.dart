@@ -59,42 +59,31 @@ class LoadingState {
   static const LoadingState idle = LoadingState(isLoading: false);
 
   /// 建立基本載入狀態
-  static LoadingState loading([String? message]) {
-    return LoadingState(isLoading: true, message: message);
-  }
+  const LoadingState.loading([String? message])
+      : isLoading = true,
+        message = message,
+        type = LoadingType.normal,
+        progress = null,
+        canCancel = false,
+        onCancel = null;
 
   /// 建立帶進度的載入狀態
-  static LoadingState withProgress({
-    required double progress,
-    String? message,
-    LoadingType type = LoadingType.normal,
-    bool canCancel = false,
-    VoidCallback? onCancel,
-  }) {
-    return LoadingState(
-      isLoading: true,
-      message: message,
-      type: type,
-      progress: progress,
-      canCancel: canCancel,
-      onCancel: onCancel,
-    );
-  }
+  const LoadingState.withProgress({
+    required this.progress,
+    this.message,
+    this.type = LoadingType.normal,
+    this.canCancel = false,
+    this.onCancel,
+  }) : isLoading = true;
 
   /// 建立可取消的載入狀態
-  static LoadingState cancellable({
-    required VoidCallback onCancel,
-    String? message,
-    LoadingType type = LoadingType.normal,
-  }) {
-    return LoadingState(
-      isLoading: true,
-      message: message,
-      type: type,
-      canCancel: true,
-      onCancel: onCancel,
-    );
-  }
+  const LoadingState.cancellable({
+    required this.onCancel,
+    this.message,
+    this.type = LoadingType.normal,
+  })  : isLoading = true,
+        progress = null,
+        canCancel = true;
 
   /// 複製並更新載入狀態
   LoadingState copyWith({
@@ -377,7 +366,7 @@ class LoadingCard extends StatelessWidget {
               width: AppDimensions.loadingIndicatorSizeLarge,
               height: AppDimensions.loadingIndicatorSizeLarge,
               child: CircularProgressIndicator(
-                strokeWidth: 3.0,
+                strokeWidth: 3,
                 color: accentColor,
                 value: loadingState.progress,
               ),
@@ -457,7 +446,7 @@ class InlineLoadingIndicator extends ConsumerWidget {
           width: size,
           height: size,
           child: CircularProgressIndicator(
-            strokeWidth: 2.0,
+            strokeWidth: 2,
             color: LoadingStyleConfig.getAccentColor(loadingState.type),
           ),
         ),
