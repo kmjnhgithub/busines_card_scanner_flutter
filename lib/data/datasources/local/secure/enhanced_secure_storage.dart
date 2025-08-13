@@ -97,10 +97,10 @@ class EnhancedSecureStorage {
       );
 
       return const Right(null);
-    } catch (e) {
-      return const Left(DataSourceFailure(
+    } on Exception catch (e) {
+      return Left(DataSourceFailure(
         userMessage: 'Failed to store API key',
-        internalMessage: 'Store API key error',
+        internalMessage: 'Store API key error: $e',
       ));
     }
   }
@@ -142,10 +142,10 @@ class EnhancedSecureStorage {
         Left.new,
         Right.new,
       );
-    } catch (e) {
-      return const Left(DataSourceFailure(
+    } on Exception catch (e) {
+      return Left(DataSourceFailure(
         userMessage: 'Failed to retrieve API key',
-        internalMessage: 'Retrieve API key error',
+        internalMessage: 'Retrieve API key error: $e',
       ));
     }
   }
@@ -174,10 +174,10 @@ class EnhancedSecureStorage {
       );
 
       return const Right(null);
-    } catch (e) {
-      return const Left(DataSourceFailure(
+    } on Exception catch (e) {
+      return Left(DataSourceFailure(
         userMessage: 'Failed to delete API key',
-        internalMessage: 'Delete API key error',
+        internalMessage: 'Delete API key error: $e',
       ));
     }
   }
@@ -202,10 +202,10 @@ class EnhancedSecureStorage {
           .toList();
 
       return Right(services);
-    } catch (e) {
-      return const Left(DataSourceFailure(
+    } on Exception catch (e) {
+      return Left(DataSourceFailure(
         userMessage: 'Failed to retrieve services',
-        internalMessage: 'Get API key services error',
+        internalMessage: 'Get API key services error: $e',
       ));
     }
   }
@@ -241,10 +241,10 @@ class EnhancedSecureStorage {
       }
 
       return const Right(null);
-    } catch (e) {
-      return const Left(DataSourceFailure(
+    } on Exception catch (e) {
+      return Left(DataSourceFailure(
         userMessage: 'Failed to clear API keys',
-        internalMessage: 'Clear API keys error',
+        internalMessage: 'Clear API keys error: $e',
       ));
     }
   }
@@ -286,7 +286,7 @@ class EnhancedSecureStorage {
       final base64Encoded = base64Encode(combined);
       
       return Right(base64Encoded);
-    } catch (e) {
+    } on Exception catch (e) {
       return const Left(InsufficientPermissionFailure(
         permission: 'secure_storage',
         operation: 'encryption',
@@ -314,7 +314,7 @@ class EnhancedSecureStorage {
       late Uint8List combined;
       try {
         combined = base64Decode(encryptedData);
-      } catch (e) {
+      } on Exception catch (e) {
         return const Left(InsufficientPermissionFailure(
           permission: 'secure_storage',
           operation: 'data_validation',
@@ -355,7 +355,7 @@ class EnhancedSecureStorage {
       final decryptedText = utf8.decode(encryptedContent);
       
       return Right(decryptedText);
-    } catch (e) {
+    } on Exception catch (e) {
       return const Left(InsufficientPermissionFailure(
         permission: 'secure_storage',
         operation: 'encryption',

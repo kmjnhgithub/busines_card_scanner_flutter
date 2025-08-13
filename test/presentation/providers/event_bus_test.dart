@@ -76,7 +76,7 @@ void main() {
         expect(events.first.data, equals('test_data'));
         
         // Cleanup
-        subscription.cancel();
+        await subscription.cancel();
       });
 
       test('should handle multiple subscribers for same event type', () async {
@@ -102,8 +102,8 @@ void main() {
         expect(events2.first.data, equals('shared_data'));
         
         // Cleanup
-        subscription1.cancel();
-        subscription2.cancel();
+        await subscription1.cancel();
+        await subscription2.cancel();
       });
 
       test('should only receive events of subscribed type', () async {
@@ -156,7 +156,7 @@ void main() {
         expect(domainEvents.first.cardId, equals('card_123'));
         expect(domainEvents.first.cardName, equals('張三'));
         
-        subscription.cancel();
+        await subscription.cancel();
       });
 
       test('should support event filtering and transformation', () async {
@@ -189,7 +189,7 @@ void main() {
         expect(filteredEvents, hasLength(1));
         expect(filteredEvents.first.cardName, equals('張三'));
         
-        subscription.cancel();
+        await subscription.cancel();
       });
     });
 
@@ -241,7 +241,7 @@ void main() {
         final subscription = eventBus.on<TestEvent>().listen(events.add);
         
         // Act
-        subscription.cancel();
+        await subscription.cancel();
         eventBus.emit(const TestEvent('after_cancel'));
         await Future.delayed(Duration.zero);
         
@@ -270,7 +270,7 @@ void main() {
         // Assert
         expect(receivedCount, equals(eventCount));
         
-        subscription.cancel();
+        await subscription.cancel();
       });
 
       test('should clean up subscriptions on provider override', () {
@@ -323,7 +323,7 @@ void main() {
         // Assert - 基底類別應該能接收所有子類別事件
         expect(baseEvents, hasLength(2));
         
-        subscription.cancel();
+        await subscription.cancel();
       });
     });
   });

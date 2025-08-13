@@ -38,14 +38,20 @@ class LoggerUtils {
     'apikey',
   ];
 
+  /// 獲取目前日誌等級
+  static LogLevel get logLevel => _currentLevel;
+  
   /// 設定日誌等級
-  static void setLogLevel(LogLevel level) {
+  static set logLevel(LogLevel level) {
     _currentLevel = level;
   }
 
+  /// 獲取是否啟用日誌
+  static bool get enabled => _isEnabled;
+  
   /// 啟用/停用日誌記錄
-  static void setEnabled(bool enabled) {
-    _isEnabled = enabled;
+  static set enabled(bool isEnabled) {
+    _isEnabled = isEnabled;
   }
 
   /// Debug 日誌
@@ -160,7 +166,7 @@ class LoggerUtils {
     for (final keyword in _sensitiveKeywords) {
       // 使用正規表達式匹配 key: value 或 key=value 格式
       final regex = RegExp(
-        '(' + keyword + r')\s*[:=]\s*([^\s,})\]]+)',
+        '($keyword${r')\s*[:=]\s*([^\s,})\]]+)'}',
         caseSensitive: false,
       );
       

@@ -121,7 +121,7 @@ class GoogleMLKitOCRService implements OCRService {
       
       return result;
       
-    } catch (e) {
+    } on Exception catch (e) {
       stopwatch.stop();
       _updateEngineHealth(isHealthy: false, error: e.toString());
       
@@ -191,7 +191,7 @@ class GoogleMLKitOCRService implements OCRService {
         checkedAt: DateTime.now(),
       );
       
-    } catch (e) {
+    } on Exception catch (e) {
       stopwatch.stop();
       
       return OCREngineHealth(
@@ -212,7 +212,7 @@ class GoogleMLKitOCRService implements OCRService {
     try {
       await _validateImageData(imageData);
       return _preprocessImageInternal(imageData, options: options);
-    } catch (e) {
+    } on Exception catch (e) {
       _throwRepositoryException(e, 0);
     }
   }
@@ -236,24 +236,22 @@ class GoogleMLKitOCRService implements OCRService {
       },
     );
     
-    try {
-      final result = await _textRecognizer.processImage(inputImage);
+    // 非同步執行 OCR 處理 - 故意不使用 await，因為我們使用 completer 模式
+    // ignore: unawaited_futures
+    _textRecognizer.processImage(inputImage).then((result) {
       timeoutTimer.cancel();
-      
       if (!completer.isCompleted) {
         completer.complete(result);
       }
-      
-      return result;
-    } catch (e) {
+    }).catchError((e) {
       timeoutTimer.cancel();
-      
       if (!completer.isCompleted) {
         completer.completeError(e);
       }
-      
-      rethrow;
-    }
+    });
+    
+    // 等待 completer 完成（可能是成功結果、錯誤或超時）
+    return completer.future;
   }
 
   /// 建立 OCR 結果物件
@@ -505,7 +503,7 @@ class GoogleMLKitOCRService implements OCRService {
       final processedData = img.encodePng(processedImage);
       return Uint8List.fromList(processedData);
       
-    } catch (e) {
+    } on Exception catch (e) {
       throw OCRProcessingFailure(
         userMessage: '圖片預處理失敗',
         internalMessage: 'Image preprocessing failed: $e',
@@ -521,7 +519,7 @@ class GoogleMLKitOCRService implements OCRService {
         return const ui.Size(0, 0);
       }
       return ui.Size(image.width.toDouble(), image.height.toDouble());
-    } catch (e) {
+    } on Exception {
       return const ui.Size(0, 0);
     }
   }

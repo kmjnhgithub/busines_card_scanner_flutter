@@ -191,7 +191,6 @@ class DeleteCardUseCase {
   /// 回傳批次刪除結果
   Future<DeleteCardBatchResult> executeBatch(DeleteCardBatchParams params) async {
     try {
-      final startTime = DateTime.now();
       final successful = <DeleteCardResult>[];
       final failed = <DeleteCardBatchError>[];
 

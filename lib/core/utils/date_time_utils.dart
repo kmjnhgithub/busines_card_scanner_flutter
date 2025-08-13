@@ -45,7 +45,7 @@ class DateTimeUtils {
   static DateTime? parseIso8601(String dateString) {
     try {
       return DateTime.parse(dateString);
-    } catch (e) {
+    } on FormatException {
       return null;
     }
   }
@@ -54,7 +54,7 @@ class DateTimeUtils {
   static DateTime? parseDate(String dateString, {String format = defaultDateFormat}) {
     try {
       return DateFormat(format).parse(dateString);
-    } catch (e) {
+    } on FormatException {
       return null;
     }
   }
@@ -67,24 +67,46 @@ class DateTimeUtils {
     if (difference.isNegative) {
       // 未來時間
       final futureDiff = dateTime.difference(now);
-      if (futureDiff.inMinutes < 1) return '即將';
-      if (futureDiff.inMinutes < 60) return '${futureDiff.inMinutes}分鐘後';
-      if (futureDiff.inHours < 24) return '${futureDiff.inHours}小時後';
-      if (futureDiff.inDays < 7) return '${futureDiff.inDays}天後';
+      if (futureDiff.inMinutes < 1) {
+        return '即將';
+      }
+      if (futureDiff.inMinutes < 60) {
+        return '${futureDiff.inMinutes}分鐘後';
+      }
+      if (futureDiff.inHours < 24) {
+        return '${futureDiff.inHours}小時後';
+      }
+      if (futureDiff.inDays < 7) {
+        return '${futureDiff.inDays}天後';
+      }
       return formatDate(dateTime);
     }
 
     // 過去時間
-    if (difference.inSeconds < 60) return '剛剛';
-    if (difference.inMinutes < 60) return '${difference.inMinutes}分鐘前';
-    if (difference.inHours < 24) return '${difference.inHours}小時前';
+    if (difference.inSeconds < 60) {
+      return '剛剛';
+    }
+    if (difference.inMinutes < 60) {
+      return '${difference.inMinutes}分鐘前';
+    }
+    if (difference.inHours < 24) {
+      return '${difference.inHours}小時前';
+    }
     if (difference.inDays < 7) {
-      if (difference.inDays == 1) return '昨天';
-      if (difference.inDays == 2) return '前天';
+      if (difference.inDays == 1) {
+        return '昨天';
+      }
+      if (difference.inDays == 2) {
+        return '前天';
+      }
       return '${difference.inDays}天前';
     }
-    if (difference.inDays < 30) return '${(difference.inDays / 7).floor()}週前';
-    if (difference.inDays < 365) return '${(difference.inDays / 30).floor()}個月前';
+    if (difference.inDays < 30) {
+      return '${(difference.inDays / 7).floor()}週前';
+    }
+    if (difference.inDays < 365) {
+      return '${(difference.inDays / 30).floor()}個月前';
+    }
     
     final years = (difference.inDays / 365).floor();
     return years == 1 ? '1年前' : '$years年前';
@@ -213,7 +235,7 @@ class DateTimeUtils {
     try {
       DateFormat(format).parseStrict(dateString);
       return true;
-    } catch (e) {
+    } on FormatException {
       return false;
     }
   }

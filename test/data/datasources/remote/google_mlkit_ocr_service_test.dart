@@ -18,7 +18,12 @@ import 'package:uuid/uuid.dart';
 /// 使用 mocktail 進行 mocking，確保單元測試的獨立性
 
 // Mock classes using mocktail
-class MockTextRecognizer extends Mock implements TextRecognizer {}
+class MockTextRecognizer extends Mock implements TextRecognizer {
+  @override
+  Future<void> close() async {
+    // Mock implementation returns void wrapped in Future
+  }
+}
 class MockSecurityService extends Mock implements SecurityService {}
 class MockUuid extends Mock implements Uuid {}
 class MockRecognizedText extends Mock implements RecognizedText {}
@@ -529,7 +534,7 @@ void main() {
             .thenReturn(const Right('validated'));
         when(() => mockTextRecognizer.processImage(any()))
             .thenAnswer((_) async {
-              await Future.delayed(const Duration(seconds: 35)); // 超過 30 秒超時
+              await Future.delayed(const Duration(seconds: 31)); // 超過 30 秒超時
               return mockRecognizedText;
             });
 
@@ -542,7 +547,7 @@ void main() {
             contains('OCR 處理超時'),
           )),
         );
-      });
+      }, timeout: const Timeout(Duration(seconds: 35))); // 設定測試超時時間
     });
   });
 }

@@ -98,10 +98,10 @@ class SecurityService {
       sanitized = sanitized.replaceAll(RegExp(r'\s+'), ' ').trim();
 
       return Right(sanitized);
-    } catch (e) {
-      return const Left(SecurityFailure(
+    } on Exception catch (e) {
+      return Left(SecurityFailure(
         userMessage: '輸入清理過程發生錯誤',
-        internalMessage: 'Error during input sanitization',
+        internalMessage: 'Error during input sanitization: ${e.toString()}',
       ));
     }
   }
@@ -142,20 +142,20 @@ class SecurityService {
       if (response.trim().startsWith('{') || response.trim().startsWith('[')) {
         try {
           json.decode(response);
-        } catch (e) {
-          return const Left(SecurityFailure(
+        } on FormatException catch (e) {
+          return Left(SecurityFailure(
             userMessage: 'API 回應格式錯誤',
-            internalMessage: 'Invalid JSON in API response',
+            internalMessage: 'Invalid JSON in API response: ${e.message}',
             securityCode: 'INVALID_JSON',
           ));
         }
       }
 
       return Right(response);
-    } catch (e) {
-      return const Left(SecurityFailure(
+    } on Exception catch (e) {
+      return Left(SecurityFailure(
         userMessage: 'API 回應驗證失敗',
-        internalMessage: 'API response validation error',
+        internalMessage: 'API response validation error: $e',
       ));
     }
   }
@@ -195,10 +195,10 @@ class SecurityService {
       }
 
       return Right(masked);
-    } catch (e) {
-      return const Left(SecurityFailure(
+    } on Exception catch (e) {
+      return Left(SecurityFailure(
         userMessage: '敏感資訊遮蔽失敗',
-        internalMessage: 'Error masking sensitive information',
+        internalMessage: 'Error masking sensitive information: $e',
       ));
     }
   }
@@ -252,10 +252,10 @@ class SecurityService {
       }
 
       return Right(content);
-    } catch (e) {
-      return const Left(SecurityFailure(
+    } on Exception catch (e) {
+      return Left(SecurityFailure(
         userMessage: '內容驗證失敗',
-        internalMessage: 'Content validation error',
+        internalMessage: 'Content validation error: $e',
       ));
     }
   }
@@ -296,10 +296,10 @@ class SecurityService {
       }
 
       return Right(headers);
-    } catch (e) {
-      return const Left(SecurityFailure(
+    } on Exception catch (e) {
+      return Left(SecurityFailure(
         userMessage: '安全標頭驗證失敗',
-        internalMessage: 'Security headers validation error',
+        internalMessage: 'Security headers validation error: $e',
       ));
     }
   }
@@ -333,10 +333,10 @@ class SecurityService {
       }
 
       return Right(activityLog);
-    } catch (e) {
-      return const Left(SecurityFailure(
+    } on Exception catch (e) {
+      return Left(SecurityFailure(
         userMessage: '可疑活動檢測失敗',
-        internalMessage: 'Suspicious activity detection error',
+        internalMessage: 'Suspicious activity detection error: $e',
       ));
     }
   }

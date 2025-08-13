@@ -104,12 +104,12 @@ dev_dependencies:
     sdk: flutter
   test: ^1.25.8
   golden_toolkit: ^0.15.0
+  matcher: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
-  matcher: any
 flutter:
 
   # The following line ensures that the Material Icons font is

@@ -12,13 +12,17 @@ class StringUtils {
   /// 
   /// 移除前後空白並將多個連續空白合併為單一空格
   static String cleanWhitespace(String input) {
-    if (input.isEmpty) return input;
+    if (input.isEmpty) {
+      return input;
+    }
     return input.trim().replaceAll(RegExp(r'\s+'), ' ');
   }
 
   /// 移除控制字元（保留換行符和製表符）
   static String removeControlCharacters(String input) {
-    if (input.isEmpty) return input;
+    if (input.isEmpty) {
+      return input;
+    }
     return input.replaceAll(RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'), '');
   }
 
@@ -29,19 +33,25 @@ class StringUtils {
 
   /// 檢查字串是否僅包含數字
   static bool isNumericOnly(String input) {
-    if (input.isEmpty) return false;
+    if (input.isEmpty) {
+      return false;
+    }
     return RegExp(r'^[0-9]+$').hasMatch(input);
   }
 
   /// 檢查字串是否包含中文字元
   static bool containsChinese(String input) {
-    if (input.isEmpty) return false;
+    if (input.isEmpty) {
+      return false;
+    }
     return RegExp(r'[\u4e00-\u9fff]').hasMatch(input);
   }
 
   /// 檢查字串是否僅包含中英文字母、數字和基本標點符號
   static bool isSafeText(String input) {
-    if (input.isEmpty) return true;
+    if (input.isEmpty) {
+      return true;
+    }
     // 檢查是否包含危險字元
     final dangerousChars = RegExp(r'[<>&"\\\x00-\x1F\x7F]');
     return !dangerousChars.hasMatch(input);
@@ -49,14 +59,20 @@ class StringUtils {
 
   /// 截斷字串並添加省略號
   static String truncate(String input, int maxLength, {String suffix = '...'}) {
-    if (input.length <= maxLength) return input;
-    if (maxLength <= suffix.length) return suffix.substring(0, maxLength);
+    if (input.length <= maxLength) {
+      return input;
+    }
+    if (maxLength <= suffix.length) {
+      return suffix.substring(0, maxLength);
+    }
     return input.substring(0, maxLength - suffix.length) + suffix;
   }
 
   /// 格式化電話號碼（僅用於顯示）
   static String formatPhoneNumber(String phone) {
-    if (phone.isEmpty) return phone;
+    if (phone.isEmpty) {
+      return phone;
+    }
     
     // 移除所有非數字字元
     final cleanPhone = phone.replaceAll(RegExp(r'[^\d]'), '');
@@ -99,7 +115,9 @@ class StringUtils {
 
   /// 提取英文名稱的首字母
   static String extractInitials(String name, {int maxInitials = 2}) {
-    if (name.isEmpty) return '';
+    if (name.isEmpty) {
+      return '';
+    }
     
     final words = name.trim().split(RegExp(r'\s+'));
     final initials = words
@@ -113,13 +131,17 @@ class StringUtils {
 
   /// 判斷字串是否為有效的電子信箱格式（基礎檢查）
   static bool isValidEmailFormat(String email) {
-    if (email.isEmpty) return false;
+    if (email.isEmpty) {
+      return false;
+    }
     return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9]{1,}$').hasMatch(email);
   }
 
   /// 判斷字串是否為有效的網址格式（基礎檢查）
   static bool isValidUrlFormat(String url) {
-    if (url.isEmpty) return false;
+    if (url.isEmpty) {
+      return false;
+    }
     return RegExp(r'^(https?|ftp)://[^\s/$.?#].[^\s]*$', caseSensitive: false).hasMatch(url);
   }
 
