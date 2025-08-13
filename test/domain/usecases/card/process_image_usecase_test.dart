@@ -1,10 +1,11 @@
 import 'dart:typed_data';
-import 'package:flutter_test/flutter_test.dart';
+
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 
 /// Mock OCRRepository 用於測試
 class MockOCRRepository implements OCRRepository {
@@ -15,7 +16,7 @@ class MockOCRRepository implements OCRRepository {
   List<OCREngineInfo>? _mockEngines;
   OCREngineInfo? _mockCurrentEngine;
   OCREngineHealth? _mockEngineHealth;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockOCRResult(OCRResult result) => _mockOCRResult = result;
   void setMockBatchResult(BatchOCRResult result) => _mockBatchResult = result;
@@ -24,7 +25,7 @@ class MockOCRRepository implements OCRRepository {
   void setMockEngines(List<OCREngineInfo> engines) => _mockEngines = engines;
   void setMockCurrentEngine(OCREngineInfo engine) => _mockCurrentEngine = engine;
   void setMockEngineHealth(OCREngineHealth health) => _mockEngineHealth = health;
-  void setMockFailure(Failure? failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure? failure) => _mockFailure = failure;
   void clearMockFailure() => _mockFailure = null;
 
   @override
@@ -42,7 +43,7 @@ class MockOCRRepository implements OCRRepository {
   @override
   Future<BatchOCRResult> recognizeTexts(List<Uint8List> imageDataList, {OCROptions? options}) async {
     if (_mockFailure != null) throw _mockFailure!;
-    return _mockBatchResult ?? BatchOCRResult(successful: [], failed: []);
+    return _mockBatchResult ?? const BatchOCRResult(successful: [], failed: []);
   }
 
   @override
@@ -137,7 +138,7 @@ class MockOCRRepository implements OCRRepository {
     return _mockStatistics ?? OCRStatistics(
       totalProcessed: 100,
       averageConfidence: 0.85,
-      averageProcessingTimeMs: 1200.0,
+      averageProcessingTimeMs: 1200,
       engineUsage: {'google-ml-kit': 100},
       languageConfidence: {'zh-Hant': 0.9, 'en': 0.8},
       lastUpdated: DateTime.now(),
@@ -189,10 +190,8 @@ void main() {
 
       test('should apply OCR options correctly', () async {
         // Arrange
-        final ocrOptions = OCROptions(
+        const ocrOptions = OCROptions(
           preferredLanguages: ['zh-Hant', 'en'],
-          enablePreprocessing: true,
-          enableRotationCorrection: true,
         );
 
         // Act
@@ -214,7 +213,7 @@ void main() {
         ]);
         mockOCRRepository.setMockPreprocessedImage(preprocessedImage);
 
-        final preprocessOptions = ImagePreprocessOptions(
+        const preprocessOptions = ImagePreprocessOptions(
           contrast: 20,
           brightness: 10,
           sharpen: true,
@@ -454,7 +453,6 @@ void main() {
         // Act
         final results = await useCase.executeBatch(ProcessImageBatchParams(
           imageDataList: imageDataList,
-          concurrency: 3,
         ));
 
         // Assert
@@ -589,7 +587,7 @@ void main() {
 
       test('should cleanup old OCR results', () async {
         // Act
-        final cleanupCount = await useCase.cleanupOldResults(daysOld: 30);
+        final cleanupCount = await useCase.cleanupOldResults();
 
         // Assert
         expect(cleanupCount, greaterThanOrEqualTo(0));
@@ -733,7 +731,7 @@ void main() {
         final result = await useCase.execute(ProcessImageParams(
           imageData: testImageData,
           optimizeImage: true,
-          preprocessOptions: ImagePreprocessOptions(
+          preprocessOptions: const ImagePreprocessOptions(
             contrast: 15,
             brightness: 5,
             sharpen: true,

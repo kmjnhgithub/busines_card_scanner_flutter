@@ -165,7 +165,7 @@ class ParsedCardData {
   final Map<String, double>? fieldConfidence;
 
   const ParsedCardData({
-    this.name,
+    required this.confidence, required this.source, required this.parsedAt, this.name,
     this.nameEnglish,
     this.company,
     this.companyEnglish,
@@ -180,9 +180,6 @@ class ParsedCardData {
     this.addressEnglish,
     this.website,
     this.notes,
-    required this.confidence,
-    required this.source,
-    required this.parsedAt,
     this.fieldConfidence,
   });
 
@@ -274,11 +271,7 @@ class AIServiceStatus {
 
   const AIServiceStatus({
     required this.isAvailable,
-    this.error,
-    required this.responseTimeMs,
-    required this.remainingQuota,
-    required this.quotaResetAt,
-    required this.checkedAt,
+    required this.responseTimeMs, required this.remainingQuota, required this.quotaResetAt, required this.checkedAt, this.error,
   });
 }
 

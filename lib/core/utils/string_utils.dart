@@ -172,7 +172,7 @@ class StringUtils {
     return emailRegex
         .allMatches(text)
         .map((match) => match.group(0)!)
-        .where((email) => isValidEmailFormat(email))
+        .where(isValidEmailFormat)
         .toList();
   }
 

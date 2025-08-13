@@ -1,0 +1,54 @@
+include: package:flutter_lints/flutter.yaml
+
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+  
+  errors:
+    # 將部分警告降級為 info 或 ignore
+    prefer_const_constructors: info
+    always_put_control_body_on_new_line: info
+    directives_ordering: info
+    only_throw_errors: info
+    avoid_redundant_argument_values: ignore
+    prefer_int_literals: ignore
+    unnecessary_await_in_return: info
+    
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.drift.dart"
+    - "**/*.future"
+    - "build/**"
+    - "test/.test_coverage.dart"
+    - "lib/generated_plugin_registrant.dart"
+
+linter:
+  rules:
+    # 保留重要的錯誤規則
+    always_use_package_imports: true
+    avoid_print: true
+    avoid_web_libraries_in_flutter: true
+    
+    # 關閉過度嚴格的風格規則
+    always_put_control_body_on_new_line: false
+    always_put_required_named_parameters_first: false
+    prefer_const_constructors: false
+    prefer_const_declarations: false
+    prefer_const_literals_to_create_immutables: false
+    prefer_final_locals: false
+    prefer_int_literals: false
+    only_throw_errors: false
+    directives_ordering: false
+    avoid_redundant_argument_values: false
+    unnecessary_await_in_return: false
+    
+    # 保留中等重要的規則
+    prefer_single_quotes: true
+    avoid_empty_else: true
+    avoid_returning_null_for_void: true
+    curly_braces_in_flow_control_structures: true
+    empty_catches: true
+    prefer_is_empty: true
+    prefer_is_not_empty: true

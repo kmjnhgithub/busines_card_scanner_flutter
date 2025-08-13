@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:busines_card_scanner_flutter/core/utils/string_utils.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('StringUtils Tests', () {
@@ -23,8 +23,8 @@ void main() {
 
     group('removeControlCharacters', () {
       test('should remove control characters but preserve newlines and tabs', () {
-        final input = 'hello\x00\x01world\n\ttest\x1F';
-        final expected = 'helloworld\n\ttest';
+        const input = 'hello\x00\x01world\n\ttest\x1F';
+        const expected = 'helloworld\n\ttest';
         expect(StringUtils.removeControlCharacters(input), expected);
       });
 

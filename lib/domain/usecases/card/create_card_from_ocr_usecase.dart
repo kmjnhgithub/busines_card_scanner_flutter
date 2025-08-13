@@ -1,9 +1,9 @@
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
+
 
 /// CreateCardFromOCRUseCase - 從 OCR 結果建立名片的業務用例
 /// 
@@ -109,7 +109,7 @@ class CreateCardFromOCRUseCase {
 
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -169,7 +169,7 @@ class CreateCardFromOCRUseCase {
 
   /// 使用 AI 解析 OCR 文字
   Future<ParsedCardData> _parseWithAI(String ocrText, ParseHints? hints) async {
-    return await _aiRepository.parseCardFromText(
+    return _aiRepository.parseCardFromText(
       ocrText,
       hints: hints,
     );
@@ -188,7 +188,7 @@ class CreateCardFromOCRUseCase {
       'notes': parsedData.notes,
     };
 
-    return await _aiRepository.validateAndSanitizeResult(rawData);
+    return _aiRepository.validateAndSanitizeResult(rawData);
   }
 
   /// 從解析資料建立 BusinessCard 實體
@@ -199,7 +199,7 @@ class CreateCardFromOCRUseCase {
 
   /// 儲存名片
   Future<BusinessCard> _saveCard(BusinessCard card) async {
-    return await _cardWriter.saveCard(card);
+    return _cardWriter.saveCard(card);
   }
 }
 

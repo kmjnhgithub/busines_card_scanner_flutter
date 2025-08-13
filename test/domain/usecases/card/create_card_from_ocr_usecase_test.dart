@@ -1,23 +1,23 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
-import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_ocr_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_ocr_usecase.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 
 /// Mock CardWriter 用於測試
 class MockCardWriter implements CardWriter {
   BusinessCard? _mockSavedCard;
   BatchSaveResult? _mockBatchResult;
   BatchDeleteResult? _mockDeleteResult;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
   void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
@@ -88,11 +88,11 @@ class MockCardWriter implements CardWriter {
 class MockAIRepository implements AIRepository {
   ParsedCardData? _mockParsedData;
   BatchParseResult? _mockBatchResult;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockParsedData(ParsedCardData data) => _mockParsedData = data;
   void setMockBatchResult(BatchParseResult result) => _mockBatchResult = result;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<ParsedCardData> parseCardFromText(String ocrText, {ParseHints? hints}) async {
@@ -113,7 +113,7 @@ class MockAIRepository implements AIRepository {
   @override
   Future<BatchParseResult> parseCardsFromTexts(List<OCRResult> ocrResults, {ParseHints? hints}) async {
     if (_mockFailure != null) throw _mockFailure!;
-    return _mockBatchResult ?? BatchParseResult(
+    return _mockBatchResult ?? const BatchParseResult(
       successful: [],
       failed: [],
     );
@@ -122,7 +122,7 @@ class MockAIRepository implements AIRepository {
   @override
   Future<CardCompletionSuggestions> suggestCardCompletion(BusinessCard incompleteCard, {CompletionContext? context}) async {
     if (_mockFailure != null) throw _mockFailure!;
-    return CardCompletionSuggestions(suggestions: {}, confidence: {});
+    return const CardCompletionSuggestions(suggestions: {}, confidence: {});
   }
 
   @override
@@ -150,7 +150,7 @@ class MockAIRepository implements AIRepository {
       isAvailable: true,
       responseTimeMs: 200,
       remainingQuota: 1000,
-      quotaResetAt: DateTime.now().add(Duration(hours: 1)),
+      quotaResetAt: DateTime.now().add(const Duration(hours: 1)),
       checkedAt: DateTime.now(),
     );
   }
@@ -169,7 +169,7 @@ class MockAIRepository implements AIRepository {
   @override
   Future<AIModelInfo> getCurrentModel() async {
     if (_mockFailure != null) throw _mockFailure!;
-    return AIModelInfo(
+    return const AIModelInfo(
       id: 'mock-model',
       name: 'Mock Model',
       version: '1.0.0',
@@ -184,8 +184,8 @@ class MockAIRepository implements AIRepository {
     return AIUsageStatistics(
       totalRequests: 0,
       successfulRequests: 0,
-      averageConfidence: 0.0,
-      averageResponseTimeMs: 0.0,
+      averageConfidence: 0,
+      averageResponseTimeMs: 0,
       modelUsage: {},
       lastUpdated: DateTime.now(),
     );
@@ -206,7 +206,7 @@ class MockAIRepository implements AIRepository {
   @override
   Future<DuplicateDetectionResult> detectDuplicates(ParsedCardData cardData, List<BusinessCard> existingCards) async {
     if (_mockFailure != null) throw _mockFailure!;
-    return DuplicateDetectionResult(hasDuplicates: false, potentialDuplicates: [], similarityScores: {});
+    return const DuplicateDetectionResult(hasDuplicates: false, potentialDuplicates: [], similarityScores: {});
   }
 
   @override
@@ -296,7 +296,7 @@ void main() {
 
       test('should apply parsing hints correctly', () async {
         // Arrange
-        final parseHints = ParseHints(
+        const parseHints = ParseHints(
           language: 'zh-TW',
           country: 'TW',
           cardType: 'business',
@@ -430,7 +430,7 @@ void main() {
         // Arrange
         mockAIRepository.setMockFailure(
           AIQuotaExceededFailure(
-            resetTime: DateTime.now().add(Duration(hours: 1)),
+            resetTime: DateTime.now().add(const Duration(hours: 1)),
             userMessage: 'AI 使用額度已用完',
           ),
         );

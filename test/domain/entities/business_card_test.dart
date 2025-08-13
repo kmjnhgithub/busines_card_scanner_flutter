@@ -1,5 +1,5 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('BusinessCard Entity Tests', () {
@@ -361,16 +361,7 @@ void main() {
           () => BusinessCard(
             id: 'card-123',
             name: 'John Doe',
-            jobTitle: null,
-            company: null,
-            email: null,
-            phone: null,
-            address: null,
-            website: null,
-            notes: null,
-            imageUrl: null,
             createdAt: testDateTime,
-            updatedAt: null,
           ),
           returnsNormally,
         );

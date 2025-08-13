@@ -1,5 +1,13 @@
 import 'dart:developer' as developer;
 
+/// 日誌等級
+enum LogLevel {
+  debug,
+  info,
+  warning,
+  error,
+}
+
 /// 日誌記錄工具類
 /// 
 /// 提供結構化的日誌記錄功能，包括：
@@ -10,14 +18,6 @@ import 'dart:developer' as developer;
 class LoggerUtils {
   // 防止實例化
   LoggerUtils._();
-
-  /// 日誌等級
-  enum LogLevel {
-    debug,
-    info,
-    warning,
-    error,
-  }
 
   /// 當前日誌等級（生產環境建議設為 info 以上）
   static LogLevel _currentLevel = LogLevel.debug;
@@ -160,7 +160,7 @@ class LoggerUtils {
     for (final keyword in _sensitiveKeywords) {
       // 使用正規表達式匹配 key: value 或 key=value 格式
       final regex = RegExp(
-        r'(' + keyword + r')\s*[:=]\s*([^\s,})\]]+)',
+        '(' + keyword + r')\s*[:=]\s*([^\s,})\]]+)',
         caseSensitive: false,
       );
       
@@ -195,7 +195,7 @@ class LoggerUtils {
   /// 檢查是否為敏感欄位名稱
   static bool _isSensitiveKey(String key) {
     final lowerKey = key.toLowerCase();
-    return _sensitiveKeywords.any((keyword) => lowerKey.contains(keyword));
+    return _sensitiveKeywords.any(lowerKey.contains);
   }
 
   /// 截斷過長的字串

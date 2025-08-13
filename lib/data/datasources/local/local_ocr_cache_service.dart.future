@@ -1,0 +1,529 @@
+// lib/data/datasources/local/local_ocr_cache_service.dart
+
+import 'dart:typed_data';
+import 'dart:convert';
+import 'dart:math' as math;
+
+import 'package:crypto/crypto.dart';
+import 'package:uuid/uuid.dart';
+import 'package:drift/drift.dart';
+
+import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/local/ocr_cache_service.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/local/clean_app_database.dart';
+
+/// 本地 OCR 快取服務實作
+/// 
+/// 使用 Drift 資料庫實作 OCR 結果的本地快取、儲存和管理功能
+/// 包含智慧快取策略、統計追蹤、資料清理等完整功能
+/// 
+/// 特色功能：
+/// - 基於 SHA-256 的圖片雜湊快取機制
+/// - LRU 快取策略和時間有效性驗證
+/// - 完整的歷史記錄管理
+/// - 即時統計資訊追蹤和效能監控
+/// - 自動資料清理和儲存空間優化
+/// - 完整的錯誤處理和資料驗證
+class LocalOCRCacheService implements OCRCacheService {
+  static const String _defaultStatsId = 'default';
+  
+  // 快取有效期限（天）
+  static const int _defaultCacheValidityDays = 7;
+  
+  // LRU 快取大小限制
+  static const int _maxCacheSize = 1000;
+  
+  // 圖片資料大小限制 (10MB)
+  static const int _maxImageSizeBytes = 10 * 1024 * 1024;
+  
+  final CleanAppDatabase _database;
+  final Uuid _uuid;
+  
+  // 快取有效期限（可配置）
+  final int _cacheValidityDays;
+
+  /// 建構函式
+  /// 
+  /// [database] Drift 資料庫實例
+  /// [uuid] UUID 生成器（可選，測試時可注入）
+  /// [cacheValidityDays] 快取有效期限天數（預設 7 天）
+  LocalOCRCacheService({
+    required CleanAppDatabase database,
+    Uuid? uuid,
+    int cacheValidityDays = _defaultCacheValidityDays,
+  }) : _database = database,
+       _uuid = uuid ?? const Uuid(),
+       _cacheValidityDays = cacheValidityDays;
+
+  @override
+  String getCacheKey(Uint8List imageData) {
+    try {
+      // 使用 SHA-256 生成圖片唯一雜湊值
+      final digest = sha256.convert(imageData);
+      return digest.toString();
+    } catch (e) {
+      throw DataSourceFailure(
+        userMessage: '無法產生快取鍵值',
+        internalMessage: 'Failed to generate cache key: $e',
+      );
+    }
+  }
+
+  @override
+  Future<OCRResult> getCachedResult(String cacheKey) async {
+    try {
+      final cachedData = await _database.ocrDao.getOCRResultByCacheKey(cacheKey);
+      
+      if (cachedData == null) {
+        throw const OCRResultNotFoundException(
+          'cache_key_not_found',
+          userMessage: '找不到快取的 OCR 結果',
+        );
+      }
+      
+      // 轉換資料庫結果為 OCRResult
+      return _mapDataToOCRResult(cachedData, includeImage: true);
+      
+    } catch (e) {
+      if (e is OCRResultNotFoundException) rethrow;
+      
+      throw DataSourceFailure(
+        userMessage: '讀取快取資料失敗',
+        internalMessage: 'Failed to read cached result: $e',
+      );
+    }
+  }
+
+  @override
+  bool isCacheValid(OCRResult result) {
+    try {
+      // 檢查基本資料完整性
+      if (result.rawText.isEmpty) {
+        return false;
+      }
+      
+      // 檢查時間有效性
+      final now = DateTime.now();
+      final ageInDays = now.difference(result.processedAt).inDays;
+      
+      if (ageInDays > _cacheValidityDays) {
+        return false;
+      }
+      
+      // 檢查信心度（過低的結果不應快取）
+      if (result.confidence < 0.1) {
+        return false;
+      }
+      
+      return true;
+      
+    } catch (e) {
+      // 發生錯誤時認為快取無效
+      return false;
+    }
+  }
+
+  @override
+  Future<void> cacheResult(String cacheKey, OCRResult result) async {
+    try {
+      // 驗證輸入
+      if (cacheKey.isEmpty) {
+        throw const DataSourceFailure(
+          userMessage: '快取鍵值不能為空',
+          internalMessage: 'Cache key cannot be empty',
+        );
+      }
+      
+      // 檢查圖片大小限制
+      if (result.imageData != null && 
+          result.imageData!.length > _maxImageSizeBytes) {
+        throw DataSourceFailure(
+          userMessage: '圖片資料過大，無法快取',
+          internalMessage: 'Image data too large: ${result.imageData!.length} bytes',
+        );
+      }
+      
+      // 檢查快取大小，必要時清理舊資料
+      await _ensureCacheSize();
+      
+      // 轉換為資料庫格式
+      final ocrData = _mapOCRResultToData(result, cacheKey);
+      
+      // 儲存或更新快取
+      await _database.ocrDao.insertOCRResult(ocrData);
+      
+      // 更新統計資訊
+      await _updateStatistics(result);
+      
+    } catch (e) {
+      if (e is DataSourceFailure) rethrow;
+      
+      throw DataSourceFailure(
+        userMessage: '快取 OCR 結果失敗',
+        internalMessage: 'Failed to cache OCR result: $e',
+      );
+    }
+  }
+
+  @override
+  Future<OCRResult> saveResult(OCRResult result) async {
+    try {
+      final resultId = _uuid.v4();
+      final cacheKey = getCacheKey(result.imageData ?? Uint8List(0));
+      
+      final updatedResult = result.copyWith(id: resultId);
+      
+      // 轉換為資料庫格式
+      final ocrData = _mapOCRResultToData(updatedResult, cacheKey);
+      
+      // 儲存到資料庫
+      await _database.ocrDao.insertOCRResult(ocrData);
+      
+      // 更新統計資訊
+      await _updateStatistics(updatedResult);
+      
+      return updatedResult;
+      
+    } catch (e) {
+      throw DataSourceFailure(
+        userMessage: '儲存 OCR 結果失敗',
+        internalMessage: 'Failed to save OCR result: $e',
+      );
+    }
+  }
+
+  @override
+  Future<List<OCRResult>> getHistory({
+    int limit = 50,
+    bool includeImages = false,
+  }) async {
+    try {
+      if (limit <= 0) {
+        throw const DataSourceFailure(
+          userMessage: '限制數量必須大於 0',
+          internalMessage: 'Limit must be positive',
+        );
+      }
+      
+      final historyData = await _database.ocrDao.getOCRHistory(
+        limit: math.min(limit, 1000), // 最多 1000 筆
+        includeImages: includeImages,
+      );
+      
+      return historyData.map((data) => _mapDataToOCRResult(
+        data, 
+        includeImage: includeImages,
+      )).toList();
+      
+    } catch (e) {
+      throw DataSourceFailure(
+        userMessage: '讀取 OCR 歷史失敗',
+        internalMessage: 'Failed to read OCR history: $e',
+      );
+    }
+  }
+
+  @override
+  Future<OCRResult> getResultById(
+    String resultId, {
+    bool includeImage = false,
+  }) async {
+    try {
+      if (resultId.isEmpty) {
+        throw const DataSourceFailure(
+          userMessage: '結果 ID 不能為空',
+          internalMessage: 'Result ID cannot be empty',
+        );
+      }
+      
+      final resultData = await _database.ocrDao.getOCRResultById(
+        resultId,
+        includeImage: includeImage,
+      );
+      
+      if (resultData == null) {
+        throw const OCRResultNotFoundException(
+          'result_not_found',
+          userMessage: '找不到指定的 OCR 結果',
+        );
+      }
+      
+      return _mapDataToOCRResult(resultData, includeImage: includeImage);
+      
+    } catch (e) {
+      if (e is OCRResultNotFoundException) rethrow;
+      
+      throw DataSourceFailure(
+        userMessage: '讀取 OCR 結果失敗',
+        internalMessage: 'Failed to read OCR result: $e',
+      );
+    }
+  }
+
+  @override
+  Future<bool> deleteResult(String resultId) async {
+    try {
+      if (resultId.isEmpty) {
+        throw const DataSourceFailure(
+          userMessage: '結果 ID 不能為空',
+          internalMessage: 'Result ID cannot be empty',
+        );
+      }
+      
+      return await _database.ocrDao.deleteOCRResult(resultId);
+      
+    } catch (e) {
+      throw DataSourceFailure(
+        userMessage: '刪除 OCR 結果失敗',
+        internalMessage: 'Failed to delete OCR result: $e',
+      );
+    }
+  }
+
+  @override
+  Future<int> cleanupOldResults({int daysOld = 30}) async {
+    try {
+      if (daysOld <= 0) {
+        throw const DataSourceFailure(
+          userMessage: '清理天數必須大於 0',
+          internalMessage: 'Days old must be positive',
+        );
+      }
+      
+      final deletedCount = await _database.ocrDao.cleanupOldResults(
+        daysOld: daysOld,
+      );
+      
+      // 更新統計資訊
+      await _refreshStatistics();
+      
+      return deletedCount;
+      
+    } catch (e) {
+      throw DataSourceFailure(
+        userMessage: '清理舊資料失敗',
+        internalMessage: 'Failed to cleanup old results: $e',
+      );
+    }
+  }
+
+  @override
+  Future<OCRStatistics> getStatistics() async {
+    try {
+      // 先嘗試從快取讀取
+      final cachedStats = await _database.ocrDao.getStatistics();
+      
+      if (cachedStats != null) {
+        return _mapDataToOCRStatistics(cachedStats);
+      }
+      
+      // 如果沒有快取，計算即時統計
+      final realTimeStats = await _database.ocrDao.calculateRealTimeStatistics();
+      
+      // 建立並儲存統計資料
+      final statistics = OCRStatistics(
+        totalProcessed: realTimeStats['totalProcessed'] ?? 0,
+        averageConfidence: realTimeStats['averageConfidence'] ?? 0.0,
+        averageProcessingTimeMs: realTimeStats['averageProcessingTimeMs'] ?? 0.0,
+        engineUsage: Map<String, int>.from(realTimeStats['engineUsage'] ?? {}),
+        languageConfidence: <String, double>{}, // 簡化實作
+        lastUpdated: DateTime.now(),
+      );
+      
+      // 儲存統計資料
+      await _saveStatistics(statistics);
+      
+      return statistics;
+      
+    } catch (e) {
+      throw DataSourceFailure(
+        userMessage: '讀取統計資訊失敗',
+        internalMessage: 'Failed to read statistics: $e',
+      );
+    }
+  }
+
+  /// 確保快取大小不超過限制
+  Future<void> _ensureCacheSize() async {
+    try {
+      final totalCount = await _database.ocrDao.calculateRealTimeStatistics();
+      final currentCount = totalCount['totalProcessed'] ?? 0;
+      
+      if (currentCount >= _maxCacheSize) {
+        // 刪除最舊的 20% 記錄
+        final deleteCount = (_maxCacheSize * 0.2).round();
+        await _database.ocrDao.cleanupOldResults(daysOld: 1);
+        
+        // 如果還是太多，強制刪除最舊的記錄
+        final remainingCount = await _database.ocrDao.calculateRealTimeStatistics();
+        if ((remainingCount['totalProcessed'] ?? 0) >= _maxCacheSize) {
+          // 這裡可以實作更複雜的 LRU 邏輯
+          await _database.ocrDao.cleanupOldResults(daysOld: 0);
+        }
+      }
+    } catch (e) {
+      // 快取大小管理失敗不影響主要功能
+      print('Warning: Failed to manage cache size: $e');
+    }
+  }
+
+  /// 更新統計資訊
+  Future<void> _updateStatistics(OCRResult result) async {
+    try {
+      // 取得現有統計
+      final currentStats = await _database.ocrDao.getStatistics();
+      
+      if (currentStats == null) {
+        // 建立新的統計記錄
+        await _database.ocrDao.updateStatistics(OCRStatisticsCompanion.insert(
+          id: _defaultStatsId,
+          totalProcessed: 1,
+          averageConfidence: result.confidence,
+          averageProcessingTimeMs: (result.processingTimeMs ?? 0).toDouble(),
+          engineUsage: jsonEncode({result.ocrEngine ?? 'unknown': 1}),
+          lastUpdated: DateTime.now(),
+        ));
+      } else {
+        // 更新現有統計
+        final newTotal = currentStats.totalProcessed + 1;
+        final newAvgConfidence = ((currentStats.averageConfidence * currentStats.totalProcessed) + result.confidence) / newTotal;
+        final newAvgProcessingTime = ((currentStats.averageProcessingTimeMs * currentStats.totalProcessed) + (result.processingTimeMs ?? 0)) / newTotal;
+        
+        // 更新引擎使用統計
+        final currentEngineUsage = jsonDecode(currentStats.engineUsage) as Map<String, dynamic>;
+        final engineName = result.ocrEngine ?? 'unknown';
+        currentEngineUsage[engineName] = (currentEngineUsage[engineName] ?? 0) + 1;
+        
+        await _database.ocrDao.updateStatistics(OCRStatisticsCompanion(
+          id: Value(_defaultStatsId),
+          totalProcessed: Value(newTotal),
+          averageConfidence: Value(newAvgConfidence),
+          averageProcessingTimeMs: Value(newAvgProcessingTime),
+          engineUsage: Value(jsonEncode(currentEngineUsage)),
+          lastUpdated: Value(DateTime.now()),
+        ));
+      }
+    } catch (e) {
+      // 統計更新失敗不影響主要功能
+      print('Warning: Failed to update statistics: $e');
+    }
+  }
+
+  /// 重新計算統計資訊
+  Future<void> _refreshStatistics() async {
+    try {
+      final realTimeStats = await _database.ocrDao.calculateRealTimeStatistics();
+      
+      final statistics = OCRStatistics(
+        totalProcessed: realTimeStats['totalProcessed'] ?? 0,
+        averageConfidence: realTimeStats['averageConfidence'] ?? 0.0,
+        averageProcessingTimeMs: realTimeStats['averageProcessingTimeMs'] ?? 0.0,
+        engineUsage: Map<String, int>.from(realTimeStats['engineUsage'] ?? {}),
+        languageConfidence: <String, double>{},
+        lastUpdated: DateTime.now(),
+      );
+      
+      await _saveStatistics(statistics);
+      
+    } catch (e) {
+      print('Warning: Failed to refresh statistics: $e');
+    }
+  }
+
+  /// 儲存統計資料到資料庫
+  Future<void> _saveStatistics(OCRStatistics statistics) async {
+    await _database.ocrDao.updateStatistics(OCRStatisticsCompanion(
+      id: const Value(_defaultStatsId),
+      totalProcessed: Value(statistics.totalProcessed),
+      averageConfidence: Value(statistics.averageConfidence),
+      averageProcessingTimeMs: Value(statistics.averageProcessingTimeMs),
+      engineUsage: Value(jsonEncode(statistics.engineUsage)),
+      languageConfidence: Value(jsonEncode(statistics.languageConfidence)),
+      lastUpdated: Value(statistics.lastUpdated),
+    ));
+  }
+
+  /// 將資料庫結果轉換為 OCRResult 實體
+  OCRResult _mapDataToOCRResult(OCRResultData data, {bool includeImage = false}) {
+    List<String>? detectedTexts;
+    if (data.detectedTexts != null) {
+      try {
+        final decoded = jsonDecode(data.detectedTexts!) as List<dynamic>;
+        detectedTexts = decoded.cast<String>();
+      } catch (e) {
+        // JSON 解析失敗時使用 null
+        detectedTexts = null;
+      }
+    }
+
+    return OCRResult(
+      id: data.id,
+      rawText: data.rawText,
+      detectedTexts: detectedTexts,
+      confidence: data.confidence,
+      imageData: includeImage ? data.imageData : null,
+      imageWidth: data.imageWidth,
+      imageHeight: data.imageHeight,
+      processedAt: data.processedAt,
+      processingTimeMs: data.processingTimeMs,
+      ocrEngine: data.ocrEngine,
+    );
+  }
+
+  /// 將 OCRResult 實體轉換為資料庫格式
+  OCRResultsCompanion _mapOCRResultToData(OCRResult result, String cacheKey) {
+    String? detectedTextsJson;
+    if (result.detectedTexts != null) {
+      try {
+        detectedTextsJson = jsonEncode(result.detectedTexts);
+      } catch (e) {
+        // JSON 編碼失敗時使用 null
+        detectedTextsJson = null;
+      }
+    }
+
+    return OCRResultsCompanion.insert(
+      id: result.id,
+      rawText: result.rawText,
+      detectedTexts: Value(detectedTextsJson),
+      confidence: result.confidence,
+      imageData: Value(result.imageData),
+      imageWidth: Value(result.imageWidth),
+      imageHeight: Value(result.imageHeight),
+      processingTimeMs: Value(result.processingTimeMs),
+      ocrEngine: Value(result.ocrEngine),
+      cacheKey: cacheKey,
+      processedAt: result.processedAt,
+      createdAt: DateTime.now(),
+    );
+  }
+
+  /// 將資料庫統計結果轉換為 OCRStatistics 實體
+  OCRStatistics _mapDataToOCRStatistics(OCRStatisticData data) {
+    Map<String, int> engineUsage;
+    Map<String, double> languageConfidence;
+    
+    try {
+      engineUsage = Map<String, int>.from(jsonDecode(data.engineUsage));
+    } catch (e) {
+      engineUsage = <String, int>{};
+    }
+    
+    try {
+      languageConfidence = Map<String, double>.from(jsonDecode(data.languageConfidence));
+    } catch (e) {
+      languageConfidence = <String, double>{};
+    }
+
+    return OCRStatistics(
+      totalProcessed: data.totalProcessed,
+      averageConfidence: data.averageConfidence,
+      averageProcessingTimeMs: data.averageProcessingTimeMs,
+      engineUsage: engineUsage,
+      languageConfidence: languageConfidence,
+      lastUpdated: data.lastUpdated,
+    );
+  }
+}

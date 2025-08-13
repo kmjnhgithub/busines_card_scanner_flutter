@@ -1,6 +1,5 @@
-import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 
 /// DeleteCardUseCase - 刪除名片的業務用例
 /// 
@@ -119,7 +118,7 @@ class DeleteCardUseCase {
 
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -174,7 +173,7 @@ class DeleteCardUseCase {
       );
 
     } catch (e, stackTrace) {
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -227,7 +226,7 @@ class DeleteCardUseCase {
       );
 
     } catch (e, stackTrace) {
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -276,7 +275,7 @@ class DeleteCardUseCase {
       );
 
     } catch (e, stackTrace) {
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -334,27 +333,27 @@ class DeleteCardUseCase {
 
   /// 執行硬刪除
   Future<bool> _performHardDelete(String cardId) async {
-    return await _cardWriter.deleteCard(cardId);
+    return _cardWriter.deleteCard(cardId);
   }
 
   /// 執行軟刪除
   Future<bool> _performSoftDelete(String cardId) async {
-    return await _cardWriter.softDeleteCard(cardId);
+    return _cardWriter.softDeleteCard(cardId);
   }
 
   /// 執行復原
   Future<bool> _performRestore(String cardId) async {
-    return await _cardWriter.restoreCard(cardId);
+    return _cardWriter.restoreCard(cardId);
   }
 
   /// 執行清理
   Future<int> _performPurge(int daysOld) async {
-    return await _cardWriter.purgeDeletedCards(daysOld: daysOld);
+    return _cardWriter.purgeDeletedCards(daysOld: daysOld);
   }
 
   /// 執行批次刪除
   Future<BatchDeleteResult> _performBatchDelete(List<String> cardIds) async {
-    return await _cardWriter.deleteCards(cardIds);
+    return _cardWriter.deleteCards(cardIds);
   }
 }
 

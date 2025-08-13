@@ -1,19 +1,19 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_reader.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 
 /// Mock Repository 用於測試
 class MockCardReader implements CardReader {
   List<BusinessCard>? _mockCards;
   CardPageResult? _mockPageResult;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockCards(List<BusinessCard> cards) => _mockCards = cards;
   void setMockPageResult(CardPageResult result) => _mockPageResult = result;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<List<BusinessCard>> getCards({int limit = 50}) async {
@@ -35,9 +35,6 @@ class MockCardReader implements CardReader {
       limit: pageSize,
       hasMore: false,
       currentPage: page,
-      totalPages: 1,
-      hasNext: false,
-      hasPrevious: false,
     );
   }
 
@@ -217,10 +214,8 @@ void main() {
           currentOffset: 0,
           limit: 10,
           hasMore: true,
-          currentPage: 1,
           totalPages: 3,
           hasNext: true,
-          hasPrevious: false,
         );
         mockCardReader.setMockPageResult(mockPageResult);
 
@@ -253,7 +248,6 @@ void main() {
           hasMore: false,
           currentPage: 3,
           totalPages: 3,
-          hasNext: false,
           hasPrevious: true,
         );
         mockCardReader.setMockPageResult(mockPageResult);
@@ -635,16 +629,13 @@ void main() {
     group('參數驗證', () {
       test('should handle invalid pagination parameters gracefully', () async {
         // Arrange - 即使參數不合理，也應該讓 Repository 決定如何處理
-        mockCardReader.setMockPageResult(CardPageResult(
+        mockCardReader.setMockPageResult(const CardPageResult(
           cards: [],
           totalCount: 0,
           currentOffset: 0,
           limit: 10,
           hasMore: false,
-          currentPage: 1,
           totalPages: 0,
-          hasNext: false,
-          hasPrevious: false,
         ));
 
         // Act - 使用無效的分頁參數

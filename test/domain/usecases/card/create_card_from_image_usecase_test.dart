@@ -1,25 +1,26 @@
 import 'dart:typed_data';
-import 'package:flutter_test/flutter_test.dart';
+
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_image_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 
 /// Mock CardWriter 用於測試
 class MockCardWriter implements CardWriter {
   BusinessCard? _mockSavedCard;
   BatchSaveResult? _mockBatchResult;
   BatchDeleteResult? _mockDeleteResult;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
   void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
@@ -92,11 +93,11 @@ class MockCardWriter implements CardWriter {
 class MockOCRRepository implements OCRRepository {
   OCRResult? _mockOCRResult;
   BatchOCRResult? _mockBatchResult;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockOCRResult(OCRResult result) => _mockOCRResult = result;
   void setMockBatchResult(BatchOCRResult result) => _mockBatchResult = result;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<OCRResult> recognizeText(
@@ -119,7 +120,7 @@ class MockOCRRepository implements OCRRepository {
     OCROptions? options,
   }) async {
     if (_mockFailure != null) throw _mockFailure!;
-    return _mockBatchResult ?? BatchOCRResult(
+    return _mockBatchResult ?? const BatchOCRResult(
       successful: [],
       failed: [],
     );
@@ -216,8 +217,8 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) throw _mockFailure!;
     return OCRStatistics(
       totalProcessed: 0,
-      averageConfidence: 0.0,
-      averageProcessingTimeMs: 0.0,
+      averageConfidence: 0,
+      averageProcessingTimeMs: 0,
       engineUsage: {},
       languageConfidence: {},
       lastUpdated: DateTime.now(),
@@ -229,11 +230,11 @@ class MockOCRRepository implements OCRRepository {
 class MockAIRepository implements AIRepository {
   ParsedCardData? _mockParsedData;
   BatchParseResult? _mockBatchResult;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockParsedData(ParsedCardData data) => _mockParsedData = data;
   void setMockBatchResult(BatchParseResult result) => _mockBatchResult = result;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<ParsedCardData> parseCardFromText(
@@ -259,7 +260,7 @@ class MockAIRepository implements AIRepository {
     ParseHints? hints,
   }) async {
     if (_mockFailure != null) throw _mockFailure!;
-    return _mockBatchResult ?? BatchParseResult(
+    return _mockBatchResult ?? const BatchParseResult(
       successful: [],
       failed: [],
     );
@@ -331,8 +332,8 @@ class MockAIRepository implements AIRepository {
     return AIUsageStatistics(
       totalRequests: 0,
       successfulRequests: 0,
-      averageConfidence: 0.0,
-      averageResponseTimeMs: 0.0,
+      averageConfidence: 0,
+      averageResponseTimeMs: 0,
       modelUsage: {},
       lastUpdated: DateTime.now(),
     );
@@ -519,8 +520,6 @@ void main() {
           imageData: testImageData,
           ocrOptions: const OCROptions(
             preferredLanguages: ['en'],
-            enablePreprocessing: true,
-            enableRotationCorrection: true,
           ),
         ));
 
@@ -634,7 +633,7 @@ void main() {
         final result = await useCase.execute(CreateCardFromImageParams(
           imageData: testImageData,
           ocrOptions: const OCROptions(
-            enablePreprocessing: true,
+            
           ),
           preprocessOptions: const ImagePreprocessOptions(
             contrast: 20,
@@ -769,7 +768,6 @@ void main() {
         // Act
         final result = await useCase.execute(CreateCardFromImageParams(
           imageData: testImageData,
-          validateResults: true, // 啟用驗證
         ));
 
         // Assert - 確保資料已被清理
@@ -843,7 +841,6 @@ void main() {
         // Arrange & Act
         final result = await useCase.execute(CreateCardFromImageParams(
           imageData: testImageData,
-          autoCleanup: true, // 自動清理
         ));
 
         // Assert - 檢查資源清理

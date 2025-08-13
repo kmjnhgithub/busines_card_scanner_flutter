@@ -1,8 +1,8 @@
 import 'dart:typed_data';
+
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 
 /// ProcessImageUseCase - 圖片處理的業務用例
 /// 
@@ -124,7 +124,7 @@ class ProcessImageUseCase {
 
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -174,7 +174,7 @@ class ProcessImageUseCase {
       );
 
     } catch (e, stackTrace) {
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -187,32 +187,32 @@ class ProcessImageUseCase {
 
   /// 取得可用的 OCR 引擎
   Future<List<OCREngineInfo>> getAvailableEngines() async {
-    return await _ocrRepository.getAvailableEngines();
+    return _ocrRepository.getAvailableEngines();
   }
 
   /// 設定偏好的 OCR 引擎
   Future<void> setPreferredEngine(String engineId) async {
-    return await _ocrRepository.setPreferredEngine(engineId);
+    return _ocrRepository.setPreferredEngine(engineId);
   }
 
   /// 取得目前的 OCR 引擎
   Future<OCREngineInfo> getCurrentEngine() async {
-    return await _ocrRepository.getCurrentEngine();
+    return _ocrRepository.getCurrentEngine();
   }
 
   /// 測試 OCR 引擎健康狀態
   Future<OCREngineHealth> testEngineHealth(String engineId) async {
-    return await _ocrRepository.testEngine(engineId: engineId);
+    return _ocrRepository.testEngine(engineId: engineId);
   }
 
   /// 取得處理統計資料
   Future<OCRStatistics> getStatistics() async {
-    return await _ocrRepository.getStatistics();
+    return _ocrRepository.getStatistics();
   }
 
   /// 清理舊的 OCR 結果
   Future<int> cleanupOldResults({int daysOld = 30}) async {
-    return await _ocrRepository.cleanupOldResults(daysOld: daysOld);
+    return _ocrRepository.cleanupOldResults(daysOld: daysOld);
   }
 
   /// 驗證輸入參數
@@ -280,7 +280,7 @@ class ProcessImageUseCase {
 
   /// 預處理圖片
   Future<Uint8List> _preprocessImage(ProcessImageParams params) async {
-    return await _ocrRepository.preprocessImage(
+    return _ocrRepository.preprocessImage(
       params.imageData,
       options: params.preprocessOptions,
     );
@@ -288,17 +288,17 @@ class ProcessImageUseCase {
 
   /// 執行 OCR 處理
   Future<OCRResult> _performOCR(Uint8List imageData, OCROptions? options) async {
-    return await _ocrRepository.recognizeText(imageData, options: options);
+    return _ocrRepository.recognizeText(imageData, options: options);
   }
 
   /// 執行批次 OCR 處理
   Future<BatchOCRResult> _performBatchOCR(List<Uint8List> imageDataList, OCROptions? options) async {
-    return await _ocrRepository.recognizeTexts(imageDataList, options: options);
+    return _ocrRepository.recognizeTexts(imageDataList, options: options);
   }
 
   /// 儲存 OCR 結果
   Future<OCRResult> _saveOCRResult(OCRResult result) async {
-    return await _ocrRepository.saveOCRResult(result);
+    return _ocrRepository.saveOCRResult(result);
   }
 
   /// 驗證結果品質
@@ -337,7 +337,7 @@ class ProcessImageUseCase {
     final mockResult = OCRResult(
       id: 'dry-run-${DateTime.now().millisecondsSinceEpoch}',
       rawText: 'Dry run mode - no actual processing',
-      confidence: 0.0,
+      confidence: 0,
       processingTimeMs: 0,
       processedAt: DateTime.now(),
     );

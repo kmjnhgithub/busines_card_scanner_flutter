@@ -1,6 +1,7 @@
 import 'dart:typed_data';
-import 'package:flutter_test/flutter_test.dart';
+
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
+import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('OCRResult Entity Tests', () {
@@ -17,7 +18,7 @@ void main() {
       test('should create OCRResult with all fields', () {
         // Arrange
         final detectedTexts = ['John Doe', 'Software Engineer', 'john@example.com'];
-        final confidence = 0.95;
+        const confidence = 0.95;
 
         // Act
         final result = OCRResult(
@@ -73,8 +74,8 @@ void main() {
         final result = OCRResult(
           id: 'ocr-789',
           rawText: '',
-          detectedTexts: [],
-          confidence: 0.0,
+          detectedTexts: const [],
+          confidence: 0,
           processedAt: testDateTime,
         );
 
@@ -303,7 +304,7 @@ void main() {
         final resultWithTexts = OCRResult(
           id: 'ocr-123',
           rawText: 'Some text',
-          detectedTexts: ['Text 1', 'Text 2'],
+          detectedTexts: const ['Text 1', 'Text 2'],
           confidence: 0.8,
           processedAt: testDateTime,
         );
@@ -344,7 +345,7 @@ void main() {
         final result = OCRResult(
           id: 'ocr-123',
           rawText: 'John Doe john@example.com Software Engineer',
-          detectedTexts: [
+          detectedTexts: const [
             'John Doe',
             'john@example.com',
             'jane@company.org',
@@ -370,7 +371,7 @@ void main() {
         final result = OCRResult(
           id: 'ocr-123',
           rawText: 'John Doe +1-555-123-4567',
-          detectedTexts: [
+          detectedTexts: const [
             'John Doe',
             '+1-555-123-4567',
             '02-1234-5678',
@@ -436,7 +437,7 @@ void main() {
 
       test('should handle special characters in text', () {
         // Arrange
-        final specialText = '特殊字符 José García-López 🚀 @#\$%^&*()';
+        const specialText = r'特殊字符 José García-López 🚀 @#$%^&*()';
 
         // Act & Assert
         expect(
@@ -471,7 +472,7 @@ void main() {
           () => OCRResult(
             id: 'ocr-123',
             rawText: '',
-            confidence: 0.0,
+            confidence: 0,
             processedAt: testDateTime,
           ),
           returnsNormally,

@@ -19,22 +19,22 @@ class SecurityService {
     RegExp(r'\b(TABLE|FROM|INTO)\b', caseSensitive: false),
     RegExp(r'(--|#|/\*|\*/)', caseSensitive: false),
     RegExp(r"'\s*(OR|AND)\s*'[^']*'", caseSensitive: false),
-    RegExp(r";\s*(DROP|DELETE)", caseSensitive: false),
+    RegExp(r';\s*(DROP|DELETE)', caseSensitive: false),
     RegExp(r"'\s*;\s*", caseSensitive: false),
-    RegExp(r"'", caseSensitive: false), // 移除所有單引號
+    RegExp("'", caseSensitive: false), // 移除所有單引號
   ];
 
   /// XSS（跨站腳本攻擊）模式
   static final List<RegExp> _xssPatterns = [
-    RegExp(r'<script[^>]*>.*?</script>', caseSensitive: false),
-    RegExp(r'<iframe[^>]*>.*?</iframe>', caseSensitive: false),
+    RegExp('<script[^>]*>.*?</script>', caseSensitive: false),
+    RegExp('<iframe[^>]*>.*?</iframe>', caseSensitive: false),
     RegExp(r'javascript:\s*alert\s*\(', caseSensitive: false),
     RegExp(r'<[^>]*\s+on\w+\s*=', caseSensitive: false),
-    RegExp(r'<svg[^>]*onload[^>]*>', caseSensitive: false),
-    RegExp(r'<img[^>]*onerror[^>]*>', caseSensitive: false),
+    RegExp('<svg[^>]*onload[^>]*>', caseSensitive: false),
+    RegExp('<img[^>]*onerror[^>]*>', caseSensitive: false),
     RegExp(r'alert\s*\(', caseSensitive: false), // 移除任何 alert 呼叫
-    RegExp(r'<script[^>]*>', caseSensitive: false), // 檢測任何 script 標籤
-    RegExp(r'</script>', caseSensitive: false), // 檢測結尾標籤
+    RegExp('<script[^>]*>', caseSensitive: false), // 檢測任何 script 標籤
+    RegExp('</script>', caseSensitive: false), // 檢測結尾標籤
   ];
 
   /// 敏感資訊檢測模式（API Key、密碼等）
@@ -60,8 +60,8 @@ class SecurityService {
     RegExp(r'eval\s*\(', caseSensitive: false),
     RegExp(r'exec\s*\(', caseSensitive: false),
     RegExp(r'system\s*\(', caseSensitive: false),
-    RegExp(r'shell_exec', caseSensitive: false),
-    RegExp(r'base64_decode', caseSensitive: false),
+    RegExp('shell_exec', caseSensitive: false),
+    RegExp('base64_decode', caseSensitive: false),
     RegExp(r'window\.location', caseSensitive: false),
     RegExp(r'document\.cookie', caseSensitive: false),
   ];
@@ -89,7 +89,7 @@ class SecurityService {
       }
 
       // 移除 HTML 標籤（保留內容）
-      sanitized = sanitized.replaceAll(RegExp(r'<[^>]*>'), '');
+      sanitized = sanitized.replaceAll(RegExp('<[^>]*>'), '');
 
       // 移除控制字元（保留換行和tab）
       sanitized = sanitized.replaceAll(RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]'), '');

@@ -200,10 +200,10 @@ void main() {
       test('All Dart files should be in appropriate layer directories', () {
         final allDartFiles = fileImports.keys.toList();
         final validLayerPatterns = [
-          RegExp(r'/core/'),
-          RegExp(r'/domain/'),
-          RegExp(r'/data/'),
-          RegExp(r'/presentation/'),
+          RegExp('/core/'),
+          RegExp('/domain/'),
+          RegExp('/data/'),
+          RegExp('/presentation/'),
           RegExp(r'main\.dart$'), // main.dart 可以在根目錄
         ];
 
@@ -295,7 +295,7 @@ Future<Map<String, List<String>>> _analyzeImports(Directory directory) async {
   
   await for (final entity in directory.list(recursive: true)) {
     if (entity is File && entity.path.endsWith('.dart')) {
-      final relativePath = entity.path.replaceFirst(RegExp(r'^.*lib/'), 'lib/');
+      final relativePath = entity.path.replaceFirst(RegExp('^.*lib/'), 'lib/');
       final fileImports = await _extractImports(entity);
       imports[relativePath] = fileImports;
     }

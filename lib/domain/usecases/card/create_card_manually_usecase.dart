@@ -1,7 +1,7 @@
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
+
 
 /// CreateCardManuallyUseCase - 手動建立名片的業務用例
 /// 
@@ -124,7 +124,7 @@ class CreateCardManuallyUseCase {
 
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -187,7 +187,7 @@ class CreateCardManuallyUseCase {
     }
 
     // 批次處理解析的資料
-    return await executeBatch(CreateCardManuallyBatchParams(
+    return executeBatch(CreateCardManuallyBatchParams(
       cardsData: parsedData,
       autoFormatPhone: params.autoFormatPhone,
       enableSanitization: params.enableSanitization,
@@ -201,7 +201,7 @@ class CreateCardManuallyUseCase {
     // 名稱是必填欄位
     if (data.name.trim().isEmpty) {
       throw DataValidationFailure(
-        validationErrors: {
+        validationErrors: const {
           'name': ['姓名不能為空']
         },
         userMessage: '姓名不能為空',
@@ -226,8 +226,8 @@ class CreateCardManuallyUseCase {
   /// 清理字串（移除 HTML 標籤和潛在的惡意內容）
   String _sanitizeString(String input) {
     return input
-        .replaceAll(RegExp(r'<[^>]*>'), '') // 移除 HTML 標籤
-        .replaceAll(RegExp(r'javascript:', caseSensitive: false), '') // 移除 JavaScript
+        .replaceAll(RegExp('<[^>]*>'), '') // 移除 HTML 標籤
+        .replaceAll(RegExp('javascript:', caseSensitive: false), '') // 移除 JavaScript
         .replaceAll(RegExp(r'on\w+\s*=', caseSensitive: false), '') // 移除事件處理器
         .trim();
   }
@@ -384,7 +384,7 @@ class CreateCardManuallyUseCase {
 
   /// 儲存名片
   Future<BusinessCard> _saveCard(BusinessCard card) async {
-    return await _cardWriter.saveCard(card);
+    return _cardWriter.saveCard(card);
   }
 
   /// 解析 CSV 資料

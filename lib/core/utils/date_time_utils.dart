@@ -170,14 +170,14 @@ class DateTimeUtils {
 
   /// 獲取一個月的開始時間
   static DateTime startOfMonth(DateTime date) {
-    return DateTime(date.year, date.month, 1);
+    return DateTime(date.year, date.month);
   }
 
   /// 獲取一個月的結束時間
   static DateTime endOfMonth(DateTime date) {
     final nextMonth = date.month == 12 ? 1 : date.month + 1;
     final year = date.month == 12 ? date.year + 1 : date.year;
-    return DateTime(year, nextMonth, 1).subtract(const Duration(milliseconds: 1));
+    return DateTime(year, nextMonth).subtract(const Duration(milliseconds: 1));
   }
 
   /// 計算兩個日期之間的工作日數量（週一到週五）
@@ -238,7 +238,7 @@ class DateTimeUtils {
 
   /// 獲取一年中的第幾週
   static int getWeekOfYear(DateTime date) {
-    final firstDayOfYear = DateTime(date.year, 1, 1);
+    final firstDayOfYear = DateTime(date.year);
     final daysSinceFirstDay = date.difference(firstDayOfYear).inDays;
     return ((daysSinceFirstDay + firstDayOfYear.weekday - 1) / 7).ceil();
   }

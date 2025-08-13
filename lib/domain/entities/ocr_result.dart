@@ -1,7 +1,8 @@
 import 'dart:typed_data';
-import 'package:equatable/equatable.dart';
+
 import 'package:busines_card_scanner_flutter/core/services/security_service.dart';
 import 'package:busines_card_scanner_flutter/core/utils/string_utils.dart';
+import 'package:equatable/equatable.dart';
 
 /// OCR 處理結果實體
 /// 
@@ -41,12 +42,10 @@ class OCRResult extends Equatable {
   OCRResult({
     required this.id,
     required this.rawText,
-    this.detectedTexts,
-    required this.confidence,
+    required this.confidence, required this.processedAt, this.detectedTexts,
     this.imageData,
     this.imageWidth,
     this.imageHeight,
-    required this.processedAt,
     this.processingTimeMs,
     this.ocrEngine,
   }) {
@@ -54,15 +53,13 @@ class OCRResult extends Equatable {
   }
 
   /// 私有建構函式，用於 copyWith 方法避免重複驗證
-  OCRResult._internal({
+  const OCRResult._internal({
     required this.id,
     required this.rawText,
-    this.detectedTexts,
-    required this.confidence,
+    required this.confidence, required this.processedAt, this.detectedTexts,
     this.imageData,
     this.imageWidth,
     this.imageHeight,
-    required this.processedAt,
     this.processingTimeMs,
     this.ocrEngine,
   });

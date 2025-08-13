@@ -18,7 +18,7 @@ void main() {
           "1' OR '1'='1",
           "admin'/**/OR/**/1=1--",
           "' UNION SELECT * FROM sensitive_table --",
-          "1; DELETE FROM users WHERE 1=1; --",
+          '1; DELETE FROM users WHERE 1=1; --',
         ];
 
         for (final input in maliciousInputs) {
@@ -130,10 +130,10 @@ void main() {
         final maliciousResponses = [
           '<script>alert("XSS")</script>',
           '{"eval": "alert(1)"}',
-          '{"javascript": "window.location=\\"evil.com\\""}',
+          r'{"javascript": "window.location=\"evil.com\""}',
           '{"<script>": "malicious"}',
           'javascript:alert(1)',
-          '{"data": "<iframe src=\\"javascript:alert(1)\\"></iframe>"}',
+          r'{"data": "<iframe src=\"javascript:alert(1)\"></iframe>"}',
         ];
 
         for (final response in maliciousResponses) {

@@ -123,7 +123,7 @@ class ValidationService {
   /// 驗證網址格式
   Either<ValidationFailure, String> validateUrl(String url) {
     if (url.isEmpty) {
-      return Left(ValidationFailure(
+      return const Left(ValidationFailure(
         userMessage: '請輸入有效的網址',
         internalMessage: 'Empty URL provided',
         field: 'url',
@@ -209,7 +209,7 @@ class ValidationService {
 
     // 檢查是否包含控制字元
     if (trimmedName.contains(RegExp(r'[\n\r\t]'))) {
-      return Left(ValidationFailure(
+      return const Left(ValidationFailure(
         userMessage: '姓名不能包含換行符號',
         internalMessage: 'Name contains control characters',
         field: 'name',
@@ -265,7 +265,7 @@ class ValidationService {
 
     // 檢查是否包含控制字元
     if (trimmedName.contains(RegExp(r'[\n\r\t]'))) {
-      return Left(ValidationFailure(
+      return const Left(ValidationFailure(
         userMessage: '公司名稱不能包含控制字元',
         internalMessage: 'Company name contains control characters',
         field: 'companyName',

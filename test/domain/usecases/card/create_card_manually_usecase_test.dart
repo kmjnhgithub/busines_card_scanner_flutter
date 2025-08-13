@@ -1,21 +1,21 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_manually_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 
 /// Mock CardWriter 用於測試
 class MockCardWriter implements CardWriter {
   BusinessCard? _mockSavedCard;
   BatchSaveResult? _mockBatchResult;
   BatchDeleteResult? _mockDeleteResult;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
   void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
@@ -97,7 +97,7 @@ void main() {
     group('成功建立名片流程', () {
       test('should create card from manual input successfully', () async {
         // Arrange
-        final manualData = ManualCardData(
+        const manualData = ManualCardData(
           name: '王大明',
           company: '科技股份有限公司',
           jobTitle: '軟體工程師',
@@ -123,7 +123,7 @@ void main() {
         mockCardWriter.setMockSavedCard(expectedCard);
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: manualData,
         ));
 
@@ -143,12 +143,12 @@ void main() {
 
       test('should create minimal card with only required fields', () async {
         // Arrange - 只有必填欄位
-        final minimalData = ManualCardData(
+        const minimalData = ManualCardData(
           name: '李小華',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: minimalData,
         ));
 
@@ -165,13 +165,13 @@ void main() {
 
       test('should auto-format phone number when enabled', () async {
         // Arrange
-        final dataWithPhone = ManualCardData(
+        const dataWithPhone = ManualCardData(
           name: '張三',
           phone: '0912345678', // 未格式化的手機號碼
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: dataWithPhone,
           autoFormatPhone: true,
         ));
@@ -183,13 +183,13 @@ void main() {
 
       test('should validate email format when provided', () async {
         // Arrange
-        final dataWithEmail = ManualCardData(
+        const dataWithEmail = ManualCardData(
           name: '陳小明',
           email: 'chen@example.com',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: dataWithEmail,
         ));
 
@@ -200,13 +200,13 @@ void main() {
 
       test('should generate suggestions for incomplete data', () async {
         // Arrange
-        final incompleteData = ManualCardData(
+        const incompleteData = ManualCardData(
           name: '王工程師',
           company: '科技公司',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: incompleteData,
           generateSuggestions: true,
         ));
@@ -221,14 +221,14 @@ void main() {
     group('輸入驗證', () {
       test('should reject empty name', () async {
         // Arrange
-        final invalidData = ManualCardData(
+        const invalidData = ManualCardData(
           name: '',
           company: '公司名稱',
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardManuallyParams(
+          () => useCase.execute(const CreateCardManuallyParams(
             manualData: invalidData,
           )),
           throwsA(isA<DataValidationFailure>()),
@@ -237,13 +237,13 @@ void main() {
 
       test('should reject whitespace-only name', () async {
         // Arrange
-        final invalidData = ManualCardData(
+        const invalidData = ManualCardData(
           name: '   \n\t   ',
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardManuallyParams(
+          () => useCase.execute(const CreateCardManuallyParams(
             manualData: invalidData,
           )),
           throwsA(isA<DataValidationFailure>()),
@@ -252,13 +252,13 @@ void main() {
 
       test('should validate email format', () async {
         // Arrange
-        final invalidEmailData = ManualCardData(
+        const invalidEmailData = ManualCardData(
           name: '王大明',
           email: 'invalid-email-format',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: invalidEmailData,
         ));
 
@@ -269,13 +269,13 @@ void main() {
 
       test('should validate phone format', () async {
         // Arrange
-        final invalidPhoneData = ManualCardData(
+        const invalidPhoneData = ManualCardData(
           name: '王大明',
           phone: 'invalid-phone',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: invalidPhoneData,
         ));
 
@@ -286,13 +286,13 @@ void main() {
 
       test('should validate website URL format', () async {
         // Arrange
-        final invalidWebsiteData = ManualCardData(
+        const invalidWebsiteData = ManualCardData(
           name: '王大明',
           website: 'not-a-valid-url',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: invalidWebsiteData,
         ));
 
@@ -303,13 +303,13 @@ void main() {
 
       test('should sanitize potentially malicious input', () async {
         // Arrange
-        final maliciousData = ManualCardData(
+        const maliciousData = ManualCardData(
           name: '王大明<script>alert("XSS")</script>',
           company: 'Company<img src=x onerror=alert("XSS")>',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: maliciousData,
           enableSanitization: true,
         ));
@@ -333,7 +333,7 @@ void main() {
         ));
 
         // Assert - 應該截斷過長的內容
-        expect(result.card.name!.length, lessThanOrEqualTo(100));
+        expect(result.card.name.length, lessThanOrEqualTo(100));
         expect(result.card.notes!.length, lessThanOrEqualTo(1000));
         expect(result.hasWarnings, true);
       });
@@ -342,7 +342,7 @@ void main() {
     group('錯誤處理', () {
       test('should handle storage failure when saving card', () async {
         // Arrange
-        final validData = ManualCardData(
+        const validData = ManualCardData(
           name: '王大明',
         );
         
@@ -356,7 +356,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardManuallyParams(
+          () => useCase.execute(const CreateCardManuallyParams(
             manualData: validData,
           )),
           throwsA(isA<StorageSpaceFailure>()),
@@ -365,7 +365,7 @@ void main() {
 
       test('should handle database connection failure', () async {
         // Arrange
-        final validData = ManualCardData(
+        const validData = ManualCardData(
           name: '王大明',
         );
         
@@ -377,7 +377,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardManuallyParams(
+          () => useCase.execute(const CreateCardManuallyParams(
             manualData: validData,
           )),
           throwsA(isA<DatabaseConnectionFailure>()),
@@ -386,13 +386,13 @@ void main() {
 
       test('should handle duplicate detection', () async {
         // Arrange
-        final duplicateData = ManualCardData(
+        const duplicateData = ManualCardData(
           name: '王大明',
           email: 'wang@tech.com',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: duplicateData,
           checkDuplicates: true,
         ));
@@ -406,13 +406,13 @@ void main() {
     group('進階功能', () {
       test('should support dry run mode without saving', () async {
         // Arrange
-        final testData = ManualCardData(
+        const testData = ManualCardData(
           name: '測試用戶',
           company: '測試公司',
         );
 
         // Act
-        final dryRunResult = await useCase.execute(CreateCardManuallyParams(
+        final dryRunResult = await useCase.execute(const CreateCardManuallyParams(
           manualData: testData,
           dryRun: true,
         ));
@@ -425,12 +425,12 @@ void main() {
 
       test('should track processing metrics when enabled', () async {
         // Arrange
-        final testData = ManualCardData(
+        const testData = ManualCardData(
           name: '效能測試',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: testData,
           trackMetrics: true,
         ));
@@ -445,9 +445,9 @@ void main() {
       test('should batch create multiple cards', () async {
         // Arrange
         final cardsData = [
-          ManualCardData(name: '王大明', company: '公司A'),
-          ManualCardData(name: '李小華', company: '公司B'),
-          ManualCardData(name: '張三', company: '公司C'),
+          const ManualCardData(name: '王大明', company: '公司A'),
+          const ManualCardData(name: '李小華', company: '公司B'),
+          const ManualCardData(name: '張三', company: '公司C'),
         ];
 
         // Act
@@ -465,9 +465,9 @@ void main() {
       test('should handle partial batch creation failures', () async {
         // Arrange
         final cardsData = [
-          ManualCardData(name: '王大明'), // 成功
-          ManualCardData(name: ''), // 失敗 - 空名稱
-          ManualCardData(name: '張三'), // 成功
+          const ManualCardData(name: '王大明'), // 成功
+          const ManualCardData(name: ''), // 失敗 - 空名稱
+          const ManualCardData(name: '張三'), // 成功
         ];
 
         // Act
@@ -483,14 +483,14 @@ void main() {
 
       test('should import from various formats', () async {
         // Arrange
-        final csvData = '''
+        const csvData = '''
 名字,公司,職稱,電子信箱
 王大明,科技公司,工程師,wang@tech.com
 李小華,設計公司,設計師,li@design.com
 ''';
 
         // Act
-        final results = await useCase.executeImport(CreateCardManuallyImportParams(
+        final results = await useCase.executeImport(const CreateCardManuallyImportParams(
           importData: csvData,
           format: ImportFormat.csv,
         ));
@@ -528,12 +528,12 @@ void main() {
 
       test('should cleanup resources properly', () async {
         // Arrange
-        final testData = ManualCardData(
+        const testData = ManualCardData(
           name: '資源測試',
         );
 
         // Act
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: testData,
           autoCleanup: true,
         ));
@@ -544,9 +544,9 @@ void main() {
 
       test('should validate input within reasonable time', () async {
         // Arrange
-        final complexData = ManualCardData(
+        const complexData = ManualCardData(
           name: '複雜資料測試',
-          company: '包含各種特殊字符的公司名稱 !@#\$%^&*()',
+          company: r'包含各種特殊字符的公司名稱 !@#$%^&*()',
           email: 'complex.test.email+tag@sub.domain.example.com',
           phone: '+886-2-1234-5678 ext.123',
           address: '台北市信義區信義路五段7號35樓3501室',
@@ -556,7 +556,7 @@ void main() {
 
         // Act
         final startTime = DateTime.now();
-        final result = await useCase.execute(CreateCardManuallyParams(
+        final result = await useCase.execute(const CreateCardManuallyParams(
           manualData: complexData,
           trackMetrics: true,
         ));

@@ -1,6 +1,6 @@
-import 'package:equatable/equatable.dart';
-import 'package:busines_card_scanner_flutter/core/services/validation_service.dart';
 import 'package:busines_card_scanner_flutter/core/services/security_service.dart';
+import 'package:busines_card_scanner_flutter/core/services/validation_service.dart';
+import 'package:equatable/equatable.dart';
 
 /// 名片業務實體
 /// 
@@ -39,7 +39,7 @@ class BusinessCard extends Equatable {
   BusinessCard({
     required this.id,
     required String name,
-    String? jobTitle,
+    required this.createdAt, String? jobTitle,
     String? company,
     String? email,
     String? phone,
@@ -47,7 +47,6 @@ class BusinessCard extends Equatable {
     String? website,
     String? notes,
     this.imageUrl,
-    required this.createdAt,
     this.updatedAt,
   }) : name = _cleanString(name) ?? '',
        jobTitle = _cleanString(jobTitle),
@@ -61,10 +60,10 @@ class BusinessCard extends Equatable {
   }
 
   /// 私有建構函式，用於 copyWith 方法避免重複驗證
-  BusinessCard._internal({
+  const BusinessCard._internal({
     required this.id,
     required this.name,
-    this.jobTitle,
+    required this.createdAt, this.jobTitle,
     this.company,
     this.email,
     this.phone,
@@ -72,7 +71,6 @@ class BusinessCard extends Equatable {
     this.website,
     this.notes,
     this.imageUrl,
-    required this.createdAt,
     this.updatedAt,
   });
 

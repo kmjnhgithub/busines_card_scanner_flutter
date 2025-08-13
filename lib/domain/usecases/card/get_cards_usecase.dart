@@ -22,7 +22,7 @@ class GetCardsUseCase {
   /// 
   /// 回傳名片列表，按建立時間降序排列
   Future<List<BusinessCard>> execute(GetCardsParams params) async {
-    return await _cardReader.getCards(limit: params.limit);
+    return _cardReader.getCards(limit: params.limit);
   }
 
   /// 執行分頁查詢
@@ -33,7 +33,7 @@ class GetCardsUseCase {
   Future<CardPageResult> executeWithPagination(
     GetCardsPaginationParams params
   ) async {
-    return await _cardReader.getCardsPage(
+    return _cardReader.getCardsPage(
       page: params.page,
       pageSize: params.pageSize,
     );
@@ -45,7 +45,7 @@ class GetCardsUseCase {
   /// 
   /// 回傳符合條件的名片列表
   Future<List<BusinessCard>> searchCards(SearchCardsParams params) async {
-    return await _cardReader.searchCards(
+    return _cardReader.searchCards(
       params.query,
       limit: params.limit,
     );
@@ -57,7 +57,7 @@ class GetCardsUseCase {
   /// 
   /// 回傳找到的名片，如果不存在則拋出 CardNotFoundException
   Future<BusinessCard> getCardById(String cardId) async {
-    return await _cardReader.getCardById(cardId);
+    return _cardReader.getCardById(cardId);
   }
 
   /// 取得最近建立的名片
@@ -66,14 +66,14 @@ class GetCardsUseCase {
   /// 
   /// 回傳按建立時間降序排列的最近名片列表
   Future<List<BusinessCard>> getRecentCards(int limit) async {
-    return await _cardReader.getRecentCards(limit: limit);
+    return _cardReader.getRecentCards(limit: limit);
   }
 
   /// 取得名片總數
   /// 
   /// 回傳目前儲存的名片總數量
   Future<int> getCardCount() async {
-    return await _cardReader.getCardCount();
+    return _cardReader.getCardCount();
   }
 
   /// 檢查名片是否存在
@@ -82,7 +82,7 @@ class GetCardsUseCase {
   /// 
   /// 回傳 true 如果名片存在，否則回傳 false
   Future<bool> cardExists(String cardId) async {
-    return await _cardReader.cardExists(cardId);
+    return _cardReader.cardExists(cardId);
   }
 
   /// 根據公司名稱取得名片
@@ -95,7 +95,7 @@ class GetCardsUseCase {
     String company, {
     int limit = 50,
   }) async {
-    return await _cardReader.getCardsByCompany(company, limit: limit);
+    return _cardReader.getCardsByCompany(company, limit: limit);
   }
 }
 

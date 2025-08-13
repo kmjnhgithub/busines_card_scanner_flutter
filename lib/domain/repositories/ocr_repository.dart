@@ -167,7 +167,7 @@ class BatchOCRResult {
   bool get hasFailures => failed.isNotEmpty;
   int get successCount => successful.length;
   int get failureCount => failed.length;
-  double get successRate => (successful.length / (successful.length + failed.length));
+  double get successRate => successful.length / (successful.length + failed.length);
 }
 
 /// 批次 OCR 錯誤
@@ -213,9 +213,8 @@ class OCREngineHealth {
   const OCREngineHealth({
     required this.engineId,
     required this.isHealthy,
-    this.error,
+    required this.checkedAt, this.error,
     this.responseTimeMs,
-    required this.checkedAt,
   });
 }
 

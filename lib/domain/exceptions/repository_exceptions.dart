@@ -1,7 +1,26 @@
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:equatable/equatable.dart';
+
+/// Domain層獨立的錯誤基底類別
+abstract class DomainFailure extends Equatable {
+  const DomainFailure({
+    required this.userMessage,
+    required this.internalMessage,
+  });
+
+  /// 使用者友善的錯誤訊息
+  final String userMessage;
+
+  /// 內部錯誤訊息，用於日誌記錄
+  final String internalMessage;
+
+  @override
+  String toString() {
+    return '$runtimeType(userMessage: <hidden>, internalMessage: <hidden>)';
+  }
+}
 
 /// Repository 相關的異常基底類別
-abstract class RepositoryException extends Failure {
+abstract class RepositoryException extends DomainFailure {
   const RepositoryException({
     required super.userMessage,
     required super.internalMessage,
@@ -276,11 +295,10 @@ class FileSystemFailure extends DataSourceFailure {
 
   const FileSystemFailure({
     this.filePath,
-    String? operation,
+    super.operation,
     String? userMessage,
   }) : super(
           dataSource: 'filesystem',
-          operation: operation,
           userMessage: userMessage ?? '檔案操作失敗',
           internalMessage: 'File system operation failed${filePath != null ? ' for file: $filePath' : ''}',
         );
@@ -310,6 +328,21 @@ class InsufficientPermissionFailure extends RepositoryException {
 }
 
 // ========== 驗證相關異常 ==========
+
+/// Domain層輸入驗證錯誤
+class DomainValidationFailure extends RepositoryException {
+  const DomainValidationFailure({
+    required super.userMessage,
+    required super.internalMessage,
+    this.field,
+  });
+
+  /// 驗證失敗的欄位名稱
+  final String? field;
+
+  @override
+  List<Object?> get props => [userMessage, internalMessage, field];
+}
 
 /// 資料驗證失敗異常
 class DataValidationFailure extends RepositoryException {

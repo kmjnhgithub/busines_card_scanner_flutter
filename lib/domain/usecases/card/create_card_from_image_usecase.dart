@@ -1,11 +1,12 @@
 import 'dart:typed_data';
+
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
-import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
-import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+
 
 /// CreateCardFromImageUseCase - 從圖片建立名片的業務用例
 /// 
@@ -131,7 +132,7 @@ class CreateCardFromImageUseCase {
 
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
-      if (e is Failure) {
+      if (e is DomainFailure) {
         rethrow;
       }
       
@@ -208,7 +209,7 @@ class CreateCardFromImageUseCase {
     Uint8List imageData,
     ImagePreprocessOptions? options,
   ) async {
-    return await _ocrRepository.preprocessImage(
+    return _ocrRepository.preprocessImage(
       imageData,
       options: options,
     );
@@ -219,7 +220,7 @@ class CreateCardFromImageUseCase {
     Uint8List imageData,
     OCROptions? options,
   ) async {
-    return await _ocrRepository.recognizeText(
+    return _ocrRepository.recognizeText(
       imageData,
       options: options,
     );
@@ -230,7 +231,7 @@ class CreateCardFromImageUseCase {
     String ocrText,
     ParseHints? hints,
   ) async {
-    return await _aiRepository.parseCardFromText(
+    return _aiRepository.parseCardFromText(
       ocrText,
       hints: hints,
     );
@@ -250,7 +251,7 @@ class CreateCardFromImageUseCase {
       'notes': parsedData.notes,
     };
 
-    return await _aiRepository.validateAndSanitizeResult(rawData);
+    return _aiRepository.validateAndSanitizeResult(rawData);
   }
 
   /// 從解析資料建立 BusinessCard 實體
@@ -262,7 +263,7 @@ class CreateCardFromImageUseCase {
 
   /// 儲存名片
   Future<BusinessCard> _saveCard(BusinessCard card) async {
-    return await _cardWriter.saveCard(card);
+    return _cardWriter.saveCard(card);
   }
 }
 

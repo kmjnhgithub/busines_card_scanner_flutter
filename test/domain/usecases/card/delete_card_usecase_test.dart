@@ -1,9 +1,9 @@
-import 'package:flutter_test/flutter_test.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
-import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
+import 'package:flutter_test/flutter_test.dart';
+
 
 /// Mock CardWriter 用於測試
 class MockCardWriter implements CardWriter {
@@ -14,7 +14,7 @@ class MockCardWriter implements CardWriter {
   bool _mockSoftDeleteSuccess = true;
   bool _mockRestoreSuccess = true;
   int _mockPurgeCount = 0;
-  Failure? _mockFailure;
+  DomainFailure? _mockFailure;
   
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
@@ -23,7 +23,7 @@ class MockCardWriter implements CardWriter {
   void setMockSoftDeleteSuccess(bool success) => _mockSoftDeleteSuccess = success;
   void setMockRestoreSuccess(bool success) => _mockRestoreSuccess = success;
   void setMockPurgeCount(int count) => _mockPurgeCount = count;
-  void setMockFailure(Failure failure) => _mockFailure = failure;
+  void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
@@ -97,7 +97,7 @@ void main() {
         mockCardWriter.setMockDeleteSuccess(true);
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.hard,
         ));
@@ -116,7 +116,7 @@ void main() {
         mockCardWriter.setMockDeleteSuccess(false);
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.hard,
         ));
@@ -134,7 +134,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(DeleteCardParams(
+          () => useCase.execute(const DeleteCardParams(
             cardId: emptyCardId,
             deleteType: DeleteType.hard,
           )),
@@ -144,11 +144,11 @@ void main() {
 
       test('should validate card ID format', () async {
         // Arrange - 無效格式的 card ID
-        const invalidCardId = 'invalid@#\$%';
+        const invalidCardId = r'invalid@#$%';
 
         // Act & Assert
         expect(
-          () => useCase.execute(DeleteCardParams(
+          () => useCase.execute(const DeleteCardParams(
             cardId: invalidCardId,
             deleteType: DeleteType.hard,
           )),
@@ -161,7 +161,7 @@ void main() {
         const cardId = 'card-metrics';
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.hard,
           trackMetrics: true,
@@ -181,7 +181,7 @@ void main() {
         mockCardWriter.setMockSoftDeleteSuccess(true);
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.soft,
         ));
@@ -200,7 +200,7 @@ void main() {
         mockCardWriter.setMockSoftDeleteSuccess(false);
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.soft,
         ));
@@ -216,7 +216,7 @@ void main() {
         mockCardWriter.setMockRestoreSuccess(true);
 
         // Act
-        final result = await useCase.executeRestore(RestoreCardParams(
+        final result = await useCase.executeRestore(const RestoreCardParams(
           cardId: cardId,
         ));
 
@@ -232,7 +232,7 @@ void main() {
         mockCardWriter.setMockRestoreSuccess(false);
 
         // Act
-        final result = await useCase.executeRestore(RestoreCardParams(
+        final result = await useCase.executeRestore(const RestoreCardParams(
           cardId: cardId,
         ));
 
@@ -300,7 +300,6 @@ void main() {
         final results = await useCase.executeBatch(DeleteCardBatchParams(
           cardIds: cardIds,
           deleteType: DeleteType.soft,
-          concurrency: 3,
         ));
 
         // Assert
@@ -315,7 +314,7 @@ void main() {
         mockCardWriter.setMockPurgeCount(expectedPurgeCount);
 
         // Act
-        final result = await useCase.executePurge(PurgeDeletedCardsParams(
+        final result = await useCase.executePurge(const PurgeDeletedCardsParams(
           daysOld: 30,
         ));
 
@@ -332,7 +331,7 @@ void main() {
         mockCardWriter.setMockPurgeCount(expectedPurgeCount);
 
         // Act
-        final result = await useCase.executePurge(PurgeDeletedCardsParams(
+        final result = await useCase.executePurge(const PurgeDeletedCardsParams(
           daysOld: customDays,
         ));
 
@@ -347,7 +346,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.executePurge(PurgeDeletedCardsParams(
+          () => useCase.executePurge(const PurgeDeletedCardsParams(
             daysOld: invalidDays,
           )),
           throwsA(isA<InvalidInputFailure>()),
@@ -359,7 +358,7 @@ void main() {
         mockCardWriter.setMockPurgeCount(3);
 
         // Act
-        final result = await useCase.executePurge(PurgeDeletedCardsParams(
+        final result = await useCase.executePurge(const PurgeDeletedCardsParams(
           daysOld: 30,
           trackMetrics: true,
         ));
@@ -383,7 +382,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(DeleteCardParams(
+          () => useCase.execute(const DeleteCardParams(
             cardId: 'card-123',
             deleteType: DeleteType.hard,
           )),
@@ -401,7 +400,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(DeleteCardParams(
+          () => useCase.execute(const DeleteCardParams(
             cardId: 'card-123',
             deleteType: DeleteType.hard,
           )),
@@ -420,7 +419,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(DeleteCardParams(
+          () => useCase.execute(const DeleteCardParams(
             cardId: 'non-existent-card',
             deleteType: DeleteType.hard,
           )),
@@ -439,7 +438,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(DeleteCardParams(
+          () => useCase.execute(const DeleteCardParams(
             cardId: 'card-123',
             deleteType: DeleteType.hard,
           )),
@@ -454,7 +453,7 @@ void main() {
         const cardId = 'card-dryrun';
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.hard,
           dryRun: true,
@@ -471,7 +470,7 @@ void main() {
         const cardId = 'card-with-dependencies';
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.hard,
           validateDependencies: true,
@@ -486,7 +485,7 @@ void main() {
         const cardId = 'card-details';
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.soft,
           includeDetails: true,
@@ -503,7 +502,7 @@ void main() {
         const cardId = 'card-custom-policy';
 
         // Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.soft,
           customRetentionDays: 60,
@@ -537,7 +536,7 @@ void main() {
 
       test('should cleanup resources properly', () async {
         // Arrange & Act
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: 'cleanup-test',
           deleteType: DeleteType.hard,
           autoCleanup: true,
@@ -558,10 +557,10 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(DeleteCardParams(
+          () => useCase.execute(const DeleteCardParams(
             cardId: 'timeout-test',
             deleteType: DeleteType.hard,
-            timeout: const Duration(milliseconds: 100),
+            timeout: Duration(milliseconds: 100),
           )),
           throwsA(isA<DataSourceFailure>()),
         );
@@ -573,7 +572,7 @@ void main() {
 
         // Act
         final startTime = DateTime.now();
-        final result = await useCase.execute(DeleteCardParams(
+        final result = await useCase.execute(const DeleteCardParams(
           cardId: cardId,
           deleteType: DeleteType.soft,
           trackMetrics: true,
