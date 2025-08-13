@@ -52,7 +52,7 @@ void main() {
       test('🔴 RED: should convert model to JSON correctly', () {
         // Act
         final json = testModel.toJson();
-        
+
         // Assert - 驗證所有欄位正確序列化
         expect(json['id'], equals('test-id-123'));
         expect(json['name'], equals('張三'));
@@ -74,7 +74,7 @@ void main() {
       test('🔴 RED: should create model from JSON correctly', () {
         // Act
         final model = BusinessCardModel.fromJson(testJson);
-        
+
         // Assert
         expect(model.id, equals('test-id-123'));
         expect(model.name, equals('張三'));
@@ -123,21 +123,27 @@ void main() {
         expect(model.updatedAt, isNotNull);
       });
 
-      test('🔴 RED: should serialize and deserialize correctly (roundtrip)', () {
-        // Act
-        final json = testModel.toJson();
-        final deserializedModel = BusinessCardModel.fromJson(json);
+      test(
+        '🔴 RED: should serialize and deserialize correctly (roundtrip)',
+        () {
+          // Act
+          final json = testModel.toJson();
+          final deserializedModel = BusinessCardModel.fromJson(json);
 
-        // Assert
-        expect(deserializedModel.id, equals(testModel.id));
-        expect(deserializedModel.name, equals(testModel.name));
-        expect(deserializedModel.namePhonetic, equals(testModel.namePhonetic));
-        expect(deserializedModel.jobTitle, equals(testModel.jobTitle));
-        expect(deserializedModel.company, equals(testModel.company));
-        expect(deserializedModel.email, equals(testModel.email));
-        expect(deserializedModel.createdAt, equals(testModel.createdAt));
-        expect(deserializedModel.updatedAt, equals(testModel.updatedAt));
-      });
+          // Assert
+          expect(deserializedModel.id, equals(testModel.id));
+          expect(deserializedModel.name, equals(testModel.name));
+          expect(
+            deserializedModel.namePhonetic,
+            equals(testModel.namePhonetic),
+          );
+          expect(deserializedModel.jobTitle, equals(testModel.jobTitle));
+          expect(deserializedModel.company, equals(testModel.company));
+          expect(deserializedModel.email, equals(testModel.email));
+          expect(deserializedModel.createdAt, equals(testModel.createdAt));
+          expect(deserializedModel.updatedAt, equals(testModel.updatedAt));
+        },
+      );
     });
 
     group('Domain Entity 轉換測試', () {
@@ -156,59 +162,68 @@ void main() {
         expect(entity.address, equals(testModel.address));
         expect(entity.website, equals(testModel.website));
         expect(entity.notes, equals(testModel.notes));
-        expect(entity.imageUrl, equals(testModel.photoPath)); // photoPath 對應到 imageUrl
+        expect(
+          entity.imageUrl,
+          equals(testModel.photoPath),
+        ); // photoPath 對應到 imageUrl
         expect(entity.createdAt, equals(testModel.createdAt));
         expect(entity.updatedAt, equals(testModel.updatedAt));
       });
 
-      test('🔴 RED: should create model from BusinessCard entity correctly', () {
-        // Arrange
-        final entity = BusinessCard(
-          id: 'entity-id',
-          name: '李四',
-          company: 'XYZ公司',
-          email: 'li.si@xyz.com',
-          createdAt: DateTime(2024, 2),
-          updatedAt: DateTime(2024, 2),
-        );
+      test(
+        '🔴 RED: should create model from BusinessCard entity correctly',
+        () {
+          // Arrange
+          final entity = BusinessCard(
+            id: 'entity-id',
+            name: '李四',
+            company: 'XYZ公司',
+            email: 'li.si@xyz.com',
+            createdAt: DateTime(2024, 2),
+            updatedAt: DateTime(2024, 2),
+          );
 
-        // Act
-        final model = BusinessCardModel.fromEntity(entity);
+          // Act
+          final model = BusinessCardModel.fromEntity(entity);
 
-        // Assert
-        expect(model.id, equals(entity.id));
-        expect(model.name, equals(entity.name));
-        expect(model.company, equals(entity.company));
-        expect(model.email, equals(entity.email));
-        expect(model.photoPath, equals(entity.imageUrl));
-        expect(model.createdAt, equals(entity.createdAt));
-        expect(model.updatedAt, equals(entity.updatedAt));
-      });
+          // Assert
+          expect(model.id, equals(entity.id));
+          expect(model.name, equals(entity.name));
+          expect(model.company, equals(entity.company));
+          expect(model.email, equals(entity.email));
+          expect(model.photoPath, equals(entity.imageUrl));
+          expect(model.createdAt, equals(entity.createdAt));
+          expect(model.updatedAt, equals(entity.updatedAt));
+        },
+      );
 
-      test('🔴 RED: should maintain data integrity in entity conversion roundtrip', () {
-        // Arrange
-        final originalEntity = BusinessCard(
-          id: 'roundtrip-test',
-          name: '王五',
-          company: '測試公司',
-          email: 'wang@test.com',
-          createdAt: DateTime(2024, 3),
-          updatedAt: DateTime(2024, 3),
-        );
+      test(
+        '🔴 RED: should maintain data integrity in entity conversion roundtrip',
+        () {
+          // Arrange
+          final originalEntity = BusinessCard(
+            id: 'roundtrip-test',
+            name: '王五',
+            company: '測試公司',
+            email: 'wang@test.com',
+            createdAt: DateTime(2024, 3),
+            updatedAt: DateTime(2024, 3),
+          );
 
-        // Act
-        final model = BusinessCardModel.fromEntity(originalEntity);
-        final convertedEntity = model.toEntity();
+          // Act
+          final model = BusinessCardModel.fromEntity(originalEntity);
+          final convertedEntity = model.toEntity();
 
-        // Assert
-        expect(convertedEntity.id, equals(originalEntity.id));
-        expect(convertedEntity.name, equals(originalEntity.name));
-        expect(convertedEntity.company, equals(originalEntity.company));
-        expect(convertedEntity.email, equals(originalEntity.email));
-        expect(convertedEntity.imageUrl, equals(originalEntity.imageUrl));
-        expect(convertedEntity.createdAt, equals(originalEntity.createdAt));
-        expect(convertedEntity.updatedAt, equals(originalEntity.updatedAt));
-      });
+          // Assert
+          expect(convertedEntity.id, equals(originalEntity.id));
+          expect(convertedEntity.name, equals(originalEntity.name));
+          expect(convertedEntity.company, equals(originalEntity.company));
+          expect(convertedEntity.email, equals(originalEntity.email));
+          expect(convertedEntity.imageUrl, equals(originalEntity.imageUrl));
+          expect(convertedEntity.createdAt, equals(originalEntity.createdAt));
+          expect(convertedEntity.updatedAt, equals(originalEntity.updatedAt));
+        },
+      );
     });
 
     group('Value Equality 測試', () {
@@ -252,8 +267,14 @@ void main() {
         expect(updatedModel.name, equals('更新的姓名')); // 更新的欄位
         expect(updatedModel.company, equals('更新的公司')); // 更新的欄位
         expect(updatedModel.email, equals(testModel.email)); // 未更新的欄位保持不變
-        expect(updatedModel.updatedAt, equals(DateTime(2024, 2, 1, 12))); // 更新的欄位
-        expect(updatedModel.createdAt, equals(testModel.createdAt)); // 未更新的欄位保持不變
+        expect(
+          updatedModel.updatedAt,
+          equals(DateTime(2024, 2, 1, 12)),
+        ); // 更新的欄位
+        expect(
+          updatedModel.createdAt,
+          equals(testModel.createdAt),
+        ); // 未更新的欄位保持不變
       });
     });
 
@@ -385,7 +406,10 @@ void main() {
         // Assert - 應該保留原始內容但在使用時進行清理
         // 注意：實際的 HTML 清理應該在 presentation 層進行
         expect(deserializedModel.name, equals(maliciousContentModel.name));
-        expect(deserializedModel.company, equals(maliciousContentModel.company));
+        expect(
+          deserializedModel.company,
+          equals(maliciousContentModel.company),
+        );
         expect(deserializedModel.notes, equals(maliciousContentModel.notes));
       });
     });

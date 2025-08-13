@@ -3,7 +3,7 @@ import 'package:busines_card_scanner_flutter/core/services/validation_service.da
 import 'package:equatable/equatable.dart';
 
 /// 名片業務實體
-/// 
+///
 /// 代表一張名片的完整資訊，包含基本聯絡資訊、公司資訊和元資料。
 /// 遵循 Clean Architecture 原則，此實體：
 /// - 包含業務規則和驗證邏輯
@@ -29,17 +29,18 @@ class BusinessCard extends Equatable {
   static final SecurityService _securityService = SecurityService();
 
   /// 建立 BusinessCard 實例
-  /// 
+  ///
   /// [id] 唯一識別碼（必填且非空）
   /// [name] 姓名（必填且非空）
   /// [createdAt] 建立時間（必填）
   /// 其他欄位皆為選填
-  /// 
+  ///
   /// 會自動驗證和清理輸入資料，確保安全性
   BusinessCard({
     required this.id,
     required String name,
-    required this.createdAt, String? jobTitle,
+    required this.createdAt,
+    String? jobTitle,
     String? company,
     String? email,
     String? phone,
@@ -63,7 +64,8 @@ class BusinessCard extends Equatable {
   const BusinessCard._internal({
     required this.id,
     required this.name,
-    required this.createdAt, this.jobTitle,
+    required this.createdAt,
+    this.jobTitle,
     this.company,
     this.email,
     this.phone,
@@ -90,11 +92,15 @@ class BusinessCard extends Equatable {
       if (field != null && field.isNotEmpty) {
         final securityResult = _securityService.sanitizeInput(field);
         securityResult.fold(
-          (failure) => throw ArgumentError('Security validation failed for field: ${failure.userMessage}'),
+          (failure) => throw ArgumentError(
+            'Security validation failed for field: ${failure.userMessage}',
+          ),
           (sanitized) {
             // 檢查是否包含惡意腳本（如 <script> 標籤）
             if (field.contains('<script')) {
-              throw ArgumentError('Field contains potentially malicious content');
+              throw ArgumentError(
+                'Field contains potentially malicious content',
+              );
             }
           },
         );
@@ -139,27 +145,29 @@ class BusinessCard extends Equatable {
   }
 
   /// 檢查名片資訊是否完整
-  /// 
+  ///
   /// 完整的定義：包含姓名、職稱、公司、以及至少一種聯絡方式
   bool isComplete() {
     return name.isNotEmpty &&
-           jobTitle != null && jobTitle!.isNotEmpty &&
-           company != null && company!.isNotEmpty &&
-           hasContactInfo();
+        jobTitle != null &&
+        jobTitle!.isNotEmpty &&
+        company != null &&
+        company!.isNotEmpty &&
+        hasContactInfo();
   }
 
   /// 檢查是否包含聯絡資訊
-  /// 
+  ///
   /// 聯絡資訊包括：email、電話、地址或網站
   bool hasContactInfo() {
     return (email != null && email!.isNotEmpty) ||
-           (phone != null && phone!.isNotEmpty) ||
-           (address != null && address!.isNotEmpty) ||
-           (website != null && website!.isNotEmpty);
+        (phone != null && phone!.isNotEmpty) ||
+        (address != null && address!.isNotEmpty) ||
+        (website != null && website!.isNotEmpty);
   }
 
   /// 取得顯示用的名稱
-  /// 
+  ///
   /// 優先顯示姓名，如果姓名為空則使用email或其他識別資訊
   String getDisplayName() {
     if (name.isNotEmpty) {
@@ -175,7 +183,7 @@ class BusinessCard extends Equatable {
   }
 
   /// 建立一個新的 BusinessCard 實例，並更新指定的欄位
-  /// 
+  ///
   /// 使用 copyWith 模式提供不可變的更新操作
   BusinessCard copyWith({
     String? id,
@@ -227,13 +235,13 @@ class BusinessCard extends Equatable {
   String toString() {
     // 基於安全考量，不在 toString 中包含 notes 等敏感資訊
     return 'BusinessCard('
-           'id: $id, '
-           'name: $name, '
-           'jobTitle: $jobTitle, '
-           'company: $company, '
-           'email: ${email != null ? '***' : null}, '
-           'phone: ${phone != null ? '***' : null}, '
-           'createdAt: $createdAt'
-           ')';
+        'id: $id, '
+        'name: $name, '
+        'jobTitle: $jobTitle, '
+        'company: $company, '
+        'email: ${email != null ? '***' : null}, '
+        'phone: ${phone != null ? '***' : null}, '
+        'createdAt: $createdAt'
+        ')';
   }
 }

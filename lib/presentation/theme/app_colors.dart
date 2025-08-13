@@ -221,8 +221,8 @@ class AppColorConstants {
   static const double opacityOverlay = 0.4;
 
   /// 標準圓角半徑（用於有顏色的元件）
-  static const double radiusSmall = 4.0;
-  static const double radiusMedium = 8.0;
-  static const double radiusLarge = 12.0;
-  static const double radiusExtraLarge = 16.0;
+  static const double radiusSmall = 4;
+  static const double radiusMedium = 8;
+  static const double radiusLarge = 12;
+  static const double radiusExtraLarge = 16;
 }

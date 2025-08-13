@@ -2,7 +2,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 
 /// Clean Architecture 邊界測試
-/// 
+///
 /// 驗證各層之間的依賴方向是否正確：
 /// - Domain 層不能依賴 Data 層或 Presentation 層
 /// - Presentation 層不能直接依賴 Data 層
@@ -38,7 +38,8 @@ void main() {
           expect(
             dataImports,
             isEmpty,
-            reason: 'Domain file $domainFile should not import from Data layer: $dataImports',
+            reason:
+                'Domain file $domainFile should not import from Data layer: $dataImports',
           );
         }
       });
@@ -57,7 +58,8 @@ void main() {
           expect(
             presentationImports,
             isEmpty,
-            reason: 'Domain file $domainFile should not import from Presentation layer: $presentationImports',
+            reason:
+                'Domain file $domainFile should not import from Presentation layer: $presentationImports',
           );
         }
       });
@@ -70,14 +72,18 @@ void main() {
         for (final domainFile in domainFiles) {
           final imports = fileImports[domainFile] ?? [];
           final internalImports = imports
-              .where((import) => import.startsWith('package:busines_card_scanner_flutter/'))
+              .where(
+                (import) =>
+                    import.startsWith('package:busines_card_scanner_flutter/'),
+              )
               .toList();
 
           for (final import in internalImports) {
             expect(
               import.contains('/core/') || import.contains('/domain/'),
               isTrue,
-              reason: 'Domain file $domainFile can only import from Core or Domain: $import',
+              reason:
+                  'Domain file $domainFile can only import from Core or Domain: $import',
             );
           }
         }
@@ -99,7 +105,8 @@ void main() {
           expect(
             presentationImports,
             isEmpty,
-            reason: 'Data file $dataFile should not import from Presentation layer: $presentationImports',
+            reason:
+                'Data file $dataFile should not import from Presentation layer: $presentationImports',
           );
         }
       });
@@ -112,16 +119,20 @@ void main() {
         for (final dataFile in dataFiles) {
           final imports = fileImports[dataFile] ?? [];
           final internalImports = imports
-              .where((import) => import.startsWith('package:busines_card_scanner_flutter/'))
+              .where(
+                (import) =>
+                    import.startsWith('package:busines_card_scanner_flutter/'),
+              )
               .toList();
 
           for (final import in internalImports) {
             expect(
-              import.contains('/core/') || 
-              import.contains('/domain/') || 
-              import.contains('/data/'),
+              import.contains('/core/') ||
+                  import.contains('/domain/') ||
+                  import.contains('/data/'),
               isTrue,
-              reason: 'Data file $dataFile can import from Core, Domain, or Data: $import',
+              reason:
+                  'Data file $dataFile can import from Core, Domain, or Data: $import',
             );
           }
         }
@@ -129,24 +140,28 @@ void main() {
     });
 
     group('Presentation Layer Dependencies', () {
-      test('Presentation layer should not directly import from Data layer models', () {
-        final presentationFiles = fileImports.keys
-            .where((file) => file.contains('/presentation/'))
-            .toList();
-
-        for (final presentationFile in presentationFiles) {
-          final imports = fileImports[presentationFile] ?? [];
-          final dataModelImports = imports
-              .where((import) => import.contains('/data/models/'))
+      test(
+        'Presentation layer should not directly import from Data layer models',
+        () {
+          final presentationFiles = fileImports.keys
+              .where((file) => file.contains('/presentation/'))
               .toList();
 
-          expect(
-            dataModelImports,
-            isEmpty,
-            reason: 'Presentation file $presentationFile should not directly import Data models: $dataModelImports',
-          );
-        }
-      });
+          for (final presentationFile in presentationFiles) {
+            final imports = fileImports[presentationFile] ?? [];
+            final dataModelImports = imports
+                .where((import) => import.contains('/data/models/'))
+                .toList();
+
+            expect(
+              dataModelImports,
+              isEmpty,
+              reason:
+                  'Presentation file $presentationFile should not directly import Data models: $dataModelImports',
+            );
+          }
+        },
+      );
 
       test('Presentation layer can import from Domain and Core layers', () {
         final presentationFiles = fileImports.keys
@@ -156,16 +171,20 @@ void main() {
         for (final presentationFile in presentationFiles) {
           final imports = fileImports[presentationFile] ?? [];
           final internalImports = imports
-              .where((import) => import.startsWith('package:busines_card_scanner_flutter/'))
+              .where(
+                (import) =>
+                    import.startsWith('package:busines_card_scanner_flutter/'),
+              )
               .toList();
 
           for (final import in internalImports) {
             expect(
-              import.contains('/core/') || 
-              import.contains('/domain/') || 
-              import.contains('/presentation/'),
+              import.contains('/core/') ||
+                  import.contains('/domain/') ||
+                  import.contains('/presentation/'),
               isTrue,
-              reason: 'Presentation file $presentationFile can import from Core, Domain, or Presentation: $import',
+              reason:
+                  'Presentation file $presentationFile can import from Core, Domain, or Presentation: $import',
             );
           }
         }
@@ -181,16 +200,19 @@ void main() {
         for (final coreFile in coreFiles) {
           final imports = fileImports[coreFile] ?? [];
           final layerImports = imports
-              .where((import) => 
-                import.contains('/data/') ||
-                import.contains('/domain/') ||
-                import.contains('/presentation/'))
+              .where(
+                (import) =>
+                    import.contains('/data/') ||
+                    import.contains('/domain/') ||
+                    import.contains('/presentation/'),
+              )
               .toList();
 
           expect(
             layerImports,
             isEmpty,
-            reason: 'Core file $coreFile should not import from other layers: $layerImports',
+            reason:
+                'Core file $coreFile should not import from other layers: $layerImports',
           );
         }
       });
@@ -208,7 +230,9 @@ void main() {
         ];
 
         for (final file in allDartFiles) {
-          final isInValidLayer = validLayerPatterns.any((pattern) => pattern.hasMatch(file));
+          final isInValidLayer = validLayerPatterns.any(
+            (pattern) => pattern.hasMatch(file),
+          );
           expect(
             isInValidLayer,
             isTrue,
@@ -228,10 +252,15 @@ void main() {
 
           for (final featureDir in featureDirs) {
             final featureName = featureDir.path.split('/').last;
-            
+
             // 檢查基本資料夾結構
-            final expectedSubdirs = ['pages', 'view_models', 'widgets', 'providers'];
-            
+            final expectedSubdirs = [
+              'pages',
+              'view_models',
+              'widgets',
+              'providers',
+            ];
+
             for (final expectedSubdir in expectedSubdirs) {
               final subdirPath = '${featureDir.path}/$expectedSubdir';
               // 只有當功能模組存在時才檢查（目前可能還沒有功能模組）
@@ -249,7 +278,10 @@ void main() {
     group('Dependency Injection Rules', () {
       test('Repository interfaces should be in Domain layer', () {
         final repositoryInterfaces = fileImports.keys
-            .where((file) => file.contains('repository') && file.contains('/domain/'))
+            .where(
+              (file) =>
+                  file.contains('repository') && file.contains('/domain/'),
+            )
             .toList();
 
         // 目前還沒有 repository 實作，這個測試將在後續 Phase 中生效
@@ -259,10 +291,12 @@ void main() {
 
       test('Repository implementations should be in Data layer', () {
         final repositoryImpls = fileImports.keys
-            .where((file) => 
-                file.contains('repository') && 
-                file.contains('/data/') &&
-                file.contains('_impl'))
+            .where(
+              (file) =>
+                  file.contains('repository') &&
+                  file.contains('/data/') &&
+                  file.contains('_impl'),
+            )
             .toList();
 
         // 目前還沒有 repository 實作，這個測試將在後續 Phase 中生效
@@ -273,17 +307,23 @@ void main() {
 
     group('Import Analysis Quality', () {
       test('Should have analyzed some files', () {
-        expect(fileImports.isNotEmpty, isTrue,
-            reason: 'Should have analyzed at least some Dart files');
+        expect(
+          fileImports.isNotEmpty,
+          isTrue,
+          reason: 'Should have analyzed at least some Dart files',
+        );
       });
 
       test('Core layer files should exist', () {
         final coreFiles = fileImports.keys
             .where((file) => file.contains('/core/'))
             .toList();
-        
-        expect(coreFiles.isNotEmpty, isTrue,
-            reason: 'Should have Core layer files');
+
+        expect(
+          coreFiles.isNotEmpty,
+          isTrue,
+          reason: 'Should have Core layer files',
+        );
       });
     });
   });
@@ -292,7 +332,7 @@ void main() {
 /// 分析指定目錄下所有 Dart 檔案的 import 語句
 Future<Map<String, List<String>>> _analyzeImports(Directory directory) async {
   final Map<String, List<String>> imports = {};
-  
+
   await for (final entity in directory.list(recursive: true)) {
     if (entity is File && entity.path.endsWith('.dart')) {
       final relativePath = entity.path.replaceFirst(RegExp('^.*lib/'), 'lib/');
@@ -300,24 +340,24 @@ Future<Map<String, List<String>>> _analyzeImports(Directory directory) async {
       imports[relativePath] = fileImports;
     }
   }
-  
+
   return imports;
 }
 
 /// 從 Dart 檔案中提取 import 語句
 Future<List<String>> _extractImports(File file) async {
   final List<String> imports = [];
-  
+
   try {
     final content = await file.readAsString();
     final lines = content.split('\n');
-    
+
     for (final line in lines) {
       final trimmed = line.trim();
       if (trimmed.startsWith('import ')) {
         // 簡單的字串解析，提取引號之間的內容
         String? extractedImport;
-        
+
         if (trimmed.contains("'")) {
           final startIndex = trimmed.indexOf("'") + 1;
           final endIndex = trimmed.indexOf("'", startIndex);
@@ -331,7 +371,7 @@ Future<List<String>> _extractImports(File file) async {
             extractedImport = trimmed.substring(startIndex, endIndex);
           }
         }
-        
+
         if (extractedImport != null && extractedImport.isNotEmpty) {
           imports.add(extractedImport);
         }
@@ -341,6 +381,6 @@ Future<List<String>> _extractImports(File file) async {
     // 如果檔案讀取失敗，回傳空列表
     return [];
   }
-  
+
   return imports;
 }

@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 enum ThemedCardSize {
   /// 小尺寸卡片
   small,
+
   /// 中等尺寸卡片（預設）
   medium,
+
   /// 大尺寸卡片
   large,
 }
@@ -99,21 +101,19 @@ class ThemedCard extends StatelessWidget {
     final config = _getCardConfig(size);
 
     // 獲取顏色
-    final bgColor = backgroundColor ?? 
-        AppColors.getCardBackgroundColor(theme.brightness);
-    final actualBorderColor = borderColor ?? 
-        AppColors.getBorderColor(theme.brightness);
+    final bgColor =
+        backgroundColor ?? AppColors.getCardBackgroundColor(theme.brightness);
+    final actualBorderColor =
+        borderColor ?? AppColors.getBorderColor(theme.brightness);
 
     // 建立卡片裝飾
     final decoration = BoxDecoration(
       color: enabled ? bgColor : AppColors.withOpacity(bgColor, 0.6),
-      borderRadius: BorderRadius.circular(
-        borderRadius ?? config.borderRadius,
-      ),
+      borderRadius: BorderRadius.circular(borderRadius ?? config.borderRadius),
       border: showBorder
           ? Border.all(
-              color: enabled 
-                  ? actualBorderColor 
+              color: enabled
+                  ? actualBorderColor
                   : AppColors.withOpacity(actualBorderColor, 0.3),
               width: AppDimensions.borderMedium,
             )
@@ -168,10 +168,7 @@ class ThemedCard extends StatelessWidget {
     return Stack(
       children: [
         // 原始內容（半透明）
-        Opacity(
-          opacity: AppColorConstants.opacityMedium,
-          child: child,
-        ),
+        Opacity(opacity: AppColorConstants.opacityMedium, child: child),
         // 載入指示器（置中）
         Center(
           child: Container(
@@ -180,9 +177,7 @@ class ThemedCard extends StatelessWidget {
               color: AppColors.getBackgroundColor(
                 Theme.of(context).brightness,
               ).withValues(alpha: 0.9),
-              borderRadius: BorderRadius.circular(
-                AppDimensions.radiusSmall,
-              ),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
             ),
             child: loadingIndicator,
           ),
@@ -264,7 +259,7 @@ class BusinessCardPreviewCard extends StatelessWidget {
       isLoading: isLoading,
       showBorder: isSelected,
       borderColor: isSelected ? AppColors.primary : null,
-      backgroundColor: isSelected 
+      backgroundColor: isSelected
           ? AppColors.withOpacity(AppColors.primary, 0.05)
           : null,
       child: child,
@@ -302,9 +297,7 @@ class SettingsItemCard extends StatelessWidget {
           if (showDivider)
             Container(
               height: AppDimensions.separatorHeight,
-              color: AppColors.getBorderColor(
-                Theme.of(context).brightness,
-              ),
+              color: AppColors.getBorderColor(Theme.of(context).brightness),
             ),
         ],
       ),
@@ -334,7 +327,7 @@ class StatsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     return ThemedCard(
       size: ThemedCardSize.medium,
       onTap: onTap,
@@ -353,8 +346,9 @@ class StatsCard extends StatelessWidget {
           Text(
             title,
             style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.getTextColor(theme.brightness)
-                  .withValues(alpha: AppColorConstants.opacityMedium),
+              color: AppColors.getTextColor(
+                theme.brightness,
+              ).withValues(alpha: AppColorConstants.opacityMedium),
             ),
           ),
           const SizedBox(height: AppDimensions.space1),

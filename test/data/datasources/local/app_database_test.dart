@@ -18,10 +18,8 @@ void main() {
       // 建立臨時測試資料庫
       tempDir = await Directory.systemTemp.createTemp('test_db');
       final testDbFile = File('${tempDir.path}/test.db');
-      
-      database = CleanAppDatabase(
-        NativeDatabase(testDbFile),
-      );
+
+      database = CleanAppDatabase(NativeDatabase(testDbFile));
     });
 
     tearDown(() async {
@@ -34,40 +32,47 @@ void main() {
       test('🔴 RED: should create database tables successfully', () async {
         // Act - 確保資料庫已初始化
         await database.doWhenOpened((executor) async {});
-        
+
         // Assert - 檢查資料表是否存在
-        final tables = await database.customSelect(
-          "SELECT name FROM sqlite_master WHERE type='table'",
-        ).get();
-        
-        final tableNames = tables.map((row) => row.data['name'] as String).toList();
+        final tables = await database
+            .customSelect("SELECT name FROM sqlite_master WHERE type='table'")
+            .get();
+
+        final tableNames = tables
+            .map((row) => row.data['name'] as String)
+            .toList();
         expect(tableNames, contains('business_cards'));
       });
 
-      test('🔴 RED: should have correct table schema for business_cards', () async {
-        // Act
-        final columns = await database.customSelect(
-          'PRAGMA table_info(business_cards)',
-        ).get();
-        
-        // Assert - 驗證資料表結構
-        final columnNames = columns.map((row) => row.data['name'] as String).toList();
-        
-        // 必要欄位
-        expect(columnNames, contains('id'));
-        expect(columnNames, contains('name'));
-        expect(columnNames, contains('created_at'));
-        expect(columnNames, contains('updated_at'));
-        
-        // 選擇性欄位 (根據實際資料庫結構)
-        expect(columnNames, contains('job_title'));
-        expect(columnNames, contains('company'));
-        expect(columnNames, contains('email'));
-        expect(columnNames, contains('phone'));
-        expect(columnNames, contains('address'));
-        expect(columnNames, contains('website'));
-        expect(columnNames, contains('notes'));
-      });
+      test(
+        '🔴 RED: should have correct table schema for business_cards',
+        () async {
+          // Act
+          final columns = await database
+              .customSelect('PRAGMA table_info(business_cards)')
+              .get();
+
+          // Assert - 驗證資料表結構
+          final columnNames = columns
+              .map((row) => row.data['name'] as String)
+              .toList();
+
+          // 必要欄位
+          expect(columnNames, contains('id'));
+          expect(columnNames, contains('name'));
+          expect(columnNames, contains('created_at'));
+          expect(columnNames, contains('updated_at'));
+
+          // 選擇性欄位 (根據實際資料庫結構)
+          expect(columnNames, contains('job_title'));
+          expect(columnNames, contains('company'));
+          expect(columnNames, contains('email'));
+          expect(columnNames, contains('phone'));
+          expect(columnNames, contains('address'));
+          expect(columnNames, contains('website'));
+          expect(columnNames, contains('notes'));
+        },
+      );
     });
 
     group('CardDao 基本 CRUD 操作測試', () {
@@ -84,7 +89,9 @@ void main() {
         );
 
         // Act
-        final insertedId = await database.cardDao.insertBusinessCard(cardCompanion);
+        final insertedId = await database.cardDao.insertBusinessCard(
+          cardCompanion,
+        );
 
         // Assert
         final retrievedCards = await database.cardDao.getAllBusinessCards();
@@ -102,10 +109,14 @@ void main() {
           name: '李四',
           company: const Value('XYZ公司'),
         );
-        final insertedId = await database.cardDao.insertBusinessCard(cardCompanion);
+        final insertedId = await database.cardDao.insertBusinessCard(
+          cardCompanion,
+        );
 
         // Act
-        final retrievedCard = await database.cardDao.getBusinessCardById(insertedId);
+        final retrievedCard = await database.cardDao.getBusinessCardById(
+          insertedId,
+        );
 
         // Assert
         expect(retrievedCard, matcher.isNotNull);
@@ -116,7 +127,9 @@ void main() {
 
       test('🔴 RED: should return null when card not found', () async {
         // Act
-        final retrievedCard = await database.cardDao.getBusinessCardById(99999); // 不存在的 ID
+        final retrievedCard = await database.cardDao.getBusinessCardById(
+          99999,
+        ); // 不存在的 ID
 
         // Assert
         expect(retrievedCard, matcher.isNull);
@@ -131,8 +144,12 @@ void main() {
           createdAt: Value(DateTime(2024, 1, 15)),
           updatedAt: Value(DateTime(2024, 1, 15)),
         );
-        final insertedId = await database.cardDao.insertBusinessCard(originalCardCompanion);
-        final originalCard = await database.cardDao.getBusinessCardById(insertedId);
+        final insertedId = await database.cardDao.insertBusinessCard(
+          originalCardCompanion,
+        );
+        final originalCard = await database.cardDao.getBusinessCardById(
+          insertedId,
+        );
 
         final updatedCard = BusinessCard(
           id: insertedId.toString(),
@@ -148,26 +165,36 @@ void main() {
 
         // Assert
         expect(success, isTrue);
-        final retrievedCard = await database.cardDao.getBusinessCardById(insertedId);
+        final retrievedCard = await database.cardDao.getBusinessCardById(
+          insertedId,
+        );
         expect(retrievedCard!.company, equals('新公司'));
         expect(retrievedCard.email, equals('wang@new.com'));
-        expect(retrievedCard.updatedAt?.isAfter(originalCard.updatedAt!), isTrue);
-        expect(retrievedCard.createdAt, equals(originalCard.createdAt)); // 建立時間不變
+        expect(
+          retrievedCard.updatedAt?.isAfter(originalCard.updatedAt!),
+          isTrue,
+        );
+        expect(
+          retrievedCard.createdAt,
+          equals(originalCard.createdAt),
+        ); // 建立時間不變
       });
 
       test('🔴 RED: should delete card successfully', () async {
         // Arrange
-        final cardCompanion = BusinessCardsCompanion.insert(
-          name: '趙六',
+        final cardCompanion = BusinessCardsCompanion.insert(name: '趙六');
+        final insertedId = await database.cardDao.insertBusinessCard(
+          cardCompanion,
         );
-        final insertedId = await database.cardDao.insertBusinessCard(cardCompanion);
-        
+
         // 確認卡片已插入
         final beforeDelete = await database.cardDao.getAllBusinessCards();
         expect(beforeDelete, hasLength(1));
 
         // Act
-        final deleteResult = await database.cardDao.deleteBusinessCard(insertedId);
+        final deleteResult = await database.cardDao.deleteBusinessCard(
+          insertedId,
+        );
 
         // Assert
         expect(deleteResult, isTrue);
@@ -175,13 +202,18 @@ void main() {
         expect(afterDelete, isEmpty);
       });
 
-      test('🔴 RED: should return false when deleting non-existent card', () async {
-        // Act
-        final deleteResult = await database.cardDao.deleteBusinessCard(99999); // 不存在的 ID
+      test(
+        '🔴 RED: should return false when deleting non-existent card',
+        () async {
+          // Act
+          final deleteResult = await database.cardDao.deleteBusinessCard(
+            99999,
+          ); // 不存在的 ID
 
-        // Assert
-        expect(deleteResult, isFalse);
-      });
+          // Assert
+          expect(deleteResult, isFalse);
+        },
+      );
 
       test('🔴 RED: should get all cards ordered by updated date', () async {
         // Arrange
@@ -283,13 +315,16 @@ void main() {
         expect(results3, hasLength(2));
       });
 
-      test('🔴 RED: should return empty list for non-matching search', () async {
-        // Act
-        final results = await database.cardDao.searchBusinessCards('不存在的關鍵字');
+      test(
+        '🔴 RED: should return empty list for non-matching search',
+        () async {
+          // Act
+          final results = await database.cardDao.searchBusinessCards('不存在的關鍵字');
 
-        // Assert
-        expect(results, isEmpty);
-      });
+          // Assert
+          expect(results, isEmpty);
+        },
+      );
     });
 
     group('CardDao 錯誤處理和邊界條件測試', () {
@@ -302,7 +337,9 @@ void main() {
         );
 
         // Act
-        final updateResult = await database.cardDao.updateBusinessCard(nonExistentCard);
+        final updateResult = await database.cardDao.updateBusinessCard(
+          nonExistentCard,
+        );
 
         // Assert
         expect(updateResult, isFalse);
@@ -319,8 +356,12 @@ void main() {
         );
 
         // Act
-        final insertedId = await database.cardDao.insertBusinessCard(cardWithLongText);
-        final retrievedCard = await database.cardDao.getBusinessCardById(insertedId);
+        final insertedId = await database.cardDao.insertBusinessCard(
+          cardWithLongText,
+        );
+        final retrievedCard = await database.cardDao.getBusinessCardById(
+          insertedId,
+        );
 
         // Assert
         expect(retrievedCard, matcher.isNotNull);
@@ -338,8 +379,12 @@ void main() {
         );
 
         // Act
-        final insertedId = await database.cardDao.insertBusinessCard(cardWithSpecialChars);
-        final retrievedCard = await database.cardDao.getBusinessCardById(insertedId);
+        final insertedId = await database.cardDao.insertBusinessCard(
+          cardWithSpecialChars,
+        );
+        final retrievedCard = await database.cardDao.getBusinessCardById(
+          insertedId,
+        );
 
         // Assert
         expect(retrievedCard, matcher.isNotNull);
@@ -359,8 +404,12 @@ void main() {
         );
 
         // Act
-        final insertedId = await database.cardDao.insertBusinessCard(minimalCard);
-        final retrievedCard = await database.cardDao.getBusinessCardById(insertedId);
+        final insertedId = await database.cardDao.insertBusinessCard(
+          minimalCard,
+        );
+        final retrievedCard = await database.cardDao.getBusinessCardById(
+          insertedId,
+        );
 
         // Assert
         expect(retrievedCard, matcher.isNotNull);
@@ -375,12 +424,8 @@ void main() {
     group('資料庫事務處理測試', () {
       test('🔴 RED: should support database transactions', () async {
         // Arrange
-        final card1 = BusinessCardsCompanion.insert(
-          name: '交易測試卡片1',
-        );
-        final card2 = BusinessCardsCompanion.insert(
-          name: '交易測試卡片2',
-        );
+        final card1 = BusinessCardsCompanion.insert(name: '交易測試卡片1');
+        final card2 = BusinessCardsCompanion.insert(name: '交易測試卡片2');
 
         // Act - 在事務中插入兩張卡片
         await database.transaction(() async {
@@ -390,14 +435,15 @@ void main() {
 
         // Assert
         final allCards = await database.cardDao.getAllBusinessCards();
-        expect(allCards.where((card) => card.name.contains('交易測試卡片')), hasLength(2));
+        expect(
+          allCards.where((card) => card.name.contains('交易測試卡片')),
+          hasLength(2),
+        );
       });
 
       test('🔴 RED: should rollback transaction on error', () async {
         // Arrange
-        final validCard = BusinessCardsCompanion.insert(
-          name: '有效卡片',
-        );
+        final validCard = BusinessCardsCompanion.insert(name: '有效卡片');
 
         // Act & Assert - 模擬事務中的錯誤
         expect(
@@ -418,10 +464,13 @@ void main() {
     group('效能測試', () {
       test('🔴 RED: should handle bulk insert efficiently', () async {
         // Arrange
-        final cards = List.generate(100, (index) => BusinessCardsCompanion.insert(
-          name: '批量測試卡片$index',
-          company: Value('Company${index % 10}'), // 10個不同公司
-        ));
+        final cards = List.generate(
+          100,
+          (index) => BusinessCardsCompanion.insert(
+            name: '批量測試卡片$index',
+            company: Value('Company${index % 10}'), // 10個不同公司
+          ),
+        );
 
         final stopwatch = Stopwatch()..start();
 
@@ -435,18 +484,29 @@ void main() {
         stopwatch.stop();
 
         // Assert
-        expect(stopwatch.elapsedMilliseconds, lessThan(5000)); // 100筆資料插入應在5秒內完成
-        
-        final retrievedCards = await database.cardDao.getAllBusinessCards(limit: 100);
-        expect(retrievedCards.where((card) => card.name.contains('批量測試卡片')), hasLength(100));
+        expect(
+          stopwatch.elapsedMilliseconds,
+          lessThan(5000),
+        ); // 100筆資料插入應在5秒內完成
+
+        final retrievedCards = await database.cardDao.getAllBusinessCards(
+          limit: 100,
+        );
+        expect(
+          retrievedCards.where((card) => card.name.contains('批量測試卡片')),
+          hasLength(100),
+        );
       });
 
       test('🔴 RED: should handle large result set efficiently', () async {
         // Arrange - 先插入100筆測試資料
-        final cards = List.generate(100, (index) => BusinessCardsCompanion.insert(
-          name: '大資料集測試卡片$index',
-          company: Value('Company${index % 10}'),
-        ));
+        final cards = List.generate(
+          100,
+          (index) => BusinessCardsCompanion.insert(
+            name: '大資料集測試卡片$index',
+            company: Value('Company${index % 10}'),
+          ),
+        );
 
         await database.transaction(() async {
           for (final card in cards) {
@@ -458,7 +518,9 @@ void main() {
 
         // Act
         final allCards = await database.cardDao.getAllBusinessCards(limit: 150);
-        final searchResults = await database.cardDao.searchBusinessCards('大資料集測試');
+        final searchResults = await database.cardDao.searchBusinessCards(
+          '大資料集測試',
+        );
 
         stopwatch.stop();
 

@@ -65,7 +65,8 @@ class LoadingState {
 
   /// 建立帶進度的載入狀態
   static LoadingState withProgress({
-    required double progress, String? message,
+    required double progress,
+    String? message,
     LoadingType type = LoadingType.normal,
     bool canCancel = false,
     VoidCallback? onCancel,
@@ -82,7 +83,8 @@ class LoadingState {
 
   /// 建立可取消的載入狀態
   static LoadingState cancellable({
-    required VoidCallback onCancel, String? message,
+    required VoidCallback onCancel,
+    String? message,
     LoadingType type = LoadingType.normal,
   }) {
     return LoadingState(
@@ -157,7 +159,8 @@ class LoadingPresenter extends StateNotifier<LoadingState> {
 
   /// 顯示帶進度的載入
   void showWithProgress({
-    required double progress, String? message,
+    required double progress,
+    String? message,
     LoadingType type = LoadingType.normal,
     bool canCancel = false,
     VoidCallback? onCancel,
@@ -173,7 +176,8 @@ class LoadingPresenter extends StateNotifier<LoadingState> {
 
   /// 顯示可取消的載入
   void showCancellable({
-    required VoidCallback onCancel, String? message,
+    required VoidCallback onCancel,
+    String? message,
     LoadingType type = LoadingType.normal,
   }) {
     state = LoadingState.cancellable(
@@ -337,7 +341,9 @@ class LoadingOverlay extends ConsumerWidget {
         child,
         if (loadingState.isLoading)
           Container(
-            color: backgroundColor ?? AppColors.scannerOverlay.withValues(alpha: 0.5),
+            color:
+                backgroundColor ??
+                AppColors.scannerOverlay.withValues(alpha: 0.5),
             child: Center(child: LoadingCard(loadingState: loadingState)),
           ),
       ],
@@ -494,7 +500,8 @@ extension LoadingProviderExtension on WidgetRef {
 
   /// 顯示帶進度的載入
   void showLoadingWithProgress({
-    required double progress, String? message,
+    required double progress,
+    String? message,
     LoadingType type = LoadingType.normal,
     bool canCancel = false,
     VoidCallback? onCancel,
@@ -510,7 +517,8 @@ extension LoadingProviderExtension on WidgetRef {
 
   /// 顯示可取消的載入
   void showCancellableLoading({
-    required VoidCallback onCancel, String? message,
+    required VoidCallback onCancel,
+    String? message,
     LoadingType type = LoadingType.normal,
   }) {
     loading.showCancellable(message: message, type: type, onCancel: onCancel);

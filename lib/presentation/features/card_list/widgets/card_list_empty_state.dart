@@ -5,7 +5,7 @@ import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_
 import 'package:flutter/material.dart';
 
 /// 名片列表空狀態元件
-/// 
+///
 /// 顯示不同情況下的空狀態，包含：
 /// - 無名片狀態
 /// - 搜尋無結果狀態
@@ -13,7 +13,8 @@ import 'package:flutter/material.dart';
 /// - 自訂空狀態
 class CardListEmptyState extends StatelessWidget {
   const CardListEmptyState({
-    required this.type, super.key,
+    required this.type,
+    super.key,
     this.title,
     this.message,
     this.icon,
@@ -58,7 +59,7 @@ class CardListEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final config = _getEmptyStateConfig();
-    
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppDimensions.space10),
@@ -67,19 +68,19 @@ class CardListEmptyState extends StatelessWidget {
           children: [
             // 插圖或圖示
             _buildIllustration(config),
-            
+
             const SizedBox(height: AppDimensions.space6),
-            
+
             // 標題
             _buildTitle(config),
-            
+
             const SizedBox(height: AppDimensions.space2),
-            
+
             // 訊息
             _buildMessage(config),
-            
+
             const SizedBox(height: AppDimensions.space8),
-            
+
             // 動作按鈕
             _buildActions(config),
           ],
@@ -99,19 +100,19 @@ class CardListEmptyState extends StatelessWidget {
           iconColor: AppColors.secondaryText,
           actionText: '新增名片',
         );
-      
+
       case EmptyStateType.searchNoResults:
         return EmptyStateConfig(
           icon: Icons.search_off,
           title: '找不到相關名片',
-          message: searchQuery != null 
+          message: searchQuery != null
               ? '沒有找到包含「$searchQuery」的名片\n試著搜尋其他關鍵字'
               : '試著搜尋其他關鍵字',
           iconColor: AppColors.secondaryText,
           actionText: '清除搜尋',
           secondaryActionText: '瀏覽所有名片',
         );
-      
+
       case EmptyStateType.error:
         return const EmptyStateConfig(
           icon: Icons.error_outline,
@@ -121,7 +122,7 @@ class CardListEmptyState extends StatelessWidget {
           actionText: '重試',
           secondaryActionText: '重新整理',
         );
-      
+
       case EmptyStateType.offline:
         return const EmptyStateConfig(
           icon: Icons.wifi_off,
@@ -130,7 +131,7 @@ class CardListEmptyState extends StatelessWidget {
           iconColor: AppColors.warning,
           actionText: '重試',
         );
-      
+
       case EmptyStateType.loading:
         return const EmptyStateConfig(
           icon: Icons.hourglass_empty,
@@ -138,7 +139,7 @@ class CardListEmptyState extends StatelessWidget {
           message: '正在取得名片列表',
           iconColor: AppColors.primary,
         );
-      
+
       case EmptyStateType.custom:
         return EmptyStateConfig(
           icon: icon ?? Icons.info_outline,
@@ -164,11 +165,7 @@ class CardListEmptyState extends StatelessWidget {
         color: config.iconColor.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
-      child: Icon(
-        config.icon,
-        size: 60,
-        color: config.iconColor,
-      ),
+      child: Icon(config.icon, size: 60, color: config.iconColor),
     );
   }
 
@@ -176,9 +173,7 @@ class CardListEmptyState extends StatelessWidget {
   Widget _buildTitle(EmptyStateConfig config) {
     return Text(
       config.title,
-      style: AppTextStyles.headline4.copyWith(
-        color: AppColors.primaryText,
-      ),
+      style: AppTextStyles.headline4.copyWith(color: AppColors.primaryText),
       textAlign: TextAlign.center,
     );
   }
@@ -187,9 +182,7 @@ class CardListEmptyState extends StatelessWidget {
   Widget _buildMessage(EmptyStateConfig config) {
     return Text(
       config.message,
-      style: AppTextStyles.bodyMedium.copyWith(
-        color: AppColors.secondaryText,
-      ),
+      style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText),
       textAlign: TextAlign.center,
     );
   }
@@ -201,10 +194,7 @@ class CardListEmptyState extends StatelessWidget {
     // 主要動作
     if (config.actionText != null) {
       actions.add(
-        ThemedButton(
-          text: config.actionText,
-          onPressed: onActionPressed,
-        ),
+        ThemedButton(text: config.actionText, onPressed: onActionPressed),
       );
     }
 
@@ -234,14 +224,19 @@ class CardListEmptyState extends StatelessWidget {
 enum EmptyStateType {
   /// 無名片
   noCards,
+
   /// 搜尋無結果
   searchNoResults,
+
   /// 錯誤狀態
   error,
+
   /// 離線狀態
   offline,
+
   /// 載入中
   loading,
+
   /// 自訂狀態
   custom,
 }
@@ -277,7 +272,7 @@ class EmptyStateConfig {
 }
 
 /// 載入狀態元件
-/// 
+///
 /// 顯示載入中的視覺效果
 class CardListLoadingState extends StatefulWidget {
   const CardListLoadingState({
@@ -316,13 +311,9 @@ class _CardListLoadingStateState extends State<CardListLoadingState>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _fadeAnimation = Tween<double>(
-      begin: 0.3,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.3, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
     _animationController.repeat(reverse: true);
   }
 
@@ -348,7 +339,7 @@ class _CardListLoadingStateState extends State<CardListLoadingState>
             ),
             const SizedBox(height: AppDimensions.space4),
           ],
-          
+
           AnimatedBuilder(
             animation: _fadeAnimation,
             builder: (context, child) {
@@ -391,12 +382,16 @@ class _CardListLoadingStateState extends State<CardListLoadingState>
                     width: 60,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: AppColors.placeholder.withValues(alpha: _fadeAnimation.value),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                      color: AppColors.placeholder.withValues(
+                        alpha: _fadeAnimation.value,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusSmall,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppDimensions.space4),
-                  
+
                   // 資訊骨架
                   Expanded(
                     child: Column(
@@ -406,8 +401,12 @@ class _CardListLoadingStateState extends State<CardListLoadingState>
                           width: double.infinity,
                           height: 16,
                           decoration: BoxDecoration(
-                            color: AppColors.placeholder.withValues(alpha: _fadeAnimation.value),
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                            color: AppColors.placeholder.withValues(
+                              alpha: _fadeAnimation.value,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusSmall,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 6),
@@ -415,8 +414,12 @@ class _CardListLoadingStateState extends State<CardListLoadingState>
                           width: 120,
                           height: 12,
                           decoration: BoxDecoration(
-                            color: AppColors.placeholder.withValues(alpha: _fadeAnimation.value * 0.7),
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                            color: AppColors.placeholder.withValues(
+                              alpha: _fadeAnimation.value * 0.7,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusSmall,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -424,21 +427,29 @@ class _CardListLoadingStateState extends State<CardListLoadingState>
                           width: 100,
                           height: 12,
                           decoration: BoxDecoration(
-                            color: AppColors.placeholder.withValues(alpha: _fadeAnimation.value * 0.7),
-                            borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                            color: AppColors.placeholder.withValues(
+                              alpha: _fadeAnimation.value * 0.7,
+                            ),
+                            borderRadius: BorderRadius.circular(
+                              AppDimensions.radiusSmall,
+                            ),
                           ),
                         ),
                       ],
                     ),
                   ),
-                  
+
                   // 按鈕骨架
                   Container(
                     width: 24,
                     height: 24,
                     decoration: BoxDecoration(
-                      color: AppColors.placeholder.withValues(alpha: _fadeAnimation.value),
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
+                      color: AppColors.placeholder.withValues(
+                        alpha: _fadeAnimation.value,
+                      ),
+                      borderRadius: BorderRadius.circular(
+                        AppDimensions.radiusSmall,
+                      ),
                     ),
                   ),
                 ],

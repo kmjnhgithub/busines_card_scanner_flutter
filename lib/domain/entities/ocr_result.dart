@@ -5,7 +5,7 @@ import 'package:busines_card_scanner_flutter/core/utils/string_utils.dart';
 import 'package:equatable/equatable.dart';
 
 /// OCR 處理結果實體
-/// 
+///
 /// 代表 OCR 處理的完整結果，包含識別的文字、信心度、圖片資料等。
 /// 遵循 Clean Architecture 原則，此實體：
 /// - 包含 OCR 相關的業務規則和驗證邏輯
@@ -31,18 +31,20 @@ class OCRResult extends Equatable {
   static const double _highConfidenceThreshold = 0.9;
 
   /// 建立 OCRResult 實例
-  /// 
+  ///
   /// [id] 唯一識別碼（必填且非空）
   /// [rawText] OCR 識別的原始文字（必填）
   /// [confidence] 信心度，範圍 0.0-1.0（必填）
   /// [processedAt] 處理時間（必填）
   /// 其他欄位皆為選填
-  /// 
+  ///
   /// 會自動驗證輸入資料，確保安全性和格式正確性
   OCRResult({
     required this.id,
     required this.rawText,
-    required this.confidence, required this.processedAt, this.detectedTexts,
+    required this.confidence,
+    required this.processedAt,
+    this.detectedTexts,
     this.imageData,
     this.imageWidth,
     this.imageHeight,
@@ -56,7 +58,9 @@ class OCRResult extends Equatable {
   const OCRResult._internal({
     required this.id,
     required this.rawText,
-    required this.confidence, required this.processedAt, this.detectedTexts,
+    required this.confidence,
+    required this.processedAt,
+    this.detectedTexts,
     this.imageData,
     this.imageWidth,
     this.imageHeight,
@@ -73,7 +77,9 @@ class OCRResult extends Equatable {
 
     // 驗證信心度範圍
     if (confidence < 0.0 || confidence > 1.0) {
-      throw ArgumentError('Confidence must be between 0.0 and 1.0, got: $confidence');
+      throw ArgumentError(
+        'Confidence must be between 0.0 and 1.0, got: $confidence',
+      );
     }
 
     // 驗證圖片尺寸
@@ -86,7 +92,9 @@ class OCRResult extends Equatable {
 
     // 驗證處理時間
     if (processingTimeMs != null && processingTimeMs! < 0) {
-      throw ArgumentError('Processing time cannot be negative, got: $processingTimeMs');
+      throw ArgumentError(
+        'Processing time cannot be negative, got: $processingTimeMs',
+      );
     }
 
     // 安全性檢查：防止腳本注入
@@ -95,11 +103,15 @@ class OCRResult extends Equatable {
       if (field != null && field.isNotEmpty) {
         final securityResult = _securityService.sanitizeInput(field);
         securityResult.fold(
-          (failure) => throw ArgumentError('Security validation failed: ${failure.userMessage}'),
+          (failure) => throw ArgumentError(
+            'Security validation failed: ${failure.userMessage}',
+          ),
           (sanitized) {
             // 檢查是否包含惡意腳本
             if (field.contains('<script')) {
-              throw ArgumentError('Field contains potentially malicious content');
+              throw ArgumentError(
+                'Field contains potentially malicious content',
+              );
             }
           },
         );
@@ -110,14 +122,16 @@ class OCRResult extends Equatable {
     if (detectedTexts != null) {
       for (final text in detectedTexts!) {
         if (text.contains('<script')) {
-          throw ArgumentError('Detected text contains potentially malicious content');
+          throw ArgumentError(
+            'Detected text contains potentially malicious content',
+          );
         }
       }
     }
   }
 
   /// 檢查是否為高信心度結果
-  /// 
+  ///
   /// 高信心度定義為 confidence >= 0.9
   bool isHighConfidence() {
     return confidence >= _highConfidenceThreshold;
@@ -129,7 +143,7 @@ class OCRResult extends Equatable {
   }
 
   /// 取得效能資訊
-  /// 
+  ///
   /// 回傳包含處理時間、信心度、文字長度等效能相關資料的 Map
   Map<String, dynamic> getPerformanceInfo() {
     return {
@@ -138,56 +152,56 @@ class OCRResult extends Equatable {
       'textLength': rawText.length,
       'detectedTextCount': detectedTexts?.length ?? 0,
       'hasImageData': imageData != null,
-      'imageSize': (imageWidth != null && imageHeight != null) 
-          ? '${imageWidth}x$imageHeight' 
+      'imageSize': (imageWidth != null && imageHeight != null)
+          ? '${imageWidth}x$imageHeight'
           : null,
     };
   }
 
   /// 從偵測到的文字中提取 Email 地址
-  /// 
+  ///
   /// 使用 StringUtils 的 extractEmails 方法
   List<String> extractEmails() {
     if (!hasDetectedTexts()) {
       return [];
     }
-    
+
     final allEmails = <String>[];
     for (final text in detectedTexts!) {
       final emails = StringUtils.extractEmails(text);
       allEmails.addAll(emails);
     }
-    
+
     // 也檢查原始文字
     allEmails.addAll(StringUtils.extractEmails(rawText));
-    
+
     // 去重並排序
     return allEmails.toSet().toList()..sort();
   }
 
   /// 從偵測到的文字中提取電話號碼
-  /// 
+  ///
   /// 使用 StringUtils 的 extractPhoneNumbers 方法
   List<String> extractPhoneNumbers() {
     if (!hasDetectedTexts()) {
       return [];
     }
-    
+
     final allPhones = <String>[];
     for (final text in detectedTexts!) {
       final phones = StringUtils.extractPhoneNumbers(text);
       allPhones.addAll(phones);
     }
-    
+
     // 也檢查原始文字
     allPhones.addAll(StringUtils.extractPhoneNumbers(rawText));
-    
+
     // 去重並排序
     return allPhones.toSet().toList()..sort();
   }
 
   /// 建立一個新的 OCRResult 實例，並更新指定的欄位
-  /// 
+  ///
   /// 使用 copyWith 模式提供不可變的更新操作
   OCRResult copyWith({
     String? id,
@@ -233,11 +247,11 @@ class OCRResult extends Equatable {
   String toString() {
     // 基於安全考量，不在 toString 中包含完整的原始文字和圖片資料
     return 'OCRResult('
-           'id: $id, '
-           'confidence: ${confidence.toStringAsFixed(2)}, '
-           'textLength: ${rawText.length}, '
-           'ocrEngine: $ocrEngine, '
-           'processedAt: $processedAt'
-           ')';
+        'id: $id, '
+        'confidence: ${confidence.toStringAsFixed(2)}, '
+        'textLength: ${rawText.length}, '
+        'ocrEngine: $ocrEngine, '
+        'processedAt: $processedAt'
+        ')';
   }
 }

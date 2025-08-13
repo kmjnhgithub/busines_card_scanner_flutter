@@ -6,7 +6,7 @@ import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_
 import 'package:flutter/material.dart';
 
 /// 名片列表項目元件
-/// 
+///
 /// 負責顯示單個名片的資訊，包含：
 /// - 名片縮圖
 /// - 基本資訊（姓名、職稱、公司）
@@ -14,7 +14,8 @@ import 'package:flutter/material.dart';
 /// - 支援可選的更多操作按鈕
 class CardListItem extends StatelessWidget {
   const CardListItem({
-    required this.card, super.key,
+    required this.card,
+    super.key,
     this.onTap,
     this.onLongPress,
     this.onMoreActions,
@@ -58,11 +59,10 @@ class CardListItem extends StatelessWidget {
         child: Container(
           decoration: isSelected
               ? BoxDecoration(
-                  borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-                  border: Border.all(
-                    color: AppColors.primary,
-                    width: 2,
+                  borderRadius: BorderRadius.circular(
+                    AppDimensions.radiusMedium,
                   ),
+                  border: Border.all(color: AppColors.primary, width: 2),
                 )
               : null,
           child: Padding(
@@ -93,10 +93,7 @@ class CardListItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.secondaryBackground,
         borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
-        border: Border.all(
-          color: AppColors.separator,
-          width: 0.5,
-        ),
+        border: Border.all(color: AppColors.separator, width: 0.5),
       ),
       child: _buildThumbnailContent(),
     );
@@ -192,9 +189,7 @@ class CardListItem extends StatelessWidget {
   Widget _buildJobTitleText() {
     return Text(
       card.jobTitle!,
-      style: AppTextStyles.bodySmall.copyWith(
-        color: AppColors.secondaryText,
-      ),
+      style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -204,9 +199,7 @@ class CardListItem extends StatelessWidget {
   Widget _buildCompanyText() {
     return Text(
       card.company!,
-      style: AppTextStyles.bodySmall.copyWith(
-        color: AppColors.secondaryText,
-      ),
+      style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
       maxLines: 1,
       overflow: TextOverflow.ellipsis,
     );
@@ -246,11 +239,7 @@ class CardListItem extends StatelessWidget {
 
   /// 建立聯絡方式圖示
   Widget _buildContactIcon(IconData icon, Color color) {
-    return Icon(
-      icon,
-      size: 12,
-      color: color.withValues(alpha: 0.7),
-    );
+    return Icon(icon, size: 12, color: color.withValues(alpha: 0.7));
   }
 
   /// 建立更多操作按鈕
@@ -263,22 +252,16 @@ class CardListItem extends StatelessWidget {
       ),
       onPressed: onMoreActions,
       padding: const EdgeInsets.all(AppDimensions.space1),
-      constraints: const BoxConstraints(
-        minWidth: 32,
-        minHeight: 32,
-      ),
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
     );
   }
 }
 
 /// 名片列表項目骨架載入元件
-/// 
+///
 /// 用於顯示載入狀態的骨架畫面
 class CardListItemSkeleton extends StatefulWidget {
-  const CardListItemSkeleton({
-    super.key,
-    this.margin,
-  });
+  const CardListItemSkeleton({super.key, this.margin});
 
   /// 自定義外邊距
   final EdgeInsets? margin;
@@ -299,13 +282,9 @@ class _CardListItemSkeletonState extends State<CardListItemSkeleton>
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
-    _animation = Tween<double>(
-      begin: 0.3,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _animation = Tween<double>(begin: 0.3, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
     _animationController.repeat(reverse: true);
   }
 
@@ -318,7 +297,8 @@ class _CardListItemSkeletonState extends State<CardListItemSkeleton>
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: widget.margin ?? const EdgeInsets.only(bottom: AppDimensions.space2),
+      margin:
+          widget.margin ?? const EdgeInsets.only(bottom: AppDimensions.space2),
       child: ThemedCard(
         child: Padding(
           padding: const EdgeInsets.all(AppDimensions.space4),
@@ -405,11 +385,12 @@ class CardListItemDivider extends StatelessWidget {
 }
 
 /// 名片列表項目包裝器
-/// 
+///
 /// 提供統一的邊距和間距管理
 class CardListItemWrapper extends StatelessWidget {
   const CardListItemWrapper({
-    required this.child, super.key,
+    required this.child,
+    super.key,
     this.padding,
     this.showDivider = false,
     this.dividerIndent = 0.0,
@@ -432,20 +413,14 @@ class CardListItemWrapper extends StatelessWidget {
     Widget content = child;
 
     if (padding != null) {
-      content = Padding(
-        padding: padding!,
-        child: content,
-      );
+      content = Padding(padding: padding!, child: content);
     }
 
     if (showDivider) {
       content = Column(
         children: [
           content,
-          CardListItemDivider(
-            indent: dividerIndent,
-            endIndent: dividerIndent,
-          ),
+          CardListItemDivider(indent: dividerIndent, endIndent: dividerIndent),
         ],
       );
     }

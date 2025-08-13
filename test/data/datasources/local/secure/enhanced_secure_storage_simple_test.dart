@@ -24,24 +24,28 @@ void main() {
 
       test('🔴 RED: should store API key successfully', () async {
         // Arrange
-        when(() => mockFlutterSecureStorage.write(
-          key: any(named: 'key'), 
-          value: any(named: 'value'),
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenAnswer((_) async => {});
+        when(
+          () => mockFlutterSecureStorage.write(
+            key: any(named: 'key'),
+            value: any(named: 'value'),
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenAnswer((_) async => {});
 
         // Act
         final result = await secureStorage.storeApiKey(testService, testApiKey);
 
         // Assert
         expect(result.isRight(), isTrue);
-        verify(() => mockFlutterSecureStorage.write(
-          key: 'api_key_$testService',
-          value: any(named: 'value'), // 加密後的值
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).called(1);
+        verify(
+          () => mockFlutterSecureStorage.write(
+            key: 'api_key_$testService',
+            value: any(named: 'value'), // 加密後的值
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).called(1);
       });
 
       test('🔴 RED: should retrieve API key successfully', () async {
@@ -50,11 +54,13 @@ void main() {
         expect(encryptResult.isRight(), isTrue);
         final encryptedValue = encryptResult.getOrElse(() => '');
 
-        when(() => mockFlutterSecureStorage.read(
-          key: any(named: 'key'),
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenAnswer((_) async => encryptedValue);
+        when(
+          () => mockFlutterSecureStorage.read(
+            key: any(named: 'key'),
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenAnswer((_) async => encryptedValue);
 
         // Act
         final result = await secureStorage.getApiKey(testService);
@@ -69,71 +75,75 @@ void main() {
 
       test('🔴 RED: should return failure when API key not found', () async {
         // Arrange
-        when(() => mockFlutterSecureStorage.read(
-          key: any(named: 'key'),
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenAnswer((_) async => null);
+        when(
+          () => mockFlutterSecureStorage.read(
+            key: any(named: 'key'),
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenAnswer((_) async => null);
 
         // Act
         final result = await secureStorage.getApiKey('nonexistent');
 
         // Assert
         expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) {
-            expect(failure, isA<DomainFailure>());
-            expect(failure.userMessage, contains('not found'));
-          },
-          (apiKey) => fail('Should return failure'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DomainFailure>());
+          expect(failure.userMessage, contains('not found'));
+        }, (apiKey) => fail('Should return failure'));
       });
 
       test('🔴 RED: should delete API key successfully', () async {
         // Arrange
-        when(() => mockFlutterSecureStorage.delete(
-          key: any(named: 'key'),
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenAnswer((_) async => {});
+        when(
+          () => mockFlutterSecureStorage.delete(
+            key: any(named: 'key'),
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenAnswer((_) async => {});
 
         // Act
         final result = await secureStorage.deleteApiKey(testService);
 
         // Assert
         expect(result.isRight(), isTrue);
-        verify(() => mockFlutterSecureStorage.delete(
-          key: 'api_key_$testService',
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).called(1);
+        verify(
+          () => mockFlutterSecureStorage.delete(
+            key: 'api_key_$testService',
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).called(1);
       });
 
       test('🔴 RED: should list stored API key services', () async {
         // Arrange
-        when(() => mockFlutterSecureStorage.readAll(
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenAnswer((_) async => {
-          'api_key_openai': 'encrypted_value_1',
-          'api_key_anthropic': 'encrypted_value_2',
-          'other_key': 'other_value',
-        });
+        when(
+          () => mockFlutterSecureStorage.readAll(
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenAnswer(
+          (_) async => {
+            'api_key_openai': 'encrypted_value_1',
+            'api_key_anthropic': 'encrypted_value_2',
+            'other_key': 'other_value',
+          },
+        );
 
         // Act
         final result = await secureStorage.getStoredApiKeyServices();
 
         // Assert
         expect(result.isRight(), isTrue);
-        result.fold(
-          (failure) => fail('Should not return failure'),
-          (services) {
-            expect(services, hasLength(2));
-            expect(services, contains('openai'));
-            expect(services, contains('anthropic'));
-            expect(services, isNot(contains('other')));
-          },
-        );
+        result.fold((failure) => fail('Should not return failure'), (services) {
+          expect(services, hasLength(2));
+          expect(services, contains('openai'));
+          expect(services, contains('anthropic'));
+          expect(services, isNot(contains('other')));
+        });
       });
     });
 
@@ -144,9 +154,9 @@ void main() {
 
         // Act
         final encryptResult = await secureStorage.encryptData(plainText);
-        
+
         expect(encryptResult.isRight(), isTrue);
-        
+
         final encryptedData = encryptResult.getOrElse(() => '');
         final decryptResult = await secureStorage.decryptData(encryptedData);
 
@@ -164,32 +174,29 @@ void main() {
 
         // Assert
         expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) {
-            expect(failure, isA<DomainFailure>());
-            expect(failure.userMessage, contains('empty'));
-          },
-          (encrypted) => fail('Should return failure for empty string'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DomainFailure>());
+          expect(failure.userMessage, contains('empty'));
+        }, (encrypted) => fail('Should return failure for empty string'));
       });
 
-      test('🔴 RED: should handle corrupted encrypted data gracefully', () async {
-        // Arrange
-        const corruptedData = 'corrupted_encrypted_data';
+      test(
+        '🔴 RED: should handle corrupted encrypted data gracefully',
+        () async {
+          // Arrange
+          const corruptedData = 'corrupted_encrypted_data';
 
-        // Act
-        final result = await secureStorage.decryptData(corruptedData);
+          // Act
+          final result = await secureStorage.decryptData(corruptedData);
 
-        // Assert
-        expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) {
+          // Assert
+          expect(result.isLeft(), isTrue);
+          result.fold((failure) {
             expect(failure, isA<DomainFailure>());
             expect(failure.userMessage, contains('integrity'));
-          },
-          (decrypted) => fail('Should return failure for corrupted data'),
-        );
-      });
+          }, (decrypted) => fail('Should return failure for corrupted data'));
+        },
+      );
     });
 
     group('驗證和安全性測試', () {
@@ -207,13 +214,10 @@ void main() {
 
           // Assert
           expect(result.isLeft(), isTrue, reason: 'Invalid key: $invalidKey');
-          result.fold(
-            (failure) {
-              expect(failure, isA<DomainFailure>());
-              expect(failure.userMessage, contains('Invalid'));
-            },
-            (success) => fail('Should reject invalid API key: $invalidKey'),
-          );
+          result.fold((failure) {
+            expect(failure, isA<DomainFailure>());
+            expect(failure.userMessage, contains('Invalid'));
+          }, (success) => fail('Should reject invalid API key: $invalidKey'));
         }
       });
 
@@ -227,16 +231,27 @@ void main() {
 
         for (final invalidService in invalidServiceNames) {
           // Act
-          final result = await secureStorage.storeApiKey(invalidService, 'sk-validkey123');
+          final result = await secureStorage.storeApiKey(
+            invalidService,
+            'sk-validkey123',
+          );
 
           // Assert
-          expect(result.isLeft(), isTrue, reason: 'Invalid service: $invalidService');
+          expect(
+            result.isLeft(),
+            isTrue,
+            reason: 'Invalid service: $invalidService',
+          );
           result.fold(
             (failure) {
               expect(failure, isA<DomainFailure>());
-              expect(failure.userMessage.toLowerCase(), contains('service name'));
+              expect(
+                failure.userMessage.toLowerCase(),
+                contains('service name'),
+              );
             },
-            (success) => fail('Should reject invalid service name: $invalidService'),
+            (success) =>
+                fail('Should reject invalid service name: $invalidService'),
           );
         }
       });
@@ -255,106 +270,122 @@ void main() {
     group('錯誤處理測試', () {
       test('🔴 RED: should handle storage write failure gracefully', () async {
         // Arrange
-        when(() => mockFlutterSecureStorage.write(
-          key: any(named: 'key'),
-          value: any(named: 'value'),
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenThrow(Exception('Storage write failed'));
+        when(
+          () => mockFlutterSecureStorage.write(
+            key: any(named: 'key'),
+            value: any(named: 'value'),
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenThrow(Exception('Storage write failed'));
 
         // Act
-        final result = await secureStorage.storeApiKey('test', 'sk-validkey123');
+        final result = await secureStorage.storeApiKey(
+          'test',
+          'sk-validkey123',
+        );
 
         // Assert
         expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) {
-            expect(failure, isA<DomainFailure>());
-            expect(failure.userMessage, contains('Failed to store'));
-          },
-          (success) => fail('Should handle storage failure'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DomainFailure>());
+          expect(failure.userMessage, contains('Failed to store'));
+        }, (success) => fail('Should handle storage failure'));
       });
 
       test('🔴 RED: should handle storage read failure gracefully', () async {
         // Arrange
-        when(() => mockFlutterSecureStorage.read(
-          key: any(named: 'key'),
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenThrow(Exception('Storage read failed'));
+        when(
+          () => mockFlutterSecureStorage.read(
+            key: any(named: 'key'),
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenThrow(Exception('Storage read failed'));
 
         // Act
         final result = await secureStorage.getApiKey('test');
 
         // Assert
         expect(result.isLeft(), isTrue);
-        result.fold(
-          (failure) {
-            expect(failure, isA<DomainFailure>());
-            expect(failure.userMessage, contains('Failed to retrieve'));
-          },
-          (apiKey) => fail('Should handle storage failure'),
-        );
+        result.fold((failure) {
+          expect(failure, isA<DomainFailure>());
+          expect(failure.userMessage, contains('Failed to retrieve'));
+        }, (apiKey) => fail('Should handle storage failure'));
       });
 
       test('🔴 RED: should clear all API keys when requested', () async {
         // Arrange
-        when(() => mockFlutterSecureStorage.readAll(
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenAnswer((_) async => {
-          'api_key_openai': 'value1',
-          'api_key_anthropic': 'value2',
-          'other_key': 'value3',
-        });
+        when(
+          () => mockFlutterSecureStorage.readAll(
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenAnswer(
+          (_) async => {
+            'api_key_openai': 'value1',
+            'api_key_anthropic': 'value2',
+            'other_key': 'value3',
+          },
+        );
 
-        when(() => mockFlutterSecureStorage.delete(
-          key: any(named: 'key'),
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).thenAnswer((_) async => {});
+        when(
+          () => mockFlutterSecureStorage.delete(
+            key: any(named: 'key'),
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).thenAnswer((_) async => {});
 
         // Act
         final result = await secureStorage.clearAllApiKeys();
 
         // Assert
         expect(result.isRight(), isTrue);
-        verify(() => mockFlutterSecureStorage.delete(
-          key: 'api_key_openai',
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).called(1);
-        verify(() => mockFlutterSecureStorage.delete(
-          key: 'api_key_anthropic',
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        )).called(1);
-        verifyNever(() => mockFlutterSecureStorage.delete(
-          key: 'other_key',
-          aOptions: any(named: 'aOptions'),
-          iOptions: any(named: 'iOptions'),
-        ));
+        verify(
+          () => mockFlutterSecureStorage.delete(
+            key: 'api_key_openai',
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).called(1);
+        verify(
+          () => mockFlutterSecureStorage.delete(
+            key: 'api_key_anthropic',
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        ).called(1);
+        verifyNever(
+          () => mockFlutterSecureStorage.delete(
+            key: 'other_key',
+            aOptions: any(named: 'aOptions'),
+            iOptions: any(named: 'iOptions'),
+          ),
+        );
       });
     });
 
     group('加密演算法測試', () {
-      test('🔴 RED: should produce different encrypted output for same input', () async {
-        // Arrange
-        const data = 'same_content';
+      test(
+        '🔴 RED: should produce different encrypted output for same input',
+        () async {
+          // Arrange
+          const data = 'same_content';
 
-        // Act
-        final encrypted1 = await secureStorage.encryptData(data);
-        final encrypted2 = await secureStorage.encryptData(data);
+          // Act
+          final encrypted1 = await secureStorage.encryptData(data);
+          final encrypted2 = await secureStorage.encryptData(data);
 
-        // Assert - 相同內容應產生不同的加密結果（因為使用了隨機 IV）
-        expect(encrypted1.isRight(), isTrue);
-        expect(encrypted2.isRight(), isTrue);
-        
-        final enc1 = encrypted1.getOrElse(() => '');
-        final enc2 = encrypted2.getOrElse(() => '');
-        expect(enc1, isNot(equals(enc2))); // 應該不同
-      });
+          // Assert - 相同內容應產生不同的加密結果（因為使用了隨機 IV）
+          expect(encrypted1.isRight(), isTrue);
+          expect(encrypted2.isRight(), isTrue);
+
+          final enc1 = encrypted1.getOrElse(() => '');
+          final enc2 = encrypted2.getOrElse(() => '');
+          expect(enc1, isNot(equals(enc2))); // 應該不同
+        },
+      );
     });
   });
 }

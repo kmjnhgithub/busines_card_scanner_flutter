@@ -1,5 +1,5 @@
 /// 字串處理工具類
-/// 
+///
 /// 提供常用的字串處理功能，包括：
 /// - 格式化和清理
 /// - 驗證和檢查
@@ -9,7 +9,7 @@ class StringUtils {
   StringUtils._();
 
   /// 清理字串中的多餘空白
-  /// 
+  ///
   /// 移除前後空白並將多個連續空白合併為單一空格
   static String cleanWhitespace(String input) {
     if (input.isEmpty) {
@@ -73,17 +73,19 @@ class StringUtils {
     if (phone.isEmpty) {
       return phone;
     }
-    
+
     // 移除所有非數字字元
     final cleanPhone = phone.replaceAll(RegExp(r'[^\d]'), '');
-    
+
     // 台灣手機號碼格式 (09xxxxxxxx -> 09xx-xxx-xxx)
     if (cleanPhone.length == 10 && cleanPhone.startsWith('09')) {
       return '${cleanPhone.substring(0, 4)}-${cleanPhone.substring(4, 7)}-${cleanPhone.substring(7)}';
     }
-    
+
     // 台灣市話格式 (0x-xxxxxxxx -> (0x) xxxx-xxxx)
-    if (cleanPhone.length >= 9 && cleanPhone.startsWith('0') && !cleanPhone.startsWith('09')) {
+    if (cleanPhone.length >= 9 &&
+        cleanPhone.startsWith('0') &&
+        !cleanPhone.startsWith('09')) {
       final areaCode = cleanPhone.substring(0, 2);
       final number = cleanPhone.substring(2);
       if (number.length >= 7) {
@@ -92,12 +94,12 @@ class StringUtils {
         return '($areaCode) $part1-$part2';
       }
     }
-    
+
     // 國際格式 (886xxxxxxxxxx)
     if (cleanPhone.length >= 12 && cleanPhone.startsWith('886')) {
       return '+${cleanPhone.substring(0, 3)} ${cleanPhone.substring(3, 4)} ${cleanPhone.substring(4, 8)}-${cleanPhone.substring(8)}';
     }
-    
+
     // 無法格式化，返回原始字串
     return phone;
   }
@@ -107,7 +109,7 @@ class StringUtils {
     if (input.length <= visibleChars) {
       return '*' * input.length;
     }
-    
+
     final visible = input.substring(input.length - visibleChars);
     final masked = '*' * (input.length - visibleChars);
     return masked + visible;
@@ -118,14 +120,14 @@ class StringUtils {
     if (name.isEmpty) {
       return '';
     }
-    
+
     final words = name.trim().split(RegExp(r'\s+'));
     final initials = words
         .where((word) => word.isNotEmpty)
         .take(maxInitials)
         .map((word) => word[0].toUpperCase())
         .join();
-    
+
     return initials;
   }
 
@@ -134,7 +136,9 @@ class StringUtils {
     if (email.isEmpty) {
       return false;
     }
-    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9]{1,}$').hasMatch(email);
+    return RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z0-9]{1,}$',
+    ).hasMatch(email);
   }
 
   /// 判斷字串是否為有效的網址格式（基礎檢查）
@@ -142,7 +146,10 @@ class StringUtils {
     if (url.isEmpty) {
       return false;
     }
-    return RegExp(r'^(https?|ftp)://[^\s/$.?#].[^\s]*$', caseSensitive: false).hasMatch(url);
+    return RegExp(
+      r'^(https?|ftp)://[^\s/$.?#].[^\s]*$',
+      caseSensitive: false,
+    ).hasMatch(url);
   }
 
   /// 計算字串的位元組長度（UTF-8）
@@ -166,7 +173,7 @@ class StringUtils {
     if (a.length != b.length) {
       return false;
     }
-    
+
     int result = 0;
     for (int i = 0; i < a.length; i++) {
       result |= a.codeUnitAt(i) ^ b.codeUnitAt(i);
@@ -179,19 +186,19 @@ class StringUtils {
     if (fileName.isEmpty) {
       return 'unnamed';
     }
-    
+
     // 移除路徑分隔符號和其他危險字元
     const dangerousChars = r'[<>:"/\|?*\x00-\x1F]';
     String cleaned = fileName.replaceAll(RegExp(dangerousChars), '_');
-    
+
     // 移除前後的點號和空白
     cleaned = cleaned.replaceAll(RegExp(r'^[.\s]+|[.\s]+$'), '');
-    
+
     // 確保不為空
     if (cleaned.isEmpty) {
       cleaned = 'unnamed';
     }
-    
+
     return cleaned;
   }
 
@@ -200,11 +207,11 @@ class StringUtils {
     if (text.isEmpty) {
       return [];
     }
-    
+
     final emailRegex = RegExp(
       r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
     );
-    
+
     return emailRegex
         .allMatches(text)
         .map((match) => match.group(0)!)
@@ -217,12 +224,10 @@ class StringUtils {
     if (text.isEmpty) {
       return [];
     }
-    
+
     // 支援多種國際電話格式的正則表達式
-    final phoneRegex = RegExp(
-      r'(?:\+?[\d\s\-\(\)]{7,})',
-    );
-    
+    final phoneRegex = RegExp(r'(?:\+?[\d\s\-\(\)]{7,})');
+
     return phoneRegex
         .allMatches(text)
         .map((match) => match.group(0)!.trim())

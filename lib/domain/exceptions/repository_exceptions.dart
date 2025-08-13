@@ -34,13 +34,11 @@ abstract class RepositoryException extends DomainFailure {
 class CardNotFoundException extends RepositoryException {
   final String cardId;
 
-  const CardNotFoundException(
-    this.cardId, {
-    String? userMessage,
-  }) : super(
-          userMessage: userMessage ?? '找不到指定的名片',
-          internalMessage: 'Card not found: $cardId',
-        );
+  const CardNotFoundException(this.cardId, {String? userMessage})
+    : super(
+        userMessage: userMessage ?? '找不到指定的名片',
+        internalMessage: 'Card not found: $cardId',
+      );
 
   @override
   List<Object?> get props => [cardId, userMessage, internalMessage];
@@ -51,14 +49,11 @@ class CardInUseFailure extends RepositoryException {
   final String cardId;
   final String operation;
 
-  const CardInUseFailure(
-    this.cardId,
-    this.operation, {
-    String? userMessage,
-  }) : super(
-          userMessage: userMessage ?? '名片正在被其他操作使用，請稍後再試',
-          internalMessage: 'Card $cardId is in use by operation: $operation',
-        );
+  const CardInUseFailure(this.cardId, this.operation, {String? userMessage})
+    : super(
+        userMessage: userMessage ?? '名片正在被其他操作使用，請稍後再試',
+        internalMessage: 'Card $cardId is in use by operation: $operation',
+      );
 
   @override
   List<Object?> get props => [cardId, operation, userMessage, internalMessage];
@@ -74,12 +69,18 @@ class StorageSpaceFailure extends RepositoryException {
     required this.requiredSpaceBytes,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? '儲存空間不足，無法儲存名片',
-          internalMessage: 'Insufficient storage space. Available: $availableSpaceBytes, Required: $requiredSpaceBytes',
-        );
+         userMessage: userMessage ?? '儲存空間不足，無法儲存名片',
+         internalMessage:
+             'Insufficient storage space. Available: $availableSpaceBytes, Required: $requiredSpaceBytes',
+       );
 
   @override
-  List<Object?> get props => [availableSpaceBytes, requiredSpaceBytes, userMessage, internalMessage];
+  List<Object?> get props => [
+    availableSpaceBytes,
+    requiredSpaceBytes,
+    userMessage,
+    internalMessage,
+  ];
 }
 
 // ========== OCR Repository 異常 ==========
@@ -93,9 +94,11 @@ class OCRProcessingFailure extends RepositoryException {
     String? userMessage,
     String? internalMessage,
   }) : super(
-          userMessage: userMessage ?? '文字識別處理失敗',
-          internalMessage: internalMessage ?? 'OCR processing failed${engineId != null ? ' with engine: $engineId' : ''}',
-        );
+         userMessage: userMessage ?? '文字識別處理失敗',
+         internalMessage:
+             internalMessage ??
+             'OCR processing failed${engineId != null ? ' with engine: $engineId' : ''}',
+       );
 
   @override
   List<Object?> get props => [engineId, userMessage, internalMessage];
@@ -105,13 +108,12 @@ class OCRProcessingFailure extends RepositoryException {
 class UnsupportedImageFormatFailure extends RepositoryException {
   final String? mimeType;
 
-  const UnsupportedImageFormatFailure({
-    this.mimeType,
-    String? userMessage,
-  }) : super(
-          userMessage: userMessage ?? '不支援的圖片格式',
-          internalMessage: 'Unsupported image format${mimeType != null ? ': $mimeType' : ''}',
-        );
+  const UnsupportedImageFormatFailure({this.mimeType, String? userMessage})
+    : super(
+        userMessage: userMessage ?? '不支援的圖片格式',
+        internalMessage:
+            'Unsupported image format${mimeType != null ? ': $mimeType' : ''}',
+      );
 
   @override
   List<Object?> get props => [mimeType, userMessage, internalMessage];
@@ -127,9 +129,10 @@ class ImageTooLargeFailure extends RepositoryException {
     required this.maxSize,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? '圖片尺寸過大，請選擇較小的圖片',
-          internalMessage: 'Image size too large: $imageSize bytes, max allowed: $maxSize bytes',
-        );
+         userMessage: userMessage ?? '圖片尺寸過大，請選擇較小的圖片',
+         internalMessage:
+             'Image size too large: $imageSize bytes, max allowed: $maxSize bytes',
+       );
 
   @override
   List<Object?> get props => [imageSize, maxSize, userMessage, internalMessage];
@@ -139,13 +142,12 @@ class ImageTooLargeFailure extends RepositoryException {
 class OCRServiceUnavailableFailure extends RepositoryException {
   final String? reason;
 
-  const OCRServiceUnavailableFailure({
-    this.reason,
-    String? userMessage,
-  }) : super(
-          userMessage: userMessage ?? 'OCR 服務暫時無法使用',
-          internalMessage: 'OCR service unavailable${reason != null ? ': $reason' : ''}',
-        );
+  const OCRServiceUnavailableFailure({this.reason, String? userMessage})
+    : super(
+        userMessage: userMessage ?? 'OCR 服務暫時無法使用',
+        internalMessage:
+            'OCR service unavailable${reason != null ? ': $reason' : ''}',
+      );
 
   @override
   List<Object?> get props => [reason, userMessage, internalMessage];
@@ -155,13 +157,11 @@ class OCRServiceUnavailableFailure extends RepositoryException {
 class OCRResultNotFoundException extends RepositoryException {
   final String resultId;
 
-  const OCRResultNotFoundException(
-    this.resultId, {
-    String? userMessage,
-  }) : super(
-          userMessage: userMessage ?? '找不到指定的 OCR 結果',
-          internalMessage: 'OCR result not found: $resultId',
-        );
+  const OCRResultNotFoundException(this.resultId, {String? userMessage})
+    : super(
+        userMessage: userMessage ?? '找不到指定的 OCR 結果',
+        internalMessage: 'OCR result not found: $resultId',
+      );
 
   @override
   List<Object?> get props => [resultId, userMessage, internalMessage];
@@ -179,9 +179,10 @@ class AIServiceUnavailableFailure extends RepositoryException {
     this.reason,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? 'AI 服務暫時無法使用',
-          internalMessage: 'AI service unavailable${serviceId != null ? ' ($serviceId)' : ''}${reason != null ? ': $reason' : ''}',
-        );
+         userMessage: userMessage ?? 'AI 服務暫時無法使用',
+         internalMessage:
+             'AI service unavailable${serviceId != null ? ' ($serviceId)' : ''}${reason != null ? ': $reason' : ''}',
+       );
 
   @override
   List<Object?> get props => [serviceId, reason, userMessage, internalMessage];
@@ -197,9 +198,10 @@ class InvalidInputFailure extends RepositoryException {
     this.value,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? '輸入內容無效',
-          internalMessage: 'Invalid input for field: $field${value != null ? ', value: $value' : ''}',
-        );
+         userMessage: userMessage ?? '輸入內容無效',
+         internalMessage:
+             'Invalid input for field: $field${value != null ? ', value: $value' : ''}',
+       );
 
   @override
   List<Object?> get props => [field, value, userMessage, internalMessage];
@@ -209,13 +211,11 @@ class InvalidInputFailure extends RepositoryException {
 class AIQuotaExceededFailure extends RepositoryException {
   final DateTime resetTime;
 
-  const AIQuotaExceededFailure({
-    required this.resetTime,
-    String? userMessage,
-  }) : super(
-          userMessage: userMessage ?? 'AI 服務使用量已達上限，請稍後再試',
-          internalMessage: 'AI quota exceeded, resets at: $resetTime',
-        );
+  const AIQuotaExceededFailure({required this.resetTime, String? userMessage})
+    : super(
+        userMessage: userMessage ?? 'AI 服務使用量已達上限，請稍後再試',
+        internalMessage: 'AI quota exceeded, resets at: $resetTime',
+      );
 
   @override
   List<Object?> get props => [resetTime, userMessage, internalMessage];
@@ -225,13 +225,12 @@ class AIQuotaExceededFailure extends RepositoryException {
 class AIRateLimitFailure extends RepositoryException {
   final Duration retryAfter;
 
-  AIRateLimitFailure({
-    required this.retryAfter,
-    String? userMessage,
-  }) : super(
-          userMessage: userMessage ?? '請求過於頻繁，請稍後再試',
-          internalMessage: 'Rate limit exceeded, retry after: ${retryAfter.inSeconds} seconds',
-        );
+  AIRateLimitFailure({required this.retryAfter, String? userMessage})
+    : super(
+        userMessage: userMessage ?? '請求過於頻繁，請稍後再試',
+        internalMessage:
+            'Rate limit exceeded, retry after: ${retryAfter.inSeconds} seconds',
+      );
 
   @override
   List<Object?> get props => [retryAfter, userMessage, internalMessage];
@@ -250,12 +249,19 @@ class DataSourceFailure extends RepositoryException {
     String? userMessage,
     String? internalMessage,
   }) : super(
-          userMessage: userMessage ?? '資料存取發生錯誤',
-          internalMessage: internalMessage ?? 'Data source failure${dataSource != null ? ' in $dataSource' : ''}${operation != null ? ' during $operation' : ''}',
-        );
+         userMessage: userMessage ?? '資料存取發生錯誤',
+         internalMessage:
+             internalMessage ??
+             'Data source failure${dataSource != null ? ' in $dataSource' : ''}${operation != null ? ' during $operation' : ''}',
+       );
 
   @override
-  List<Object?> get props => [dataSource, operation, userMessage, internalMessage];
+  List<Object?> get props => [
+    dataSource,
+    operation,
+    userMessage,
+    internalMessage,
+  ];
 }
 
 /// 資料庫連線失敗異常
@@ -264,48 +270,62 @@ class DatabaseConnectionFailure extends DataSourceFailure {
     String? userMessage,
     String? internalMessage,
   }) : super(
-          dataSource: 'database',
-          userMessage: userMessage ?? '資料庫連線失敗',
-          internalMessage: internalMessage ?? 'Failed to connect to database',
-        );
+         dataSource: 'database',
+         userMessage: userMessage ?? '資料庫連線失敗',
+         internalMessage: internalMessage ?? 'Failed to connect to database',
+       );
 
   @override
-  List<Object?> get props => [dataSource, operation, userMessage, internalMessage];
+  List<Object?> get props => [
+    dataSource,
+    operation,
+    userMessage,
+    internalMessage,
+  ];
 }
 
 /// 網路連線失敗異常
 class NetworkConnectionFailure extends DataSourceFailure {
   final String? endpoint;
 
-  const NetworkConnectionFailure({
-    this.endpoint,
-    String? userMessage,
-  }) : super(
-          dataSource: 'network',
-          userMessage: userMessage ?? '網路連線失敗',
-          internalMessage: 'Network connection failed${endpoint != null ? ' to $endpoint' : ''}',
-        );
+  const NetworkConnectionFailure({this.endpoint, String? userMessage})
+    : super(
+        dataSource: 'network',
+        userMessage: userMessage ?? '網路連線失敗',
+        internalMessage:
+            'Network connection failed${endpoint != null ? ' to $endpoint' : ''}',
+      );
 
   @override
-  List<Object?> get props => [endpoint, dataSource, operation, userMessage, internalMessage];
+  List<Object?> get props => [
+    endpoint,
+    dataSource,
+    operation,
+    userMessage,
+    internalMessage,
+  ];
 }
 
 /// 檔案系統異常
 class FileSystemFailure extends DataSourceFailure {
   final String? filePath;
 
-  const FileSystemFailure({
-    this.filePath,
-    super.operation,
-    String? userMessage,
-  }) : super(
-          dataSource: 'filesystem',
-          userMessage: userMessage ?? '檔案操作失敗',
-          internalMessage: 'File system operation failed${filePath != null ? ' for file: $filePath' : ''}',
-        );
+  const FileSystemFailure({this.filePath, super.operation, String? userMessage})
+    : super(
+        dataSource: 'filesystem',
+        userMessage: userMessage ?? '檔案操作失敗',
+        internalMessage:
+            'File system operation failed${filePath != null ? ' for file: $filePath' : ''}',
+      );
 
   @override
-  List<Object?> get props => [filePath, dataSource, operation, userMessage, internalMessage];
+  List<Object?> get props => [
+    filePath,
+    dataSource,
+    operation,
+    userMessage,
+    internalMessage,
+  ];
 }
 
 // ========== 權限相關異常 ==========
@@ -320,12 +340,18 @@ class InsufficientPermissionFailure extends RepositoryException {
     required this.operation,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? '沒有執行此操作的權限',
-          internalMessage: 'Insufficient permission: $permission for operation: $operation',
-        );
+         userMessage: userMessage ?? '沒有執行此操作的權限',
+         internalMessage:
+             'Insufficient permission: $permission for operation: $operation',
+       );
 
   @override
-  List<Object?> get props => [permission, operation, userMessage, internalMessage];
+  List<Object?> get props => [
+    permission,
+    operation,
+    userMessage,
+    internalMessage,
+  ];
 }
 
 // ========== 驗證相關異常 ==========
@@ -353,9 +379,9 @@ class DataValidationFailure extends RepositoryException {
     required this.validationErrors,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? '資料驗證失敗',
-          internalMessage: 'Data validation failed: $validationErrors',
-        );
+         userMessage: userMessage ?? '資料驗證失敗',
+         internalMessage: 'Data validation failed: $validationErrors',
+       );
 
   @override
   List<Object?> get props => [validationErrors, userMessage, internalMessage];
@@ -396,12 +422,17 @@ class DataConflictFailure extends RepositoryException {
     required this.resourceType,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? '資料已被其他用戶修改，請重新載入後再試',
-          internalMessage: 'Data conflict for $resourceType: $resourceId',
-        );
+         userMessage: userMessage ?? '資料已被其他用戶修改，請重新載入後再試',
+         internalMessage: 'Data conflict for $resourceType: $resourceId',
+       );
 
   @override
-  List<Object?> get props => [resourceId, resourceType, userMessage, internalMessage];
+  List<Object?> get props => [
+    resourceId,
+    resourceType,
+    userMessage,
+    internalMessage,
+  ];
 }
 
 /// 資源鎖定異常
@@ -414,10 +445,16 @@ class ResourceLockFailure extends RepositoryException {
     required this.lockDuration,
     String? userMessage,
   }) : super(
-          userMessage: userMessage ?? '資源正在被使用中，請稍後再試',
-          internalMessage: 'Resource locked: $resourceId, duration: ${lockDuration.inSeconds}s',
-        );
+         userMessage: userMessage ?? '資源正在被使用中，請稍後再試',
+         internalMessage:
+             'Resource locked: $resourceId, duration: ${lockDuration.inSeconds}s',
+       );
 
   @override
-  List<Object?> get props => [resourceId, lockDuration, userMessage, internalMessage];
+  List<Object?> get props => [
+    resourceId,
+    lockDuration,
+    userMessage,
+    internalMessage,
+  ];
 }

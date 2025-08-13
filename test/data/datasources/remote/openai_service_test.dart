@@ -8,7 +8,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockDio extends Mock implements Dio {}
+
 class MockEnhancedSecureStorage extends Mock implements EnhancedSecureStorage {}
+
 void main() {
   group('OpenAIService', () {
     late OpenAIService service;
@@ -18,10 +20,7 @@ void main() {
     setUp(() {
       mockDio = MockDio();
       mockStorage = MockEnhancedSecureStorage();
-      service = OpenAIServiceImpl(
-        dio: mockDio,
-        secureStorage: mockStorage,
-      );
+      service = OpenAIServiceImpl(dio: mockDio, secureStorage: mockStorage);
     });
 
     group('parseCardFromText', () {
@@ -52,23 +51,28 @@ void main() {
                   "email": "zhang.san@abc.com.tw",
                   "address": "台北市信義區信義路100號8樓",
                   "confidence": 0.95
-                }'''
-              }
-            }
-          ]
+                }''',
+              },
+            },
+          ],
         };
 
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).thenAnswer((_) async => Response(
-          data: mockResponse,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ));
+        when(
+          () => mockStorage.getApiKey('openai_api_key'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockDio.post(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            data: mockResponse,
+            statusCode: 200,
+            requestOptions: RequestOptions(),
+          ),
+        );
 
         // Act
         final result = await service.parseCardFromText(testOcrText);
@@ -86,116 +90,157 @@ void main() {
 
         // 驗證 API 調用
         verify(() => mockStorage.getApiKey('openai_api_key')).called(1);
-        verify(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).called(1);
-      });
-
-      test('should throw AIServiceUnavailableFailure when API key is missing', () async {
-        // Arrange
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Left(DataSourceFailure(userMessage: 'Not found')));
-
-        // Act & Assert
-        await expectLater(
-          service.parseCardFromText(testOcrText),
-          throwsA(isA<AIServiceUnavailableFailure>()),
-        );
-
-        verifyNever(() => mockDio.post(any(), data: any(named: 'data'), options: any(named: 'options')));
-      });
-
-      test('should throw AIServiceUnavailableFailure when API key is empty', () async {
-        // Arrange
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(''));
-
-        // Act & Assert
-        await expectLater(
-          service.parseCardFromText(testOcrText),
-          throwsA(isA<AIServiceUnavailableFailure>()),
-        );
-      });
-
-      test('should throw InvalidInputFailure for empty or invalid text', () async {
-        // Arrange
-        const apiKey = 'test-api-key';
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-
-        // Act & Assert - 空字串
-        await expectLater(
-          service.parseCardFromText(''),
-          throwsA(isA<InvalidInputFailure>()),
-        );
-
-        // Act & Assert - 只有空格
-        await expectLater(
-          service.parseCardFromText('   '),
-          throwsA(isA<InvalidInputFailure>()),
-        );
-
-        // Act & Assert - 超長文字（假設限制是 10000 字元）
-        final longText = 'x' * 10001;
-        await expectLater(
-          service.parseCardFromText(longText),
-          throwsA(isA<InvalidInputFailure>()),
-        );
-      });
-
-      test('should throw AIQuotaExceededFailure when API quota is exceeded', () async {
-        // Arrange
-        const apiKey = 'test-api-key';
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).thenThrow(DioException(
-          requestOptions: RequestOptions(),
-          response: Response(
-            statusCode: 429,
-            statusMessage: 'Too Many Requests',
-            data: {'error': {'code': 'quota_exceeded'}},
-            requestOptions: RequestOptions(),
+        verify(
+          () => mockDio.post(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
           ),
-        ));
-
-        // Act & Assert
-        await expectLater(
-          service.parseCardFromText(testOcrText),
-          throwsA(isA<AIQuotaExceededFailure>()),
-        );
+        ).called(1);
       });
 
-      test('should throw AIRateLimitFailure when rate limit is exceeded', () async {
-        // Arrange
-        const apiKey = 'test-api-key';
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).thenThrow(DioException(
-          requestOptions: RequestOptions(),
-          response: Response(
-            statusCode: 429,
-            statusMessage: 'Too Many Requests',
-            data: {'error': {'code': 'rate_limit_exceeded'}},
-            requestOptions: RequestOptions(),
-          ),
-        ));
+      test(
+        'should throw AIServiceUnavailableFailure when API key is missing',
+        () async {
+          // Arrange
+          when(() => mockStorage.getApiKey('openai_api_key')).thenAnswer(
+            (_) async =>
+                const Left(DataSourceFailure(userMessage: 'Not found')),
+          );
 
-        // Act & Assert
-        await expectLater(
-          service.parseCardFromText(testOcrText),
-          throwsA(isA<AIRateLimitFailure>()),
-        );
-      });
+          // Act & Assert
+          await expectLater(
+            service.parseCardFromText(testOcrText),
+            throwsA(isA<AIServiceUnavailableFailure>()),
+          );
+
+          verifyNever(
+            () => mockDio.post(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            ),
+          );
+        },
+      );
+
+      test(
+        'should throw AIServiceUnavailableFailure when API key is empty',
+        () async {
+          // Arrange
+          when(
+            () => mockStorage.getApiKey('openai_api_key'),
+          ).thenAnswer((_) async => const Right(''));
+
+          // Act & Assert
+          await expectLater(
+            service.parseCardFromText(testOcrText),
+            throwsA(isA<AIServiceUnavailableFailure>()),
+          );
+        },
+      );
+
+      test(
+        'should throw InvalidInputFailure for empty or invalid text',
+        () async {
+          // Arrange
+          const apiKey = 'test-api-key';
+          when(
+            () => mockStorage.getApiKey('openai_api_key'),
+          ).thenAnswer((_) async => const Right(apiKey));
+
+          // Act & Assert - 空字串
+          await expectLater(
+            service.parseCardFromText(''),
+            throwsA(isA<InvalidInputFailure>()),
+          );
+
+          // Act & Assert - 只有空格
+          await expectLater(
+            service.parseCardFromText('   '),
+            throwsA(isA<InvalidInputFailure>()),
+          );
+
+          // Act & Assert - 超長文字（假設限制是 10000 字元）
+          final longText = 'x' * 10001;
+          await expectLater(
+            service.parseCardFromText(longText),
+            throwsA(isA<InvalidInputFailure>()),
+          );
+        },
+      );
+
+      test(
+        'should throw AIQuotaExceededFailure when API quota is exceeded',
+        () async {
+          // Arrange
+          const apiKey = 'test-api-key';
+          when(
+            () => mockStorage.getApiKey('openai_api_key'),
+          ).thenAnswer((_) async => const Right(apiKey));
+          when(
+            () => mockDio.post(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            ),
+          ).thenThrow(
+            DioException(
+              requestOptions: RequestOptions(),
+              response: Response(
+                statusCode: 429,
+                statusMessage: 'Too Many Requests',
+                data: {
+                  'error': {'code': 'quota_exceeded'},
+                },
+                requestOptions: RequestOptions(),
+              ),
+            ),
+          );
+
+          // Act & Assert
+          await expectLater(
+            service.parseCardFromText(testOcrText),
+            throwsA(isA<AIQuotaExceededFailure>()),
+          );
+        },
+      );
+
+      test(
+        'should throw AIRateLimitFailure when rate limit is exceeded',
+        () async {
+          // Arrange
+          const apiKey = 'test-api-key';
+          when(
+            () => mockStorage.getApiKey('openai_api_key'),
+          ).thenAnswer((_) async => const Right(apiKey));
+          when(
+            () => mockDio.post(
+              any(),
+              data: any(named: 'data'),
+              options: any(named: 'options'),
+            ),
+          ).thenThrow(
+            DioException(
+              requestOptions: RequestOptions(),
+              response: Response(
+                statusCode: 429,
+                statusMessage: 'Too Many Requests',
+                data: {
+                  'error': {'code': 'rate_limit_exceeded'},
+                },
+                requestOptions: RequestOptions(),
+              ),
+            ),
+          );
+
+          // Act & Assert
+          await expectLater(
+            service.parseCardFromText(testOcrText),
+            throwsA(isA<AIRateLimitFailure>()),
+          );
+        },
+      );
 
       test('should handle malformed JSON response gracefully', () async {
         // Arrange
@@ -203,24 +248,27 @@ void main() {
         final mockResponse = {
           'choices': [
             {
-              'message': {
-                'content': 'invalid json {'
-              }
-            }
-          ]
+              'message': {'content': 'invalid json {'},
+            },
+          ],
         };
 
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).thenAnswer((_) async => Response(
-          data: mockResponse,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ));
+        when(
+          () => mockStorage.getApiKey('openai_api_key'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockDio.post(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            data: mockResponse,
+            statusCode: 200,
+            requestOptions: RequestOptions(),
+          ),
+        );
 
         // Act & Assert
         await expectLater(
@@ -244,23 +292,28 @@ void main() {
                   "phone": "123",
                   "confidence": 1.5,
                   "maliciousField": "<script>alert('xss')</script>"
-                }'''
-              }
-            }
-          ]
+                }''',
+              },
+            },
+          ],
         };
 
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).thenAnswer((_) async => Response(
-          data: mockResponse,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ));
+        when(
+          () => mockStorage.getApiKey('openai_api_key'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockDio.post(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            data: mockResponse,
+            statusCode: 200,
+            requestOptions: RequestOptions(),
+          ),
+        );
 
         // Act
         final result = await service.parseCardFromText(testOcrText);
@@ -279,34 +332,39 @@ void main() {
         final mockResponse = {
           'choices': [
             {
-              'message': {
-                'content': '{"name": "張三", "confidence": 0.9}'
-              }
-            }
-          ]
+              'message': {'content': '{"name": "張三", "confidence": 0.9}'},
+            },
+          ],
         };
 
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).thenAnswer((_) async => Response(
-          data: mockResponse,
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-        ));
+        when(
+          () => mockStorage.getApiKey('openai_api_key'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockDio.post(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
+          ),
+        ).thenAnswer(
+          (_) async => Response(
+            data: mockResponse,
+            statusCode: 200,
+            requestOptions: RequestOptions(),
+          ),
+        );
 
         // Act
         await service.parseCardFromText(testOcrText);
 
         // Assert
-        final capturedCall = verify(() => mockDio.post(
-          captureAny(),
-          data: captureAny(named: 'data'),
-          options: captureAny(named: 'options'),
-        )).captured;
+        final capturedCall = verify(
+          () => mockDio.post(
+            captureAny(),
+            data: captureAny(named: 'data'),
+            options: captureAny(named: 'options'),
+          ),
+        ).captured;
 
         final url = capturedCall[0] as String;
         final data = capturedCall[1] as Map<String, dynamic>;
@@ -316,7 +374,7 @@ void main() {
         expect(data['messages'], isA<List>());
         expect(data['temperature'], equals(0.1)); // 低溫度確保一致性
         expect(data['max_tokens'], isA<int>());
-        
+
         // 檢查 system prompt 包含適當的指示
         final messages = data['messages'] as List;
         final systemMessage = messages.firstWhere(
@@ -341,20 +399,22 @@ void main() {
       test('should return service status without exposing API key', () async {
         // Arrange
         const apiKey = 'test-api-key';
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.get(
-          any(),
-          options: any(named: 'options'),
-        )).thenAnswer((_) async => Response(
-          data: {'data': []},
-          statusCode: 200,
-          requestOptions: RequestOptions(),
-          headers: Headers.fromMap({
-            'x-ratelimit-remaining-requests': ['100'],
-            'x-ratelimit-reset-requests': ['2024-01-01T00:00:00Z'],
-          }),
-        ));
+        when(
+          () => mockStorage.getApiKey('openai_api_key'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockDio.get(any(), options: any(named: 'options')),
+        ).thenAnswer(
+          (_) async => Response(
+            data: {'data': []},
+            statusCode: 200,
+            requestOptions: RequestOptions(),
+            headers: Headers.fromMap({
+              'x-ratelimit-remaining-requests': ['100'],
+              'x-ratelimit-reset-requests': ['2024-01-01T00:00:00Z'],
+            }),
+          ),
+        );
 
         // Act
         final status = await service.getServiceStatus();
@@ -370,8 +430,9 @@ void main() {
 
       test('should handle service unavailable gracefully', () async {
         // Arrange
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Left(DataSourceFailure(userMessage: 'Not found')));
+        when(() => mockStorage.getApiKey('openai_api_key')).thenAnswer(
+          (_) async => const Left(DataSourceFailure(userMessage: 'Not found')),
+        );
 
         // Act
         final status = await service.getServiceStatus();
@@ -415,16 +476,21 @@ void main() {
       test('should handle network timeouts gracefully', () async {
         // Arrange
         const apiKey = 'test-api-key';
-        when(() => mockStorage.getApiKey('openai_api_key'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockDio.post(
-          any(),
-          data: any(named: 'data'),
-          options: any(named: 'options'),
-        )).thenThrow(DioException(
-          requestOptions: RequestOptions(),
-          type: DioExceptionType.receiveTimeout,
-        ));
+        when(
+          () => mockStorage.getApiKey('openai_api_key'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockDio.post(
+            any(),
+            data: any(named: 'data'),
+            options: any(named: 'options'),
+          ),
+        ).thenThrow(
+          DioException(
+            requestOptions: RequestOptions(),
+            type: DioExceptionType.receiveTimeout,
+          ),
+        );
 
         // Act & Assert
         await expectLater(

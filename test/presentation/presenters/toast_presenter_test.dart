@@ -23,10 +23,7 @@ void main() {
       // Arrange
       const customDuration = Duration(seconds: 5);
       void testCallback() {}
-      final action = ToastAction(
-        label: 'Undo',
-        onPressed: testCallback,
-      );
+      final action = ToastAction(label: 'Undo', onPressed: testCallback);
 
       // Act
       final message = ToastMessage(
@@ -81,10 +78,7 @@ void main() {
       void testCallback() {}
 
       // Act
-      final action = ToastAction(
-        label: 'Action',
-        onPressed: testCallback,
-      );
+      final action = ToastAction(label: 'Action', onPressed: testCallback);
 
       // Assert
       expect(action.label, equals('Action'));
@@ -94,19 +88,10 @@ void main() {
     test('should support equality comparison', () {
       // Arrange
       void testCallback() {}
-      
-      final action1 = ToastAction(
-        label: 'Action',
-        onPressed: testCallback,
-      );
-      final action2 = ToastAction(
-        label: 'Action',
-        onPressed: testCallback,
-      );
-      final action3 = ToastAction(
-        label: 'Different',
-        onPressed: testCallback,
-      );
+
+      final action1 = ToastAction(label: 'Action', onPressed: testCallback);
+      final action2 = ToastAction(label: 'Action', onPressed: testCallback);
+      final action3 = ToastAction(label: 'Different', onPressed: testCallback);
 
       // Assert
       expect(action1, equals(action2));
@@ -126,7 +111,9 @@ void main() {
       container.dispose();
     });
 
-    testWidgets('should be able to read toastPresenterProvider', (tester) async {
+    testWidgets('should be able to read toastPresenterProvider', (
+      tester,
+    ) async {
       // Act
       final presenter = container.read(toastPresenterProvider.notifier);
 
@@ -135,7 +122,9 @@ void main() {
     });
 
     group('ToastPresenter methods', () {
-      testWidgets('showInfo should create info toast using SnackBar', (tester) async {
+      testWidgets('showInfo should create info toast using SnackBar', (
+        tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(
@@ -267,7 +256,9 @@ void main() {
         expect(find.text('Error message'), findsOneWidget);
       });
 
-      testWidgets('show should create toast with custom parameters', (tester) async {
+      testWidgets('show should create toast with custom parameters', (
+        tester,
+      ) async {
         // Arrange
         await tester.pumpWidget(
           ProviderScope(

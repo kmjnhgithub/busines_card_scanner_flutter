@@ -6,7 +6,7 @@ import 'package:busines_card_scanner_flutter/domain/exceptions/repository_except
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 
 /// 簡化的 OCR 服務實作
-/// 
+///
 /// 提供基本的 OCR 功能，用於快速解決編譯問題
 /// 後續可以替換為完整的 Google ML Kit 實作
 class SimpleOCRService implements OCRService {
@@ -21,15 +21,14 @@ class SimpleOCRService implements OCRService {
   }) async {
     // 簡單的模擬實作 - 返回固定結果
     await Future.delayed(const Duration(milliseconds: 500));
-    
+
     // 基本的圖片驗證
     if (imageData.isEmpty) {
-      throw const UnsupportedImageFormatFailure(
-        userMessage: '圖片資料無效',
-      );
+      throw const UnsupportedImageFormatFailure(userMessage: '圖片資料無效');
     }
-    
-    if (imageData.length > 10 * 1024 * 1024) { // 10MB limit
+
+    if (imageData.length > 10 * 1024 * 1024) {
+      // 10MB limit
       throw const ImageTooLargeFailure(
         imageSize: 0,
         maxSize: 10 * 1024 * 1024,
@@ -43,7 +42,7 @@ class SimpleOCRService implements OCRService {
       detectedTexts: const [
         '張三',
         'ABC科技公司',
-        '產品經理', 
+        '產品經理',
         '02-1234-5678',
         'email@example.com',
       ],

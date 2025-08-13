@@ -4,13 +4,12 @@ import 'package:busines_card_scanner_flutter/domain/repositories/card_reader.dar
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-
 /// Mock Repository 用於測試
 class MockCardReader implements CardReader {
   List<BusinessCard>? _mockCards;
   CardPageResult? _mockPageResult;
   DomainFailure? _mockFailure;
-  
+
   void setMockCards(List<BusinessCard> cards) => _mockCards = cards;
   void setMockPageResult(CardPageResult result) => _mockPageResult = result;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
@@ -25,21 +24,19 @@ class MockCardReader implements CardReader {
   }
 
   @override
-  Future<CardPageResult> getCardsPage({
-    int page = 1,
-    int pageSize = 20,
-  }) async {
+  Future<CardPageResult> getCardsPage({int page = 1, int pageSize = 20}) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockPageResult ?? CardPageResult(
-      cards: _mockCards ?? [],
-      totalCount: _mockCards?.length ?? 0,
-      currentOffset: (page - 1) * pageSize,
-      limit: pageSize,
-      hasMore: false,
-      currentPage: page,
-    );
+    return _mockPageResult ??
+        CardPageResult(
+          cards: _mockCards ?? [],
+          totalCount: _mockCards?.length ?? 0,
+          currentOffset: (page - 1) * pageSize,
+          limit: pageSize,
+          hasMore: false,
+          currentPage: page,
+        );
   }
 
   @override
@@ -52,13 +49,14 @@ class MockCardReader implements CardReader {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockPageResult ?? CardPageResult(
-      cards: _mockCards ?? [],
-      totalCount: _mockCards?.length ?? 0,
-      currentOffset: offset,
-      limit: limit,
-      hasMore: false,
-    );
+    return _mockPageResult ??
+        CardPageResult(
+          cards: _mockCards ?? [],
+          totalCount: _mockCards?.length ?? 0,
+          currentOffset: offset,
+          limit: limit,
+          hasMore: false,
+        );
   }
 
   @override
@@ -75,18 +73,20 @@ class MockCardReader implements CardReader {
   }
 
   @override
-  Future<List<BusinessCard>> searchCards(
-    String query, {
-    int limit = 50,
-  }) async {
+  Future<List<BusinessCard>> searchCards(String query, {int limit = 50}) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
     final cards = _mockCards ?? [];
-    return cards.where((card) => 
-      card.name.toLowerCase().contains(query.toLowerCase()) ||
-      (card.company?.toLowerCase().contains(query.toLowerCase()) ?? false)
-    ).take(limit).toList();
+    return cards
+        .where(
+          (card) =>
+              card.name.toLowerCase().contains(query.toLowerCase()) ||
+              (card.company?.toLowerCase().contains(query.toLowerCase()) ??
+                  false),
+        )
+        .take(limit)
+        .toList();
   }
 
   @override
@@ -117,9 +117,10 @@ class MockCardReader implements CardReader {
       throw _mockFailure!;
     }
     final cards = _mockCards ?? [];
-    return cards.where((card) => 
-      card.company?.toLowerCase() == company.toLowerCase()
-    ).take(limit).toList();
+    return cards
+        .where((card) => card.company?.toLowerCase() == company.toLowerCase())
+        .take(limit)
+        .toList();
   }
 
   @override
@@ -145,34 +146,37 @@ void main() {
     });
 
     group('執行基本取得名片功能', () {
-      test('should return list of cards when repository returns cards', () async {
-        // Arrange
-        final mockCards = [
-          BusinessCard(
-            id: 'card-1',
-            name: 'John Doe',
-            company: 'Tech Corp',
-            email: 'john@techcorp.com',
-            createdAt: testDateTime,
-          ),
-          BusinessCard(
-            id: 'card-2', 
-            name: 'Jane Smith',
-            company: 'Design Studio',
-            email: 'jane@design.com',
-            createdAt: testDateTime.subtract(const Duration(days: 1)),
-          ),
-        ];
-        mockCardReader.setMockCards(mockCards);
+      test(
+        'should return list of cards when repository returns cards',
+        () async {
+          // Arrange
+          final mockCards = [
+            BusinessCard(
+              id: 'card-1',
+              name: 'John Doe',
+              company: 'Tech Corp',
+              email: 'john@techcorp.com',
+              createdAt: testDateTime,
+            ),
+            BusinessCard(
+              id: 'card-2',
+              name: 'Jane Smith',
+              company: 'Design Studio',
+              email: 'jane@design.com',
+              createdAt: testDateTime.subtract(const Duration(days: 1)),
+            ),
+          ];
+          mockCardReader.setMockCards(mockCards);
 
-        // Act
-        final result = await useCase.execute(const GetCardsParams());
+          // Act
+          final result = await useCase.execute(const GetCardsParams());
 
-        // Assert
-        expect(result.length, 2);
-        expect(result[0].id, 'card-1');
-        expect(result[1].id, 'card-2');
-      });
+          // Assert
+          expect(result.length, 2);
+          expect(result[0].id, 'card-1');
+          expect(result[1].id, 'card-2');
+        },
+      );
 
       test('should return empty list when no cards exist', () async {
         // Arrange
@@ -187,11 +191,14 @@ void main() {
 
       test('should respect limit parameter', () async {
         // Arrange
-        final mockCards = List.generate(15, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'Person $index',
-          createdAt: testDateTime.subtract(Duration(days: index)),
-        ));
+        final mockCards = List.generate(
+          15,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'Person $index',
+            createdAt: testDateTime.subtract(Duration(days: index)),
+          ),
+        );
         mockCardReader.setMockCards(mockCards);
 
         // Act
@@ -203,11 +210,14 @@ void main() {
 
       test('should use default limit when not specified', () async {
         // Arrange
-        final mockCards = List.generate(60, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'Person $index',
-          createdAt: testDateTime,
-        ));
+        final mockCards = List.generate(
+          60,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'Person $index',
+            createdAt: testDateTime,
+          ),
+        );
         mockCardReader.setMockCards(mockCards);
 
         // Act
@@ -221,11 +231,14 @@ void main() {
     group('執行分頁查詢功能', () {
       test('should return paginated result when using pagination', () async {
         // Arrange
-        final mockCards = List.generate(25, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'Person $index',
-          createdAt: testDateTime,
-        ));
+        final mockCards = List.generate(
+          25,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'Person $index',
+            createdAt: testDateTime,
+          ),
+        );
         final mockPageResult = CardPageResult(
           cards: mockCards.take(10).toList(),
           totalCount: 25,
@@ -239,7 +252,7 @@ void main() {
 
         // Act
         final result = await useCase.executeWithPagination(
-          const GetCardsPaginationParams(page: 1, pageSize: 10)
+          const GetCardsPaginationParams(page: 1, pageSize: 10),
         );
 
         // Assert
@@ -253,11 +266,14 @@ void main() {
 
       test('should handle last page correctly', () async {
         // Arrange
-        final mockCards = List.generate(5, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'Person $index',
-          createdAt: testDateTime,
-        ));
+        final mockCards = List.generate(
+          5,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'Person $index',
+            createdAt: testDateTime,
+          ),
+        );
         final mockPageResult = CardPageResult(
           cards: mockCards,
           totalCount: 25,
@@ -272,7 +288,7 @@ void main() {
 
         // Act
         final result = await useCase.executeWithPagination(
-          const GetCardsPaginationParams(page: 3, pageSize: 10)
+          const GetCardsPaginationParams(page: 3, pageSize: 10),
         );
 
         // Assert
@@ -309,7 +325,7 @@ void main() {
 
         // Act
         final result = await useCase.searchCards(
-          const SearchCardsParams(query: 'john')
+          const SearchCardsParams(query: 'john'),
         );
 
         // Assert
@@ -344,7 +360,7 @@ void main() {
 
         // Act
         final result = await useCase.searchCards(
-          const SearchCardsParams(query: 'tech corp')
+          const SearchCardsParams(query: 'tech corp'),
         );
 
         // Assert
@@ -366,7 +382,7 @@ void main() {
 
         // Act
         final result = await useCase.searchCards(
-          const SearchCardsParams(query: 'nonexistent')
+          const SearchCardsParams(query: 'nonexistent'),
         );
 
         // Assert
@@ -375,16 +391,19 @@ void main() {
 
       test('should respect search limit parameter', () async {
         // Arrange
-        final mockCards = List.generate(15, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'John $index',
-          createdAt: testDateTime,
-        ));
+        final mockCards = List.generate(
+          15,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'John $index',
+            createdAt: testDateTime,
+          ),
+        );
         mockCardReader.setMockCards(mockCards);
 
         // Act
         final result = await useCase.searchCards(
-          const SearchCardsParams(query: 'john', limit: 5)
+          const SearchCardsParams(query: 'john', limit: 5),
         );
 
         // Assert
@@ -434,11 +453,7 @@ void main() {
             name: 'Oldest',
             createdAt: now.subtract(const Duration(days: 3)),
           ),
-          BusinessCard(
-            id: 'card-2',
-            name: 'Newest',
-            createdAt: now,
-          ),
+          BusinessCard(id: 'card-2', name: 'Newest', createdAt: now),
           BusinessCard(
             id: 'card-3',
             name: 'Middle',
@@ -459,11 +474,14 @@ void main() {
 
       test('should respect limit for recent cards', () async {
         // Arrange
-        final mockCards = List.generate(15, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'Person $index',
-          createdAt: testDateTime.subtract(Duration(hours: index)),
-        ));
+        final mockCards = List.generate(
+          15,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'Person $index',
+            createdAt: testDateTime.subtract(Duration(hours: index)),
+          ),
+        );
         mockCardReader.setMockCards(mockCards);
 
         // Act
@@ -477,11 +495,14 @@ void main() {
     group('統計資訊功能', () {
       test('should return correct card count', () async {
         // Arrange
-        final mockCards = List.generate(42, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'Person $index',
-          createdAt: testDateTime,
-        ));
+        final mockCards = List.generate(
+          42,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'Person $index',
+            createdAt: testDateTime,
+          ),
+        );
         mockCardReader.setMockCards(mockCards);
 
         // Act
@@ -612,20 +633,23 @@ void main() {
         );
       });
 
-      test('should propagate NetworkConnectionFailure from repository', () async {
-        // Arrange
-        const failure = NetworkConnectionFailure(
-          endpoint: 'api.example.com',
-          userMessage: '網路連線失敗',
-        );
-        mockCardReader.setMockFailure(failure);
+      test(
+        'should propagate NetworkConnectionFailure from repository',
+        () async {
+          // Arrange
+          const failure = NetworkConnectionFailure(
+            endpoint: 'api.example.com',
+            userMessage: '網路連線失敗',
+          );
+          mockCardReader.setMockFailure(failure);
 
-        // Act & Assert
-        expect(
-          () => useCase.getRecentCards(10),
-          throwsA(isA<NetworkConnectionFailure>()),
-        );
-      });
+          // Act & Assert
+          expect(
+            () => useCase.getRecentCards(10),
+            throwsA(isA<NetworkConnectionFailure>()),
+          );
+        },
+      );
 
       test('should handle unexpected exceptions gracefully', () async {
         // Arrange
@@ -633,7 +657,7 @@ void main() {
           const DatabaseConnectionFailure(
             userMessage: '資料庫無法連線',
             internalMessage: 'Connection timeout',
-          )
+          ),
         );
 
         // Act & Assert
@@ -647,18 +671,20 @@ void main() {
     group('參數驗證', () {
       test('should handle invalid pagination parameters gracefully', () async {
         // Arrange - 即使參數不合理，也應該讓 Repository 決定如何處理
-        mockCardReader.setMockPageResult(const CardPageResult(
-          cards: [],
-          totalCount: 0,
-          currentOffset: 0,
-          limit: 10,
-          hasMore: false,
-          totalPages: 0,
-        ));
+        mockCardReader.setMockPageResult(
+          const CardPageResult(
+            cards: [],
+            totalCount: 0,
+            currentOffset: 0,
+            limit: 10,
+            hasMore: false,
+            totalPages: 0,
+          ),
+        );
 
         // Act - 使用無效的分頁參數
         final result = await useCase.executeWithPagination(
-          const GetCardsPaginationParams(page: -1, pageSize: -10)
+          const GetCardsPaginationParams(page: -1, pageSize: -10),
         );
 
         // Assert - 應該回傳有效的結果結構
@@ -669,17 +695,13 @@ void main() {
       test('should handle empty search query', () async {
         // Arrange
         final mockCards = [
-          BusinessCard(
-            id: 'card-1',
-            name: 'John Doe',
-            createdAt: testDateTime,
-          ),
+          BusinessCard(id: 'card-1', name: 'John Doe', createdAt: testDateTime),
         ];
         mockCardReader.setMockCards(mockCards);
 
         // Act
         final result = await useCase.searchCards(
-          const SearchCardsParams(query: '')
+          const SearchCardsParams(query: ''),
         );
 
         // Assert - 空搜尋應該回傳符合條件的結果（依 Repository 實作而定）
@@ -690,12 +712,15 @@ void main() {
     group('效能測試', () {
       test('should handle large number of cards efficiently', () async {
         // Arrange
-        final largeMockCards = List.generate(10000, (index) => BusinessCard(
-          id: 'card-$index',
-          name: 'Person $index',
-          company: index % 100 == 0 ? 'Special Corp $index' : 'Regular Corp',
-          createdAt: testDateTime.subtract(Duration(minutes: index)),
-        ));
+        final largeMockCards = List.generate(
+          10000,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: 'Person $index',
+            company: index % 100 == 0 ? 'Special Corp $index' : 'Regular Corp',
+            createdAt: testDateTime.subtract(Duration(minutes: index)),
+          ),
+        );
         mockCardReader.setMockCards(largeMockCards);
 
         // Act
@@ -710,17 +735,22 @@ void main() {
 
       test('should handle search on large dataset efficiently', () async {
         // Arrange
-        final largeMockCards = List.generate(5000, (index) => BusinessCard(
-          id: 'card-$index',
-          name: index % 10 == 0 ? 'John Person $index' : 'Other Person $index',
-          createdAt: testDateTime,
-        ));
+        final largeMockCards = List.generate(
+          5000,
+          (index) => BusinessCard(
+            id: 'card-$index',
+            name: index % 10 == 0
+                ? 'John Person $index'
+                : 'Other Person $index',
+            createdAt: testDateTime,
+          ),
+        );
         mockCardReader.setMockCards(largeMockCards);
 
         // Act
         final stopwatch = Stopwatch()..start();
         final result = await useCase.searchCards(
-          const SearchCardsParams(query: 'john', limit: 100)
+          const SearchCardsParams(query: 'john', limit: 100),
         );
         stopwatch.stop();
 

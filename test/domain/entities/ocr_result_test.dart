@@ -17,7 +17,11 @@ void main() {
     group('Construction and Properties', () {
       test('should create OCRResult with all fields', () {
         // Arrange
-        final detectedTexts = ['John Doe', 'Software Engineer', 'john@example.com'];
+        final detectedTexts = [
+          'John Doe',
+          'Software Engineer',
+          'john@example.com',
+        ];
         const confidence = 0.95;
 
         // Act
@@ -150,7 +154,8 @@ void main() {
             id: 'ocr-123',
             rawText: 'Some text',
             confidence: 0.5,
-            processingTimeMs: -100, // Negative processing time should be invalid
+            processingTimeMs:
+                -100, // Negative processing time should be invalid
             processedAt: testDateTime,
           ),
           throwsA(isA<ArgumentError>()),
@@ -350,7 +355,7 @@ void main() {
             'john@example.com',
             'jane@company.org',
             'Software Engineer',
-            'invalid-email'
+            'invalid-email',
           ],
           confidence: 0.8,
           processedAt: testDateTime,
@@ -376,7 +381,7 @@ void main() {
             '+1-555-123-4567',
             '02-1234-5678',
             'Software Engineer',
-            '123' // Too short to be a phone number
+            '123', // Too short to be a phone number
           ],
           confidence: 0.8,
           processedAt: testDateTime,

@@ -4,7 +4,8 @@ import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_ma
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
-import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart' as data;
+import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart'
+    as data;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 // =============================================================================
@@ -20,16 +21,24 @@ final getCardsUseCaseProvider = Provider<GetCardsUseCase>((ref) {
 
 /// Provider for CreateCardFromImageUseCase
 /// Handles creating business card from image with OCR and AI parsing
-final createCardFromImageUseCaseProvider = Provider<CreateCardFromImageUseCase>((ref) {
-  final cardRepository = ref.watch(data.cardRepositoryProvider);
-  final ocrRepository = ref.watch(data.ocrRepositoryProvider);
-  final aiRepository = ref.watch(data.aiRepositoryProvider);
-  return CreateCardFromImageUseCase(cardRepository, ocrRepository, aiRepository);
-});
+final createCardFromImageUseCaseProvider = Provider<CreateCardFromImageUseCase>(
+  (ref) {
+    final cardRepository = ref.watch(data.cardRepositoryProvider);
+    final ocrRepository = ref.watch(data.ocrRepositoryProvider);
+    final aiRepository = ref.watch(data.aiRepositoryProvider);
+    return CreateCardFromImageUseCase(
+      cardRepository,
+      ocrRepository,
+      aiRepository,
+    );
+  },
+);
 
 /// Provider for CreateCardFromOCRUseCase
 /// Handles creating business card from OCR text with AI parsing
-final createCardFromOCRUseCaseProvider = Provider<CreateCardFromOCRUseCase>((ref) {
+final createCardFromOCRUseCaseProvider = Provider<CreateCardFromOCRUseCase>((
+  ref,
+) {
   final cardRepository = ref.watch(data.cardRepositoryProvider);
   final aiRepository = ref.watch(data.aiRepositoryProvider);
   return CreateCardFromOCRUseCase(cardRepository, aiRepository);
@@ -37,7 +46,9 @@ final createCardFromOCRUseCaseProvider = Provider<CreateCardFromOCRUseCase>((ref
 
 /// Provider for CreateCardManuallyUseCase
 /// Handles manual business card creation
-final createCardManuallyUseCaseProvider = Provider<CreateCardManuallyUseCase>((ref) {
+final createCardManuallyUseCaseProvider = Provider<CreateCardManuallyUseCase>((
+  ref,
+) {
   final repository = ref.watch(data.cardRepositoryProvider);
   return CreateCardManuallyUseCase(repository);
 });

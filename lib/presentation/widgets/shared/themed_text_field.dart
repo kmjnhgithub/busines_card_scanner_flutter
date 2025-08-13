@@ -7,18 +7,25 @@ import 'package:flutter/services.dart';
 enum ThemedTextFieldType {
   /// 普通文字輸入
   text,
+
   /// 密碼輸入
   password,
+
   /// 電子郵件輸入
   email,
+
   /// 電話號碼輸入
   phone,
+
   /// 數字輸入
   number,
+
   /// 搜尋輸入
   search,
+
   /// 多行文字輸入
   multiline,
+
   /// URL 輸入
   url,
 }
@@ -27,10 +34,13 @@ enum ThemedTextFieldType {
 enum ThemedTextFieldValidationState {
   /// 正常狀態
   normal,
+
   /// 成功狀態
   success,
+
   /// 警告狀態
   warning,
+
   /// 錯誤狀態
   error,
 }
@@ -39,8 +49,10 @@ enum ThemedTextFieldValidationState {
 enum ThemedTextFieldSize {
   /// 小尺寸
   small,
+
   /// 中等尺寸（預設）
   medium,
+
   /// 大尺寸
   large,
 }
@@ -207,7 +219,8 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
     super.initState();
     _controller = widget.controller ?? TextEditingController();
     _focusNode = FocusNode();
-    _obscureText = widget.obscureText || widget.type == ThemedTextFieldType.password;
+    _obscureText =
+        widget.obscureText || widget.type == ThemedTextFieldType.password;
 
     _focusNode.addListener(_handleFocusChange);
   }
@@ -227,7 +240,8 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
     super.didUpdateWidget(oldWidget);
     if (widget.obscureText != oldWidget.obscureText ||
         widget.type != oldWidget.type) {
-      _obscureText = widget.obscureText || widget.type == ThemedTextFieldType.password;
+      _obscureText =
+          widget.obscureText || widget.type == ThemedTextFieldType.password;
     }
   }
 
@@ -270,10 +284,11 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
       obscureText: _obscureText,
       inputFormatters: _getInputFormatters(),
       style: config.textStyle.copyWith(
-        color: widget.enabled 
+        color: widget.enabled
             ? AppColors.getTextColor(theme.brightness)
-            : AppColors.getTextColor(theme.brightness)
-                .withValues(alpha: AppColorConstants.opacityDisabled),
+            : AppColors.getTextColor(
+                theme.brightness,
+              ).withValues(alpha: AppColorConstants.opacityDisabled),
       ),
       decoration: InputDecoration(
         labelText: _getLabelText(),
@@ -289,17 +304,25 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
         errorBorder: _buildBorder(colorScheme.errorBorder),
         focusedErrorBorder: _buildBorder(colorScheme.errorBorder),
         disabledBorder: _buildBorder(
-          colorScheme.border.withValues(alpha: AppColorConstants.opacityDisabled),
+          colorScheme.border.withValues(
+            alpha: AppColorConstants.opacityDisabled,
+          ),
         ),
         filled: true,
-        fillColor: widget.enabled 
+        fillColor: widget.enabled
             ? colorScheme.fillColor
-            : colorScheme.fillColor.withValues(alpha: AppColorConstants.opacityDisabled),
+            : colorScheme.fillColor.withValues(
+                alpha: AppColorConstants.opacityDisabled,
+              ),
         labelStyle: config.labelStyle.copyWith(color: colorScheme.labelColor),
         hintStyle: config.hintStyle.copyWith(color: colorScheme.hintColor),
-        helperStyle: config.helperStyle.copyWith(color: colorScheme.helperColor),
+        helperStyle: config.helperStyle.copyWith(
+          color: colorScheme.helperColor,
+        ),
         errorStyle: config.errorStyle.copyWith(color: colorScheme.errorColor),
-        counterStyle: config.counterStyle.copyWith(color: colorScheme.hintColor),
+        counterStyle: config.counterStyle.copyWith(
+          color: colorScheme.hintColor,
+        ),
       ),
       onChanged: widget.onChanged,
       onSubmitted: widget.onSubmitted,
@@ -307,10 +330,7 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
 
     // 添加外邊距
     if (widget.margin != null) {
-      textField = Padding(
-        padding: widget.margin!,
-        child: textField,
-      );
+      textField = Padding(padding: widget.margin!, child: textField);
     }
 
     // 添加語義標籤
@@ -424,8 +444,11 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
 
     return Icon(
       iconData,
-      color: widget.enabled ? colorScheme.iconColor : colorScheme.iconColor
-          .withValues(alpha: AppColorConstants.opacityDisabled),
+      color: widget.enabled
+          ? colorScheme.iconColor
+          : colorScheme.iconColor.withValues(
+              alpha: AppColorConstants.opacityDisabled,
+            ),
     );
   }
 
@@ -435,23 +458,25 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
     if (widget.type == ThemedTextFieldType.password) {
       return IconButton(
         icon: Icon(
-          _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-          color: widget.enabled ? colorScheme.iconColor : colorScheme.iconColor
-              .withValues(alpha: AppColorConstants.opacityDisabled),
+          _obscureText
+              ? Icons.visibility_outlined
+              : Icons.visibility_off_outlined,
+          color: widget.enabled
+              ? colorScheme.iconColor
+              : colorScheme.iconColor.withValues(
+                  alpha: AppColorConstants.opacityDisabled,
+                ),
         ),
         onPressed: widget.enabled ? _togglePasswordVisibility : null,
       );
     }
 
     // 搜尋清除按鈕
-    if (widget.type == ThemedTextFieldType.search && 
-        _controller.text.isNotEmpty && 
+    if (widget.type == ThemedTextFieldType.search &&
+        _controller.text.isNotEmpty &&
         widget.enabled) {
       return IconButton(
-        icon: Icon(
-          Icons.clear,
-          color: colorScheme.iconColor,
-        ),
+        icon: Icon(Icons.clear, color: colorScheme.iconColor),
         onPressed: () {
           _controller.clear();
           widget.onChanged?.call('');
@@ -464,8 +489,11 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
       return IconButton(
         icon: Icon(
           widget.suffixIcon,
-          color: widget.enabled ? colorScheme.iconColor : colorScheme.iconColor
-              .withValues(alpha: AppColorConstants.opacityDisabled),
+          color: widget.enabled
+              ? colorScheme.iconColor
+              : colorScheme.iconColor.withValues(
+                  alpha: AppColorConstants.opacityDisabled,
+                ),
         ),
         onPressed: widget.enabled ? widget.onSuffixIconPressed : null,
       );
@@ -479,10 +507,7 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
     final config = _getTextFieldConfig(widget.size);
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(config.borderRadius),
-      borderSide: BorderSide(
-        color: color,
-        width: AppDimensions.borderMedium,
-      ),
+      borderSide: BorderSide(color: color, width: AppDimensions.borderMedium),
     );
   }
 
@@ -548,14 +573,17 @@ class _ThemedTextFieldState extends State<ThemedTextField> {
       focusedBorder: AppColors.primary,
       errorBorder: AppColors.error,
       fillColor: AppColors.getCardBackgroundColor(theme.brightness),
-      labelColor: AppColors.getTextColor(theme.brightness)
-          .withValues(alpha: AppColorConstants.opacityMedium),
+      labelColor: AppColors.getTextColor(
+        theme.brightness,
+      ).withValues(alpha: AppColorConstants.opacityMedium),
       hintColor: AppColors.placeholder,
-      helperColor: AppColors.getTextColor(theme.brightness)
-          .withValues(alpha: AppColorConstants.opacityMedium),
+      helperColor: AppColors.getTextColor(
+        theme.brightness,
+      ).withValues(alpha: AppColorConstants.opacityMedium),
       errorColor: AppColors.error,
-      iconColor: AppColors.getTextColor(theme.brightness)
-          .withValues(alpha: AppColorConstants.opacityMedium),
+      iconColor: AppColors.getTextColor(
+        theme.brightness,
+      ).withValues(alpha: AppColorConstants.opacityMedium),
     );
 
     switch (state) {

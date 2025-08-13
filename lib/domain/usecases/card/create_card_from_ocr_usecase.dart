@@ -4,42 +4,40 @@ import 'package:busines_card_scanner_flutter/domain/exceptions/repository_except
 import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 
-
 /// CreateCardFromOCRUseCase - 從 OCR 結果建立名片的業務用例
-/// 
+///
 /// 遵循單一職責原則（SRP），專注於 OCR 結果處理流程：
 /// 1. 驗證 OCR 結果有效性
 /// 2. 使用 AI 解析 OCR 文字為結構化資料
 /// 3. 驗證和清理解析結果
 /// 4. 建立名片實體並儲存
-/// 
+///
 /// 遵循介面隔離原則（ISP），只依賴必要的 Repository 介面：
 /// - CardWriter：負責名片儲存
 /// - AIRepository：負責文字解析
-/// 
+///
 /// 遵循依賴反轉原則（DIP），依賴抽象而非具體實作
 class CreateCardFromOCRUseCase {
-  const CreateCardFromOCRUseCase(
-    this._cardWriter,
-    this._aiRepository,
-  );
+  const CreateCardFromOCRUseCase(this._cardWriter, this._aiRepository);
 
   final CardWriter _cardWriter;
   final AIRepository _aiRepository;
 
   /// 執行從 OCR 結果建立名片的業務邏輯
-  /// 
+  ///
   /// [params] 包含 OCR 結果和相關參數的執行參數
-  /// 
+  ///
   /// 回傳建立結果，包含成功建立的名片和處理資訊
-  /// 
+  ///
   /// Throws:
   /// - [InvalidInputFailure] 當 OCR 文字無效或為空
   /// - [AIServiceUnavailableFailure] 當 AI 服務無法使用
   /// - [AIQuotaExceededFailure] 當 API 配額用盡
   /// - [StorageSpaceFailure] 當儲存空間不足
   /// - [DataSourceFailure] 當發生未預期的錯誤
-  Future<CreateCardFromOCRResult> execute(CreateCardFromOCRParams params) async {
+  Future<CreateCardFromOCRResult> execute(
+    CreateCardFromOCRParams params,
+  ) async {
     try {
       final startTime = DateTime.now();
       final processingSteps = <String>[];
@@ -52,13 +50,15 @@ class CreateCardFromOCRUseCase {
 
       // 2. 檢查 OCR 信心度
       if (params.ocrResult.confidence < (params.confidenceThreshold ?? 0.7)) {
-        warnings.add('OCR 信心度較低 (${(params.ocrResult.confidence * 100).toStringAsFixed(1)}%)');
+        warnings.add(
+          'OCR 信心度較低 (${(params.ocrResult.confidence * 100).toStringAsFixed(1)}%)',
+        );
       }
 
       // 3. AI 文字解析
       final aiStartTime = DateTime.now();
       final parsedData = await _parseWithAI(
-        params.ocrResult.rawText, 
+        params.ocrResult.rawText,
         params.parseHints,
       );
       final aiEndTime = DateTime.now();
@@ -106,55 +106,58 @@ class CreateCardFromOCRUseCase {
         warnings: warnings,
         metrics: metrics,
       );
-
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
       if (e is DomainFailure) {
         rethrow;
       }
-      
+
       // 包裝未預期的異常
       throw DataSourceFailure(
         userMessage: '處理 OCR 結果時發生錯誤',
-        internalMessage: 'Unexpected error during OCR processing: $e\nStack trace: $stackTrace',
+        internalMessage:
+            'Unexpected error during OCR processing: $e\nStack trace: $stackTrace',
       );
     }
   }
 
   /// 批次處理多個 OCR 結果
-  /// 
+  ///
   /// [params] 批次處理參數
-  /// 
+  ///
   /// 回傳批次處理結果
-  Future<CreateCardFromOCRBatchResult> executeBatch(CreateCardFromOCRBatchParams params) async {
+  Future<CreateCardFromOCRBatchResult> executeBatch(
+    CreateCardFromOCRBatchParams params,
+  ) async {
     final successful = <CreateCardFromOCRResult>[];
     final failed = <CreateCardFromOCRBatchError>[];
 
     for (int i = 0; i < params.ocrResults.length; i++) {
       try {
-        final result = await execute(CreateCardFromOCRParams(
-          ocrResult: params.ocrResults[i],
-          parseHints: params.parseHints,
-          confidenceThreshold: params.confidenceThreshold,
-          enableSanitization: params.enableSanitization,
-          dryRun: params.dryRun,
-          trackMetrics: params.trackMetrics,
-          autoCleanup: params.autoCleanup,
-        ));
+        final result = await execute(
+          CreateCardFromOCRParams(
+            ocrResult: params.ocrResults[i],
+            parseHints: params.parseHints,
+            confidenceThreshold: params.confidenceThreshold,
+            enableSanitization: params.enableSanitization,
+            dryRun: params.dryRun,
+            trackMetrics: params.trackMetrics,
+            autoCleanup: params.autoCleanup,
+          ),
+        );
         successful.add(result);
       } on Exception catch (e) {
-        failed.add(CreateCardFromOCRBatchError(
-          index: i,
-          error: e.toString(),
-          originalOCRResult: params.ocrResults[i],
-        ));
+        failed.add(
+          CreateCardFromOCRBatchError(
+            index: i,
+            error: e.toString(),
+            originalOCRResult: params.ocrResults[i],
+          ),
+        );
       }
     }
 
-    return CreateCardFromOCRBatchResult(
-      successful: successful,
-      failed: failed,
-    );
+    return CreateCardFromOCRBatchResult(successful: successful, failed: failed);
   }
 
   /// 驗證 OCR 結果有效性
@@ -169,10 +172,7 @@ class CreateCardFromOCRUseCase {
 
   /// 使用 AI 解析 OCR 文字
   Future<ParsedCardData> _parseWithAI(String ocrText, ParseHints? hints) async {
-    return _aiRepository.parseCardFromText(
-      ocrText,
-      hints: hints,
-    );
+    return _aiRepository.parseCardFromText(ocrText, hints: hints);
   }
 
   /// 驗證和清理解析結果

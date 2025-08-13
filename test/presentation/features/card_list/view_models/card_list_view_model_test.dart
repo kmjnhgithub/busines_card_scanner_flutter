@@ -9,16 +9,16 @@ import 'package:mocktail/mocktail.dart';
 
 // Mock classes
 class MockGetCardsUseCase extends Mock implements GetCardsUseCase {}
+
 class MockDeleteCardUseCase extends Mock implements DeleteCardUseCase {}
 
 void main() {
   setUpAll(() {
     // Register fallback values for Mocktail
     registerFallbackValue(const GetCardsParams());
-    registerFallbackValue(const DeleteCardParams(
-      cardId: 'test',
-      deleteType: DeleteType.soft,
-    ));
+    registerFallbackValue(
+      const DeleteCardParams(cardId: 'test', deleteType: DeleteType.soft),
+    );
   });
 
   group('CardListViewModel', () {
@@ -29,13 +29,15 @@ void main() {
     setUp(() {
       mockGetCardsUseCase = MockGetCardsUseCase();
       mockDeleteCardUseCase = MockDeleteCardUseCase();
-      
+
       container = ProviderContainer(
         overrides: [
-          cardListViewModelProvider.overrideWith((ref) => CardListViewModel(
-            getCardsUseCase: mockGetCardsUseCase,
-            deleteCardUseCase: mockDeleteCardUseCase,
-          )),
+          cardListViewModelProvider.overrideWith(
+            (ref) => CardListViewModel(
+              getCardsUseCase: mockGetCardsUseCase,
+              deleteCardUseCase: mockDeleteCardUseCase,
+            ),
+          ),
         ],
       );
     });
@@ -87,9 +89,9 @@ void main() {
 
       test('成功載入名片時應該更新狀態', () async {
         // Arrange
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => testCards,
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => testCards);
 
         // Act
         final viewModel = container.read(cardListViewModelProvider.notifier);
@@ -100,8 +102,14 @@ void main() {
         expect(state.cards, equals(testCards));
         // 預設按 dateCreated descending 排序，所以順序會是 [李四, 張三]
         expect(state.filteredCards.length, equals(testCards.length));
-        expect(state.filteredCards.first.id, equals('2')); // 李四 (2024-01-02, 較新的日期)
-        expect(state.filteredCards.last.id, equals('1')); // 張三 (2024-01-01, 較舊的日期)
+        expect(
+          state.filteredCards.first.id,
+          equals('2'),
+        ); // 李四 (2024-01-02, 較新的日期)
+        expect(
+          state.filteredCards.last.id,
+          equals('1'),
+        ); // 張三 (2024-01-01, 較舊的日期)
         expect(state.isLoading, false);
         expect(state.error, null);
 
@@ -129,12 +137,10 @@ void main() {
 
       test('載入過程中應該顯示載入狀態', () async {
         // Arrange
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async {
-            await Future.delayed(const Duration(milliseconds: 100));
-            return testCards;
-          },
-        );
+        when(() => mockGetCardsUseCase.execute(any())).thenAnswer((_) async {
+          await Future.delayed(const Duration(milliseconds: 100));
+          return testCards;
+        });
 
         // Act
         final viewModel = container.read(cardListViewModelProvider.notifier);
@@ -185,9 +191,9 @@ void main() {
       ];
 
       setUp(() {
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => testCards,
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => testCards);
       });
 
       test('應該根據姓名搜尋名片', () async {
@@ -216,7 +222,12 @@ void main() {
         // Assert
         final state = container.read(cardListViewModelProvider);
         expect(state.filteredCards.length, equals(2));
-        expect(state.filteredCards.every((card) => card.company?.contains('台積電') ?? false), true);
+        expect(
+          state.filteredCards.every(
+            (card) => card.company?.contains('台積電') ?? false,
+          ),
+          true,
+        );
       });
 
       test('應該根據職稱搜尋名片', () async {
@@ -244,7 +255,11 @@ void main() {
         // Assert
         final state = container.read(cardListViewModelProvider);
         expect(state.filteredCards.length, equals(1));
-        expect(state.filteredCards.first.email?.toLowerCase().contains('zhang') ?? false, true);
+        expect(
+          state.filteredCards.first.email?.toLowerCase().contains('zhang') ??
+              false,
+          true,
+        );
       });
 
       test('空搜尋查詢應該顯示所有名片', () async {
@@ -302,12 +317,12 @@ void main() {
 
       test('成功刪除名片後應該重新載入列表', () async {
         // Arrange
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => testCards,
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => testCards);
         when(() => mockDeleteCardUseCase.execute(any())).thenAnswer(
           (_) async => const DeleteCardResult(
-            isSuccess: true, 
+            isSuccess: true,
             deletedCardId: '1',
             deleteType: DeleteType.soft,
             isReversible: true,
@@ -320,9 +335,9 @@ void main() {
         await viewModel.loadCards();
 
         // Mock the updated list after deletion
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => [testCards[1]],
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => [testCards[1]]);
 
         // Act
         final result = await viewModel.deleteCard('1');
@@ -334,14 +349,16 @@ void main() {
         expect(state.cards.first.id, equals('2'));
 
         verify(() => mockDeleteCardUseCase.execute(any())).called(1);
-        verify(() => mockGetCardsUseCase.execute(any())).called(2); // Initial load + reload after delete
+        verify(
+          () => mockGetCardsUseCase.execute(any()),
+        ).called(2); // Initial load + reload after delete
       });
 
       test('刪除失敗時應該返回 false 並設置錯誤狀態', () async {
         // Arrange
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => testCards,
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => testCards);
         const failure = DataSourceFailure(userMessage: 'Delete failed');
         when(() => mockDeleteCardUseCase.execute(any())).thenThrow(failure);
 
@@ -358,7 +375,9 @@ void main() {
         expect(state.cards.length, equals(2)); // Cards should remain unchanged
 
         verify(() => mockDeleteCardUseCase.execute(any())).called(1);
-        verify(() => mockGetCardsUseCase.execute(any())).called(1); // Only initial load
+        verify(
+          () => mockGetCardsUseCase.execute(any()),
+        ).called(1); // Only initial load
       });
     });
 
@@ -387,9 +406,9 @@ void main() {
       ];
 
       setUp(() {
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => testCards,
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => testCards);
       });
 
       test('應該根據姓名排序', () async {
@@ -433,8 +452,14 @@ void main() {
 
         // Assert
         final state = container.read(cardListViewModelProvider);
-        expect(state.filteredCards.first.createdAt, equals(DateTime(2024, 1, 1)));
-        expect(state.filteredCards.last.createdAt, equals(DateTime(2024, 1, 2)));
+        expect(
+          state.filteredCards.first.createdAt,
+          equals(DateTime(2024, 1, 1)),
+        );
+        expect(
+          state.filteredCards.last.createdAt,
+          equals(DateTime(2024, 1, 2)),
+        );
       });
 
       test('降序排序應該正確工作', () async {
@@ -464,7 +489,10 @@ void main() {
         // Assert
         final state = container.read(cardListViewModelProvider);
         expect(state.filteredCards.length, equals(2));
-        expect(state.filteredCards.first.name, equals('張三')); // Should maintain sort order (ascending by name)
+        expect(
+          state.filteredCards.first.name,
+          equals('張三'),
+        ); // Should maintain sort order (ascending by name)
       });
     });
 
@@ -478,7 +506,10 @@ void main() {
         await viewModel.loadCards();
 
         // Verify error is set
-        expect(container.read(cardListViewModelProvider).error, equals('Test error'));
+        expect(
+          container.read(cardListViewModelProvider).error,
+          equals('Test error'),
+        );
 
         // Act
         viewModel.clearError();
@@ -528,18 +559,18 @@ void main() {
           ),
         ];
 
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => initialCards,
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => initialCards);
 
         final viewModel = container.read(cardListViewModelProvider.notifier);
         await viewModel.loadCards();
         viewModel.searchCards('張三');
 
         // Mock updated data
-        when(() => mockGetCardsUseCase.execute(any())).thenAnswer(
-          (_) async => updatedCards,
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => updatedCards);
 
         // Act
         await viewModel.refresh();
@@ -548,7 +579,10 @@ void main() {
         final state = container.read(cardListViewModelProvider);
         expect(state.cards.length, equals(2));
         expect(state.searchQuery, equals('張三')); // Search should be preserved
-        expect(state.filteredCards.length, equals(1)); // Filtered results should be updated
+        expect(
+          state.filteredCards.length,
+          equals(1),
+        ); // Filtered results should be updated
         expect(state.filteredCards.first.name, equals('張三'));
 
         verify(() => mockGetCardsUseCase.execute(any())).called(2);

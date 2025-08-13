@@ -60,7 +60,10 @@ void main() {
         );
 
         expect(failure.userMessage, 'Server error occurred');
-        expect(failure.internalMessage, 'Internal server error: Database connection lost');
+        expect(
+          failure.internalMessage,
+          'Internal server error: Database connection lost',
+        );
         expect(failure.statusCode, 500);
       });
 
@@ -89,7 +92,10 @@ void main() {
         );
 
         expect(failure.userMessage, 'Invalid email address');
-        expect(failure.internalMessage, 'Email validation failed: regex mismatch');
+        expect(
+          failure.internalMessage,
+          'Email validation failed: regex mismatch',
+        );
         expect(failure.field, 'email');
       });
 
@@ -121,8 +127,11 @@ void main() {
         );
 
         expect(failure.userMessage, 'Access denied');
-        expect(failure.internalMessage, 'API key validation failed: key=abc123xyz');
-        
+        expect(
+          failure.internalMessage,
+          'API key validation failed: key=abc123xyz',
+        );
+
         final toString = failure.toString();
         expect(toString, isNot(contains('abc123xyz')));
         expect(toString, contains('SecurityFailure'));
@@ -220,9 +229,18 @@ void main() {
 
       test('should support generic error handling', () {
         const List<Failure> failures = [
-          NetworkFailure(userMessage: 'Network error', internalMessage: 'Net error'),
-          ServerFailure(userMessage: 'Server error', internalMessage: 'Server error'),
-          ValidationFailure(userMessage: 'Validation error', internalMessage: 'Val error'),
+          NetworkFailure(
+            userMessage: 'Network error',
+            internalMessage: 'Net error',
+          ),
+          ServerFailure(
+            userMessage: 'Server error',
+            internalMessage: 'Server error',
+          ),
+          ValidationFailure(
+            userMessage: 'Validation error',
+            internalMessage: 'Val error',
+          ),
         ];
 
         expect(failures.length, 3);

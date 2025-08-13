@@ -1,15 +1,10 @@
 import 'dart:developer' as developer;
 
 /// 日誌等級
-enum LogLevel {
-  debug,
-  info,
-  warning,
-  error,
-}
+enum LogLevel { debug, info, warning, error }
 
 /// 日誌記錄工具類
-/// 
+///
 /// 提供結構化的日誌記錄功能，包括：
 /// - 分級日誌記錄（Debug、Info、Warning、Error）
 /// - 安全的日誌輸出（避免敏感資訊洩露）
@@ -40,38 +35,82 @@ class LoggerUtils {
 
   /// 獲取目前日誌等級
   static LogLevel get logLevel => _currentLevel;
-  
+
   /// 設定日誌等級
-  static set logLevel(LogLevel level) {
+  static void setLogLevel(LogLevel level) {
     _currentLevel = level;
   }
 
   /// 獲取是否啟用日誌
   static bool get enabled => _isEnabled;
-  
+
   /// 啟用/停用日誌記錄
-  static set enabled(bool isEnabled) {
+  static void setEnabled(bool isEnabled) {
     _isEnabled = isEnabled;
   }
 
   /// Debug 日誌
-  static void debug(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
-    _log(LogLevel.debug, message, tag: tag, error: error, stackTrace: stackTrace);
+  static void debug(
+    String message, {
+    String? tag,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    _log(
+      LogLevel.debug,
+      message,
+      tag: tag,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   /// Info 日誌
-  static void info(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
-    _log(LogLevel.info, message, tag: tag, error: error, stackTrace: stackTrace);
+  static void info(
+    String message, {
+    String? tag,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    _log(
+      LogLevel.info,
+      message,
+      tag: tag,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   /// Warning 日誌
-  static void warning(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
-    _log(LogLevel.warning, message, tag: tag, error: error, stackTrace: stackTrace);
+  static void warning(
+    String message, {
+    String? tag,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    _log(
+      LogLevel.warning,
+      message,
+      tag: tag,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   /// Error 日誌
-  static void error(String message, {String? tag, Object? error, StackTrace? stackTrace}) {
-    _log(LogLevel.error, message, tag: tag, error: error, stackTrace: stackTrace);
+  static void error(
+    String message, {
+    String? tag,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    _log(
+      LogLevel.error,
+      message,
+      tag: tag,
+      error: error,
+      stackTrace: stackTrace,
+    );
   }
 
   /// 記錄效能監控
@@ -83,7 +122,11 @@ class LoggerUtils {
   }
 
   /// 記錄 API 請求
-  static void apiRequest(String method, String url, {Map<String, dynamic>? headers}) {
+  static void apiRequest(
+    String method,
+    String url, {
+    Map<String, dynamic>? headers,
+  }) {
     final safeHeaders = headers != null ? _sanitizeData(headers) : null;
     debug(
       'API Request: $method $url${safeHeaders != null ? ' Headers: $safeHeaders' : ''}',
@@ -93,7 +136,9 @@ class LoggerUtils {
 
   /// 記錄 API 回應
   static void apiResponse(String url, int statusCode, {String? responseBody}) {
-    final safeBody = responseBody != null ? _sanitizeString(responseBody) : null;
+    final safeBody = responseBody != null
+        ? _sanitizeString(responseBody)
+        : null;
     debug(
       'API Response: $url -> $statusCode${safeBody != null ? ' Body: ${_truncate(safeBody, 200)}' : ''}',
       tag: 'API',
@@ -164,27 +209,27 @@ class LoggerUtils {
   /// 清理字串中的敏感資訊
   static String _sanitizeString(String input) {
     String sanitized = input;
-    
+
     for (final keyword in _sensitiveKeywords) {
       // 使用正規表達式匹配 key: value 或 key=value 格式
       final regex = RegExp(
         '($keyword${r')\s*[:=]\s*([^\s,})\]]+)'}',
         caseSensitive: false,
       );
-      
+
       sanitized = sanitized.replaceAllMapped(regex, (match) {
         final key = match.group(1)!;
         return '$key: ***';
       });
     }
-    
+
     return sanitized;
   }
 
   /// 清理 Map 中的敏感資訊
   static Map<String, dynamic> _sanitizeData(Map<String, dynamic> data) {
     final sanitized = <String, dynamic>{};
-    
+
     data.forEach((key, value) {
       if (_isSensitiveKey(key)) {
         sanitized[key] = '***';
@@ -196,7 +241,7 @@ class LoggerUtils {
         sanitized[key] = value;
       }
     });
-    
+
     return sanitized;
   }
 

@@ -6,17 +6,17 @@ import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dar
 import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_ocr_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-
 /// Mock CardWriter 用於測試
 class MockCardWriter implements CardWriter {
   BusinessCard? _mockSavedCard;
   BatchSaveResult? _mockBatchResult;
   BatchDeleteResult? _mockDeleteResult;
   DomainFailure? _mockFailure;
-  
+
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
-  void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
+  void setMockDeleteResult(BatchDeleteResult result) =>
+      _mockDeleteResult = result;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
@@ -27,13 +27,13 @@ class MockCardWriter implements CardWriter {
     if (_mockSavedCard != null) {
       return _mockSavedCard!;
     }
-    
+
     if (card.id.startsWith('temp-')) {
       return card.copyWith(
         id: 'saved-id-${DateTime.now().millisecondsSinceEpoch}',
       );
     }
-    
+
     return card;
   }
 
@@ -42,10 +42,7 @@ class MockCardWriter implements CardWriter {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockBatchResult ?? BatchSaveResult(
-      successful: cards,
-      failed: [],
-    );
+    return _mockBatchResult ?? BatchSaveResult(successful: cards, failed: []);
   }
 
   @override
@@ -61,10 +58,8 @@ class MockCardWriter implements CardWriter {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockDeleteResult ?? BatchDeleteResult(
-      successful: cardIds,
-      failed: [],
-    );
+    return _mockDeleteResult ??
+        BatchDeleteResult(successful: cardIds, failed: []);
   }
 
   @override
@@ -105,42 +100,50 @@ class MockAIRepository implements AIRepository {
   ParsedCardData? _mockParsedData;
   BatchParseResult? _mockBatchResult;
   DomainFailure? _mockFailure;
-  
+
   void setMockParsedData(ParsedCardData data) => _mockParsedData = data;
   void setMockBatchResult(BatchParseResult result) => _mockBatchResult = result;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
-  Future<ParsedCardData> parseCardFromText(String ocrText, {ParseHints? hints}) async {
+  Future<ParsedCardData> parseCardFromText(
+    String ocrText, {
+    ParseHints? hints,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockParsedData ?? ParsedCardData(
-      name: '王大明',
-      company: '科技股份有限公司',
-      jobTitle: '軟體工程師',
-      email: 'wang@tech.com',
-      phone: '02-1234-5678',
-      address: '台北市信義區信義路五段7號',
-      confidence: 0.88,
-      source: ParseSource.ai,
-      parsedAt: DateTime.now(),
-    );
+    return _mockParsedData ??
+        ParsedCardData(
+          name: '王大明',
+          company: '科技股份有限公司',
+          jobTitle: '軟體工程師',
+          email: 'wang@tech.com',
+          phone: '02-1234-5678',
+          address: '台北市信義區信義路五段7號',
+          confidence: 0.88,
+          source: ParseSource.ai,
+          parsedAt: DateTime.now(),
+        );
   }
 
   @override
-  Future<BatchParseResult> parseCardsFromTexts(List<OCRResult> ocrResults, {ParseHints? hints}) async {
+  Future<BatchParseResult> parseCardsFromTexts(
+    List<OCRResult> ocrResults, {
+    ParseHints? hints,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockBatchResult ?? const BatchParseResult(
-      successful: [],
-      failed: [],
-    );
+    return _mockBatchResult ??
+        const BatchParseResult(successful: [], failed: []);
   }
 
   @override
-  Future<CardCompletionSuggestions> suggestCardCompletion(BusinessCard incompleteCard, {CompletionContext? context}) async {
+  Future<CardCompletionSuggestions> suggestCardCompletion(
+    BusinessCard incompleteCard, {
+    CompletionContext? context,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
@@ -148,7 +151,9 @@ class MockAIRepository implements AIRepository {
   }
 
   @override
-  Future<ParsedCardData> validateAndSanitizeResult(Map<String, dynamic> parsedData) async {
+  Future<ParsedCardData> validateAndSanitizeResult(
+    Map<String, dynamic> parsedData,
+  ) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
@@ -234,7 +239,10 @@ class MockAIRepository implements AIRepository {
   }
 
   @override
-  Future<FormattedFieldResult> formatField(String fieldName, String rawValue) async {
+  Future<FormattedFieldResult> formatField(
+    String fieldName,
+    String rawValue,
+  ) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
@@ -242,11 +250,18 @@ class MockAIRepository implements AIRepository {
   }
 
   @override
-  Future<DuplicateDetectionResult> detectDuplicates(ParsedCardData cardData, List<BusinessCard> existingCards) async {
+  Future<DuplicateDetectionResult> detectDuplicates(
+    ParsedCardData cardData,
+    List<BusinessCard> existingCards,
+  ) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return const DuplicateDetectionResult(hasDuplicates: false, potentialDuplicates: [], similarityScores: {});
+    return const DuplicateDetectionResult(
+      hasDuplicates: false,
+      potentialDuplicates: [],
+      similarityScores: {},
+    );
   }
 
   @override
@@ -268,11 +283,8 @@ void main() {
     setUp(() {
       mockCardWriter = MockCardWriter();
       mockAIRepository = MockAIRepository();
-      useCase = CreateCardFromOCRUseCase(
-        mockCardWriter,
-        mockAIRepository,
-      );
-      
+      useCase = CreateCardFromOCRUseCase(mockCardWriter, mockAIRepository);
+
       // 建立測試 OCR 結果
       testOCRResult = OCRResult(
         id: 'ocr-test-123',
@@ -319,9 +331,9 @@ void main() {
         mockCardWriter.setMockSavedCard(expectedCard);
 
         // Act
-        final result = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: testOCRResult,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromOCRParams(ocrResult: testOCRResult),
+        );
 
         // Assert
         expect(result.card.name, '王大明');
@@ -346,10 +358,12 @@ void main() {
         );
 
         // Act
-        final result = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: testOCRResult,
-          parseHints: parseHints,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromOCRParams(
+            ocrResult: testOCRResult,
+            parseHints: parseHints,
+          ),
+        );
 
         // Assert
         expect(result.card.name, isNotEmpty);
@@ -367,10 +381,12 @@ void main() {
         );
 
         // Act
-        final result = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: lowConfidenceOCR,
-          confidenceThreshold: 0.7,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromOCRParams(
+            ocrResult: lowConfidenceOCR,
+            confidenceThreshold: 0.7,
+          ),
+        );
 
         // Assert
         expect(result.hasWarnings, true);
@@ -391,9 +407,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromOCRParams(
-            ocrResult: emptyOCR,
-          )),
+          () => useCase.execute(CreateCardFromOCRParams(ocrResult: emptyOCR)),
           throwsA(isA<InvalidInputFailure>()),
         );
       });
@@ -408,21 +422,23 @@ void main() {
           processingTimeMs: 1000,
           processedAt: DateTime.now(),
         );
-        
+
         // 使用反射或直接測試 UseCase 內部的驗證邏輯
         // 因為 OCRResult 已經有安全驗證，我們測試 UseCase 對空文字的處理
-        
+
         // Act & Assert - 測試 UseCase 本身對空文字的處理
         expect(
-          () => useCase.execute(CreateCardFromOCRParams(
-            ocrResult: OCRResult(
-              id: 'valid-id',
-              rawText: 'x', // 使用最小有效文字
-              confidence: 0.8,
-              processingTimeMs: 1000,
-              processedAt: DateTime.now(),
+          () => useCase.execute(
+            CreateCardFromOCRParams(
+              ocrResult: OCRResult(
+                id: 'valid-id',
+                rawText: 'x', // 使用最小有效文字
+                confidence: 0.8,
+                processingTimeMs: 1000,
+                processedAt: DateTime.now(),
+              ),
             ),
-          )),
+          ),
           returnsNormally, // 應該正常處理
         );
       });
@@ -438,10 +454,12 @@ void main() {
         );
 
         // Act
-        final result = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: lowConfidenceOCR,
-          confidenceThreshold: 0.7,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromOCRParams(
+            ocrResult: lowConfidenceOCR,
+            confidenceThreshold: 0.7,
+          ),
+        );
 
         // Assert - 應該有警告但不拒絕處理
         expect(result.hasWarnings, true);
@@ -461,9 +479,9 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromOCRParams(
-            ocrResult: testOCRResult,
-          )),
+          () => useCase.execute(
+            CreateCardFromOCRParams(ocrResult: testOCRResult),
+          ),
           throwsA(isA<AIServiceUnavailableFailure>()),
         );
       });
@@ -479,9 +497,9 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromOCRParams(
-            ocrResult: testOCRResult,
-          )),
+          () => useCase.execute(
+            CreateCardFromOCRParams(ocrResult: testOCRResult),
+          ),
           throwsA(isA<AIQuotaExceededFailure>()),
         );
       });
@@ -498,9 +516,9 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromOCRParams(
-            ocrResult: testOCRResult,
-          )),
+          () => useCase.execute(
+            CreateCardFromOCRParams(ocrResult: testOCRResult),
+          ),
           throwsA(isA<StorageSpaceFailure>()),
         );
       });
@@ -517,10 +535,12 @@ void main() {
         );
 
         // Act
-        final result = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: suspiciousOCR,
-          enableSanitization: true,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromOCRParams(
+            ocrResult: suspiciousOCR,
+            enableSanitization: true,
+          ),
+        );
 
         // Assert - 應該正常處理並包含清理步驟
         expect(result.card.name, isNotEmpty);
@@ -531,10 +551,9 @@ void main() {
     group('進階功能', () {
       test('should support dry run mode without saving', () async {
         // Act
-        final dryRunResult = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: testOCRResult,
-          dryRun: true,
-        ));
+        final dryRunResult = await useCase.execute(
+          CreateCardFromOCRParams(ocrResult: testOCRResult, dryRun: true),
+        );
 
         // Assert
         expect(dryRunResult.card.id, startsWith('temp-'));
@@ -544,16 +563,18 @@ void main() {
 
       test('should track processing metrics when enabled', () async {
         // Act
-        final result = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: testOCRResult,
-          trackMetrics: true,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromOCRParams(ocrResult: testOCRResult, trackMetrics: true),
+        );
 
         // Assert
         expect(result.metrics, isNotNull);
         expect(result.metrics!.totalProcessingTimeMs, greaterThanOrEqualTo(0));
         expect(result.metrics!.aiProcessingTimeMs, greaterThanOrEqualTo(0));
-        expect(result.metrics!.startTime.isBefore(result.metrics!.endTime), true);
+        expect(
+          result.metrics!.startTime.isBefore(result.metrics!.endTime),
+          true,
+        );
       });
 
       test('should batch process multiple OCR results', () async {
@@ -577,9 +598,9 @@ void main() {
         ];
 
         // Act
-        final results = await useCase.executeBatch(CreateCardFromOCRBatchParams(
-          ocrResults: ocrResults,
-        ));
+        final results = await useCase.executeBatch(
+          CreateCardFromOCRBatchParams(ocrResults: ocrResults),
+        );
 
         // Assert
         expect(results.successful.length, 3);
@@ -592,14 +613,16 @@ void main() {
         // Arrange
         final ocrResults = [
           testOCRResult, // 成功
-          OCRResult( // 失敗 - 空文字
+          OCRResult(
+            // 失敗 - 空文字
             id: 'ocr-empty',
             rawText: '',
             confidence: 0.85,
             processingTimeMs: 1100,
             processedAt: DateTime.now(),
           ),
-          OCRResult( // 成功
+          OCRResult(
+            // 成功
             id: 'ocr-3',
             rawText: '張三\n設計師',
             confidence: 0.78,
@@ -609,9 +632,9 @@ void main() {
         ];
 
         // Act
-        final results = await useCase.executeBatch(CreateCardFromOCRBatchParams(
-          ocrResults: ocrResults,
-        ));
+        final results = await useCase.executeBatch(
+          CreateCardFromOCRBatchParams(ocrResults: ocrResults),
+        );
 
         // Assert
         expect(results.successful.length, 2);
@@ -624,16 +647,18 @@ void main() {
       test('should handle concurrent requests efficiently', () async {
         // Arrange
         final futures = List.generate(3, (index) {
-          return useCase.execute(CreateCardFromOCRParams(
-            ocrResult: OCRResult(
-              id: 'ocr-concurrent-$index',
-              rawText: '測試名片 $index\n軟體工程師',
-              confidence: 0.85,
-              processingTimeMs: 1000,
-              processedAt: DateTime.now(),
+          return useCase.execute(
+            CreateCardFromOCRParams(
+              ocrResult: OCRResult(
+                id: 'ocr-concurrent-$index',
+                rawText: '測試名片 $index\n軟體工程師',
+                confidence: 0.85,
+                processingTimeMs: 1000,
+                processedAt: DateTime.now(),
+              ),
+              trackMetrics: true,
             ),
-            trackMetrics: true,
-          ));
+          );
         });
 
         // Act
@@ -649,10 +674,9 @@ void main() {
 
       test('should cleanup resources properly', () async {
         // Act
-        final result = await useCase.execute(CreateCardFromOCRParams(
-          ocrResult: testOCRResult,
-          autoCleanup: true,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromOCRParams(ocrResult: testOCRResult, autoCleanup: true),
+        );
 
         // Assert
         expect(result.processingSteps, contains('資源清理'));

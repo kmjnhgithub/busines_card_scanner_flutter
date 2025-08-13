@@ -1,6 +1,7 @@
 import 'dart:io';
 
-import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart' as domain;
+import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart'
+    as domain;
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path/path.dart' as p;
@@ -9,47 +10,47 @@ import 'package:path_provider/path_provider.dart';
 part 'clean_app_database.g.dart';
 
 /// 名片資料表定義
-/// 
+///
 /// 對應 Domain 層的 BusinessCard 實體
 /// 使用 Drift 的聲明式語法定義資料表結構
 @DataClassName('BusinessCardData')
 class BusinessCards extends Table {
   /// 主鍵 - 自動生成的唯一識別碼
   IntColumn get id => integer().autoIncrement()();
-  
+
   /// 姓名（必填）
   TextColumn get name => text().withLength(min: 1, max: 100)();
-  
+
   /// 職稱（可選）
   TextColumn get jobTitle => text().withLength(max: 100).nullable()();
-  
+
   /// 公司名稱（可選）
   TextColumn get company => text().withLength(max: 100).nullable()();
-  
+
   /// 電子郵件（可選）
   TextColumn get email => text().withLength(max: 200).nullable()();
-  
+
   /// 電話號碼（可選）
   TextColumn get phone => text().withLength(max: 50).nullable()();
-  
+
   /// 地址（可選）
   TextColumn get address => text().withLength(max: 500).nullable()();
-  
+
   /// 網站（可選）
   TextColumn get website => text().withLength(max: 200).nullable()();
-  
+
   /// 備註（可選）
   TextColumn get notes => text().withLength(max: 1000).nullable()();
-  
+
   /// 建立時間（自動設定）
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
-  
+
   /// 最後更新時間（自動更新）
   DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
 }
 
 /// 名片資料存取物件
-/// 
+///
 /// 提供所有與名片資料表相關的資料庫操作
 /// 包含基本 CRUD、搜尋、過濾、排序等功能
 @DriftAccessor(tables: [BusinessCards])
@@ -87,12 +88,14 @@ class CardDao extends DatabaseAccessor<CleanAppDatabase> with _$CardDaoMixin {
   Future<List<domain.BusinessCard>> searchBusinessCards(String keyword) async {
     final normalizedKeyword = '%${keyword.toLowerCase()}%';
     final query = select(businessCards)
-      ..where((tbl) =>
-          tbl.name.lower().like(normalizedKeyword) |
-          tbl.company.lower().like(normalizedKeyword) |
-          tbl.jobTitle.lower().like(normalizedKeyword) |
-          tbl.email.lower().like(normalizedKeyword) |
-          tbl.phone.like(normalizedKeyword))
+      ..where(
+        (tbl) =>
+            tbl.name.lower().like(normalizedKeyword) |
+            tbl.company.lower().like(normalizedKeyword) |
+            tbl.jobTitle.lower().like(normalizedKeyword) |
+            tbl.email.lower().like(normalizedKeyword) |
+            tbl.phone.like(normalizedKeyword),
+      )
       ..orderBy([(t) => OrderingTerm.desc(t.updatedAt)]);
     final results = await query.get();
     return results.map(_mapToDomainBusinessCard).toList();
@@ -104,27 +107,30 @@ class CardDao extends DatabaseAccessor<CleanAppDatabase> with _$CardDaoMixin {
     if (cardIdInt == null) {
       throw ArgumentError('Invalid card ID format: ${card.id}');
     }
-    final result = await (update(businessCards)
-          ..where((tbl) => tbl.id.equals(cardIdInt)))
-        .write(BusinessCardsCompanion(
-      name: Value(card.name),
-      jobTitle: Value(card.jobTitle),
-      company: Value(card.company),
-      email: Value(card.email),
-      phone: Value(card.phone),
-      address: Value(card.address),
-      website: Value(card.website),
-      notes: Value(card.notes),
-      updatedAt: Value(DateTime.now()),
-    ));
+    final result =
+        await (update(
+          businessCards,
+        )..where((tbl) => tbl.id.equals(cardIdInt))).write(
+          BusinessCardsCompanion(
+            name: Value(card.name),
+            jobTitle: Value(card.jobTitle),
+            company: Value(card.company),
+            email: Value(card.email),
+            phone: Value(card.phone),
+            address: Value(card.address),
+            website: Value(card.website),
+            notes: Value(card.notes),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
     return result > 0;
   }
 
   /// 刪除名片
   Future<bool> deleteBusinessCard(int id) async {
-    final result = await (delete(businessCards)
-          ..where((tbl) => tbl.id.equals(id)))
-        .go();
+    final result = await (delete(
+      businessCards,
+    )..where((tbl) => tbl.id.equals(id))).go();
     return result > 0;
   }
 
@@ -155,7 +161,7 @@ class CardDao extends DatabaseAccessor<CleanAppDatabase> with _$CardDaoMixin {
 }
 
 /// 應用程式資料庫
-/// 
+///
 /// 使用 Drift 建構的 SQLite 資料庫
 /// 提供名片資料的持久化儲存
 @DriftDatabase(tables: [BusinessCards], daos: [CardDao])

@@ -5,15 +5,14 @@ import 'package:busines_card_scanner_flutter/domain/exceptions/repository_except
 import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 
 /// AI Repository 實作
-/// 
+///
 /// 使用 OpenAI Service 進行名片資料解析和處理
 /// 這是一個基本實作，專注於核心功能，可以在後續開發中擴展
 class AIRepositoryImpl implements AIRepository {
   final OpenAIService _openAIService;
 
-  const AIRepositoryImpl({
-    required OpenAIService openAIService,
-  }) : _openAIService = openAIService;
+  const AIRepositoryImpl({required OpenAIService openAIService})
+    : _openAIService = openAIService;
 
   @override
   Future<ParsedCardData> parseCardFromText(
@@ -27,9 +26,7 @@ class AIRepositoryImpl implements AIRepository {
       if (e is DataSourceFailure) {
         rethrow;
       }
-      throw const AIServiceUnavailableFailure(
-        userMessage: 'AI 解析服務暫時無法使用',
-      );
+      throw const AIServiceUnavailableFailure(userMessage: 'AI 解析服務暫時無法使用');
     }
   }
 
@@ -49,32 +46,28 @@ class AIRepositoryImpl implements AIRepository {
         );
         successful.add(result);
       } on Exception catch (e) {
-        failed.add(BatchParseError(
-          index: i,
-          error: e.toString(),
-          originalResult: ocrResults[i],
-        ));
+        failed.add(
+          BatchParseError(
+            index: i,
+            error: e.toString(),
+            originalResult: ocrResults[i],
+          ),
+        );
       }
     }
 
-    return BatchParseResult(
-      successful: successful,
-      failed: failed,
-    );
+    return BatchParseResult(successful: successful, failed: failed);
   }
 
   // Stub implementations for other methods - can be enhanced later
-  
+
   @override
   Future<CardCompletionSuggestions> suggestCardCompletion(
     BusinessCard incompleteCard, {
     CompletionContext? context,
   }) async {
     // Basic stub implementation
-    return const CardCompletionSuggestions(
-      suggestions: {},
-      confidence: {},
-    );
+    return const CardCompletionSuggestions(suggestions: {}, confidence: {});
   }
 
   @override
@@ -181,10 +174,7 @@ class AIRepositoryImpl implements AIRepository {
     String rawValue,
   ) async {
     // Basic formatting
-    return FormattedFieldResult(
-      formattedValue: rawValue.trim(),
-      confidence: 1,
-    );
+    return FormattedFieldResult(formattedValue: rawValue.trim(), confidence: 1);
   }
 
   @override

@@ -1,0 +1,217 @@
+import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
+import 'package:busines_card_scanner_flutter/presentation/presenters/loading_presenter.dart';
+import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
+import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart';
+import 'package:camera/camera.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'camera_view_model.freezed.dart';
+
+/// 相機狀態
+@Freezed(toJson: false, fromJson: false)
+class CameraState with _$CameraState {
+  const factory CameraState({
+    /// 相機控制器
+    CameraController? cameraController,
+
+    /// 相機是否已初始化
+    @Default(false) bool isInitialized,
+
+    /// 是否正在載入
+    @Default(false) bool isLoading,
+
+    /// 錯誤訊息
+    String? error,
+
+    /// 拍攝的圖片路徑
+    String? capturedImagePath,
+
+    /// 當前閃光燈模式
+    @Default(FlashMode.auto) FlashMode flashMode,
+  }) = _CameraState;
+}
+
+/// 相機ViewModel
+///
+/// 負責管理相機功能，包括：
+/// - 相機初始化和控制
+/// - 拍照功能
+/// - 閃光燈控制
+/// - 焦點控制
+/// - 圖片處理
+class CameraViewModel extends StateNotifier<CameraState> {
+  CameraViewModel(
+    this._processImageUseCase,
+    this._loadingPresenter,
+    this._toastPresenter,
+  ) : super(const CameraState());
+
+  final ProcessImageUseCase _processImageUseCase;
+  final LoadingPresenter _loadingPresenter;
+  final ToastPresenter _toastPresenter;
+
+  /// 初始化相機
+  Future<void> initializeCamera(List<CameraDescription> cameras) async {
+    if (cameras.isEmpty) {
+      _updateError('沒有可用的相機');
+      _toastPresenter.showError('沒有可用的相機');
+      return;
+    }
+
+    try {
+      state = state.copyWith(isLoading: true, error: null);
+
+      final controller = CameraController(
+        cameras.first,
+        ResolutionPreset.high,
+        enableAudio: false,
+      );
+
+      await controller.initialize();
+
+      if (controller.value.isInitialized) {
+        state = state.copyWith(
+          cameraController: controller,
+          isInitialized: true,
+          isLoading: false,
+        );
+      }
+    } on CameraException catch (e) {
+      _updateError('相機初始化失敗: ${e.description}');
+      _toastPresenter.showError('相機初始化失敗');
+      state = state.copyWith(isLoading: false);
+    } on Exception catch (e) {
+      _updateError('相機初始化失敗: $e');
+      _toastPresenter.showError('相機初始化失敗');
+      state = state.copyWith(isLoading: false);
+    }
+  }
+
+  /// 拍照
+  Future<void> takePicture() async {
+    final controller = state.cameraController;
+    if (controller == null || !controller.value.isInitialized) {
+      _updateError('相機尚未初始化，無法拍照');
+      _toastPresenter.showError('相機尚未初始化，無法拍照');
+      return;
+    }
+
+    try {
+      _loadingPresenter.show('拍攝中...');
+
+      final image = await controller.takePicture();
+
+      state = state.copyWith(capturedImagePath: image.path, error: null);
+
+      _loadingPresenter.hide();
+    } on CameraException catch (e) {
+      _loadingPresenter.hide();
+      _updateError('拍照失敗: ${e.description}');
+      _toastPresenter.showError('拍照失敗: ${e.description}');
+    } on Exception catch (e) {
+      _loadingPresenter.hide();
+      _updateError('拍照失敗: $e');
+      _toastPresenter.showError('拍照失敗: $e');
+    }
+  }
+
+  /// 處理圖片
+  Future<ProcessImageResult> processImage(Uint8List imageData) async {
+    try {
+      _loadingPresenter.show('處理圖片中...');
+
+      final params = ProcessImageParams(imageData: imageData);
+      final result = await _processImageUseCase.execute(params);
+
+      _loadingPresenter.hide();
+      return result;
+    } on Exception catch (e) {
+      _loadingPresenter.hide();
+      _toastPresenter.showError('圖片處理失敗: $e');
+      rethrow;
+    }
+  }
+
+  /// 切換閃光燈模式
+  Future<void> toggleFlashMode() async {
+    final controller = state.cameraController;
+    if (controller == null || !controller.value.isInitialized) {
+      _toastPresenter.showError('相機尚未初始化');
+      return;
+    }
+
+    try {
+      FlashMode newMode;
+      switch (state.flashMode) {
+        case FlashMode.auto:
+          newMode = FlashMode.torch;
+          break;
+        case FlashMode.torch:
+          newMode = FlashMode.off;
+          break;
+        case FlashMode.off:
+          newMode = FlashMode.auto;
+          break;
+        default:
+          newMode = FlashMode.auto;
+      }
+
+      await controller.setFlashMode(newMode);
+      state = state.copyWith(flashMode: newMode);
+    } on Exception catch (e) {
+      _toastPresenter.showError('切換閃光燈失敗: $e');
+    }
+  }
+
+  /// 設定焦點點
+  Future<void> setFocusPoint(Offset point) async {
+    final controller = state.cameraController;
+    if (controller == null || !controller.value.isInitialized) {
+      return;
+    }
+
+    try {
+      await controller.setFocusPoint(point);
+    } on Exception catch (e) {
+      debugPrint('設定焦點失敗: $e');
+    }
+  }
+
+  /// 重設狀態
+  void resetState() {
+    state = state.copyWith(
+      capturedImagePath: null,
+      error: null,
+      isLoading: false,
+    );
+  }
+
+  /// 清理資源
+  @override
+  void dispose() {
+    state.cameraController?.dispose();
+    super.dispose();
+  }
+
+  /// 更新錯誤狀態
+  void _updateError(String error) {
+    state = state.copyWith(error: error);
+  }
+}
+
+/// Camera ViewModel Provider
+final cameraViewModelProvider =
+    StateNotifierProvider<CameraViewModel, CameraState>((ref) {
+      final processImageUseCase = ref.watch(processImageUseCaseProvider);
+      final loadingPresenter = ref.watch(loadingPresenterProvider.notifier);
+      final toastPresenter = ref.watch(toastPresenterProvider.notifier);
+
+      return CameraViewModel(
+        processImageUseCase,
+        loadingPresenter,
+        toastPresenter,
+      );
+    });

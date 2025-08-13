@@ -4,7 +4,7 @@ import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.
 import 'package:flutter/material.dart';
 
 /// 名片列表搜尋列
-/// 
+///
 /// 提供名片搜尋功能，支援：
 /// - 展開/收縮動畫
 /// - 即時搜尋回調
@@ -75,21 +75,16 @@ class _CardListSearchBarState extends State<CardListSearchBar>
       vsync: this,
     );
 
-    _expandAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    ));
+    _expandAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
-    _fadeAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: const Interval(0.5, 1, curve: Curves.easeIn),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.5, 1, curve: Curves.easeIn),
+      ),
+    );
 
     _controller.addListener(_onTextChanged);
 
@@ -138,7 +133,7 @@ class _CardListSearchBarState extends State<CardListSearchBar>
   void _toggleExpansion() {
     final newExpanded = !widget.isExpanded;
     widget.onExpansionChanged?.call(newExpanded);
-    
+
     if (!newExpanded) {
       _clearSearch();
     }
@@ -161,7 +156,7 @@ class _CardListSearchBarState extends State<CardListSearchBar>
           ),
           onPressed: _toggleExpansion,
         ),
-        
+
         // 展開的搜尋輸入框
         Expanded(
           child: AnimatedBuilder(
@@ -190,9 +185,7 @@ class _CardListSearchBarState extends State<CardListSearchBar>
       decoration: BoxDecoration(
         color: AppColors.secondaryBackground,
         borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        border: Border.all(
-          color: AppColors.separator,
-        ),
+        border: Border.all(color: AppColors.separator),
       ),
       child: Row(
         children: [
@@ -220,10 +213,9 @@ class _CardListSearchBarState extends State<CardListSearchBar>
               textInputAction: TextInputAction.search,
             ),
           ),
-          
+
           // 清除按鈕
-          if (widget.showClearButton && _hasText)
-            _buildClearButton(),
+          if (widget.showClearButton && _hasText) _buildClearButton(),
         ],
       ),
     );
@@ -239,20 +231,18 @@ class _CardListSearchBarState extends State<CardListSearchBar>
       ),
       onPressed: _clearSearch,
       padding: const EdgeInsets.all(AppDimensions.space1),
-      constraints: const BoxConstraints(
-        minWidth: 32,
-        minHeight: 32,
-      ),
+      constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
     );
   }
 }
 
 /// 搜尋建議元件
-/// 
+///
 /// 顯示搜尋建議列表
 class SearchSuggestions extends StatelessWidget {
   const SearchSuggestions({
-    required this.suggestions, super.key,
+    required this.suggestions,
+    super.key,
     this.onSuggestionTap,
     this.maxHeight = 200,
     this.showNoResults = true,
@@ -285,14 +275,10 @@ class SearchSuggestions extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.background,
         borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        border: Border.all(
-          color: AppColors.separator,
-        ),
+        border: Border.all(color: AppColors.separator),
         boxShadow: AppDimensions.shadowMedium,
       ),
-      child: suggestions.isEmpty
-          ? _buildNoResults()
-          : _buildSuggestionsList(),
+      child: suggestions.isEmpty ? _buildNoResults() : _buildSuggestionsList(),
     );
   }
 
@@ -317,10 +303,8 @@ class SearchSuggestions extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.symmetric(vertical: AppDimensions.space1),
       itemCount: suggestions.length,
-      separatorBuilder: (context, index) => const Divider(
-        height: 1,
-        color: AppColors.separator,
-      ),
+      separatorBuilder: (context, index) =>
+          const Divider(height: 1, color: AppColors.separator),
       itemBuilder: (context, index) {
         final suggestion = suggestions[index];
         return ListTile(
@@ -348,11 +332,13 @@ class SearchSuggestions extends StatelessWidget {
 }
 
 /// 搜尋過濾器元件
-/// 
+///
 /// 提供搜尋過濾選項
 class SearchFilters extends StatelessWidget {
   const SearchFilters({
-    required this.filters, required this.selectedFilters, super.key,
+    required this.filters,
+    required this.selectedFilters,
+    super.key,
     this.onFilterChanged,
     this.showTitle = true,
     this.title = '篩選條件',
@@ -380,9 +366,7 @@ class SearchFilters extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppColors.secondaryBackground,
         borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        border: Border.all(
-          color: AppColors.separator,
-        ),
+        border: Border.all(color: AppColors.separator),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

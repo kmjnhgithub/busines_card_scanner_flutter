@@ -7,16 +7,15 @@ import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.d
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 
-
 /// CreateCardFromImageUseCase - 從圖片建立名片的業務用例
-/// 
+///
 /// 遵循單一職責原則（SRP），專注於影像處理流程：
 /// 1. 圖片驗證和預處理
 /// 2. OCR 文字識別
 /// 3. AI 解析和結構化
 /// 4. 資料驗證和清理
 /// 5. 名片儲存
-/// 
+///
 /// 支援：
 /// - 自訂 OCR 選項
 /// - AI 解析提示
@@ -35,12 +34,12 @@ class CreateCardFromImageUseCase {
   );
 
   /// 執行從圖片建立名片的完整流程
-  /// 
+  ///
   /// [params] 建立參數，包含圖片資料和處理選項
-  /// 
+  ///
   /// 回傳建立結果，包含名片、OCR 結果和處理資訊
   Future<CreateCardFromImageResult> execute(
-    CreateCardFromImageParams params
+    CreateCardFromImageParams params,
   ) async {
     final startTime = DateTime.now();
     final processingSteps = <String>[];
@@ -64,18 +63,26 @@ class CreateCardFromImageUseCase {
 
       // 3. OCR 文字識別
       final ocrStartTime = DateTime.now();
-      final ocrResult = await _performOCR(processedImageData, params.ocrOptions);
+      final ocrResult = await _performOCR(
+        processedImageData,
+        params.ocrOptions,
+      );
       final ocrEndTime = DateTime.now();
       processingSteps.add('OCR 文字識別');
 
       // 4. 檢查 OCR 信心度
       if (ocrResult.confidence < (params.confidenceThreshold ?? 0.7)) {
-        warnings.add('OCR 信心度較低 (${(ocrResult.confidence * 100).toStringAsFixed(1)}%)');
+        warnings.add(
+          'OCR 信心度較低 (${(ocrResult.confidence * 100).toStringAsFixed(1)}%)',
+        );
       }
 
       // 5. AI 解析和結構化
       final aiStartTime = DateTime.now();
-      final parsedData = await _parseWithAI(ocrResult.rawText, params.parseHints);
+      final parsedData = await _parseWithAI(
+        ocrResult.rawText,
+        params.parseHints,
+      );
       final aiEndTime = DateTime.now();
       processingSteps.add('AI 解析');
 
@@ -114,7 +121,9 @@ class CreateCardFromImageUseCase {
       if (params.trackMetrics) {
         metrics = ProcessingMetrics(
           totalProcessingTimeMs: endTime.difference(startTime).inMilliseconds,
-          ocrProcessingTimeMs: ocrEndTime.difference(ocrStartTime).inMilliseconds,
+          ocrProcessingTimeMs: ocrEndTime
+              .difference(ocrStartTime)
+              .inMilliseconds,
           aiProcessingTimeMs: aiEndTime.difference(aiStartTime).inMilliseconds,
           startTime: startTime,
           endTime: endTime,
@@ -129,28 +138,28 @@ class CreateCardFromImageUseCase {
         warnings: warnings,
         metrics: metrics,
       );
-
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
       if (e is DomainFailure) {
         rethrow;
       }
-      
+
       // 包裝未預期的異常
       throw DataSourceFailure(
         userMessage: '處理圖片時發生錯誤',
-        internalMessage: 'Unexpected error during image processing: $e\nStack trace: $stackTrace',
+        internalMessage:
+            'Unexpected error during image processing: $e\nStack trace: $stackTrace',
       );
     }
   }
 
   /// 批次處理多張圖片
-  /// 
+  ///
   /// [params] 批次處理參數
-  /// 
+  ///
   /// 回傳批次處理結果
   Future<CreateCardFromImageBatchResult> executeBatch(
-    CreateCardFromImageBatchParams params
+    CreateCardFromImageBatchParams params,
   ) async {
     final successful = <CreateCardFromImageResult>[];
     final failed = <CreateCardFromImageBatchError>[];
@@ -158,31 +167,35 @@ class CreateCardFromImageUseCase {
     // 使用 Stream 進行並行處理，限制並行數量
     final stream = Stream.fromIterable(params.imageDataList.asMap().entries)
         .asyncMap((entry) async {
-      try {
-        final result = await execute(CreateCardFromImageParams(
-          imageData: entry.value,
-          // 繼承其他參數
-          ocrOptions: params.ocrOptions,
-          parseHints: params.parseHints,
-          confidenceThreshold: params.confidenceThreshold,
-          validateResults: params.validateResults,
-          trackMetrics: params.trackMetrics,
-        ));
-        return MapEntry(entry.key, result);
-      } on Exception catch (error) {
-        return MapEntry(entry.key, error);
-      }
-    });
+          try {
+            final result = await execute(
+              CreateCardFromImageParams(
+                imageData: entry.value,
+                // 繼承其他參數
+                ocrOptions: params.ocrOptions,
+                parseHints: params.parseHints,
+                confidenceThreshold: params.confidenceThreshold,
+                validateResults: params.validateResults,
+                trackMetrics: params.trackMetrics,
+              ),
+            );
+            return MapEntry(entry.key, result);
+          } on Exception catch (error) {
+            return MapEntry(entry.key, error);
+          }
+        });
 
     await for (final entry in stream) {
       if (entry.value is CreateCardFromImageResult) {
         successful.add(entry.value as CreateCardFromImageResult);
       } else {
-        failed.add(CreateCardFromImageBatchError(
-          index: entry.key,
-          error: entry.value.toString(),
-          originalImageData: params.imageDataList[entry.key],
-        ));
+        failed.add(
+          CreateCardFromImageBatchError(
+            index: entry.key,
+            error: entry.value.toString(),
+            originalImageData: params.imageDataList[entry.key],
+          ),
+        );
       }
     }
 
@@ -209,10 +222,7 @@ class CreateCardFromImageUseCase {
     Uint8List imageData,
     ImagePreprocessOptions? options,
   ) async {
-    return _ocrRepository.preprocessImage(
-      imageData,
-      options: options,
-    );
+    return _ocrRepository.preprocessImage(imageData, options: options);
   }
 
   /// 執行 OCR 識別
@@ -220,21 +230,12 @@ class CreateCardFromImageUseCase {
     Uint8List imageData,
     OCROptions? options,
   ) async {
-    return _ocrRepository.recognizeText(
-      imageData,
-      options: options,
-    );
+    return _ocrRepository.recognizeText(imageData, options: options);
   }
 
   /// 使用 AI 解析 OCR 文字
-  Future<ParsedCardData> _parseWithAI(
-    String ocrText,
-    ParseHints? hints,
-  ) async {
-    return _aiRepository.parseCardFromText(
-      ocrText,
-      hints: hints,
-    );
+  Future<ParsedCardData> _parseWithAI(String ocrText, ParseHints? hints) async {
+    return _aiRepository.parseCardFromText(ocrText, hints: hints);
   }
 
   /// 驗證和清理解析結果

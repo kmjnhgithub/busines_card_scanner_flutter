@@ -6,12 +6,16 @@ import 'package:flutter/material.dart';
 enum ThemedButtonType {
   /// 主要按鈕（實心，品牌色背景）
   primary,
+
   /// 次要按鈕（實心，灰色背景）
   secondary,
+
   /// 外框按鈕（透明背景，彩色邊框）
   outline,
+
   /// 文字按鈕（透明背景，無邊框）
   text,
+
   /// 圖示按鈕（圓形，僅圖示）
   icon,
 }
@@ -20,10 +24,13 @@ enum ThemedButtonType {
 enum ThemedButtonSize {
   /// 小尺寸
   small,
+
   /// 中等尺寸（預設）
   medium,
+
   /// 大尺寸
   large,
+
   /// 超大尺寸
   extraLarge,
 }
@@ -136,26 +143,17 @@ class ThemedButton extends StatelessWidget {
 
     // 添加外邊距
     if (margin != null) {
-      button = Padding(
-        padding: margin!,
-        child: button,
-      );
+      button = Padding(padding: margin!, child: button);
     }
 
     // 展開填滿寬度
     if (expanded) {
-      button = SizedBox(
-        width: double.infinity,
-        child: button,
-      );
+      button = SizedBox(width: double.infinity, child: button);
     }
 
     // 添加提示文字
     if (tooltip != null) {
-      button = Tooltip(
-        message: tooltip!,
-        child: button,
-      );
+      button = Tooltip(message: tooltip!, child: button);
     }
 
     // 添加語義標籤
@@ -331,10 +329,7 @@ class ThemedButton extends StatelessWidget {
             horizontal: AppDimensions.space3,
             vertical: AppDimensions.space1,
           ),
-          textStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
+          textStyle: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
           iconSize: AppDimensions.iconSmall,
           borderRadius: AppDimensions.radiusSmall,
           elevation: 1,
@@ -346,10 +341,7 @@ class ThemedButton extends StatelessWidget {
         return _ButtonConfig(
           height: AppDimensions.buttonHeightMedium,
           padding: AppDimensions.paddingButton,
-          textStyle: const TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
+          textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
           iconSize: AppDimensions.iconMedium,
           borderRadius: AppDimensions.radiusMedium,
           elevation: 2,
@@ -364,10 +356,7 @@ class ThemedButton extends StatelessWidget {
             horizontal: AppDimensions.space8,
             vertical: AppDimensions.space4,
           ),
-          textStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
           iconSize: AppDimensions.iconLarge,
           borderRadius: AppDimensions.radiusLarge,
           elevation: 3,
@@ -382,10 +371,7 @@ class ThemedButton extends StatelessWidget {
             horizontal: AppDimensions.space10,
             vertical: AppDimensions.space5,
           ),
-          textStyle: const TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
-          ),
+          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
           iconSize: AppDimensions.iconLarge,
           borderRadius: AppDimensions.radiusLarge,
           elevation: 4,
@@ -414,8 +400,8 @@ class ThemedButton extends StatelessWidget {
 
       case ThemedButtonType.secondary:
         return _ButtonColorScheme(
-          background: isDark 
-              ? AppColors.secondaryBackgroundDark 
+          background: isDark
+              ? AppColors.secondaryBackgroundDark
               : AppColors.secondaryBackground,
           foreground: AppColors.getTextColor(theme.brightness),
           border: AppColors.getBorderColor(theme.brightness),
@@ -620,13 +606,7 @@ class ThemedButtonGroup extends StatelessWidget {
     }
 
     return direction == Axis.horizontal
-        ? Row(
-            mainAxisAlignment: alignment,
-            children: separatedChildren,
-          )
-        : Column(
-            mainAxisAlignment: alignment,
-            children: separatedChildren,
-          );
+        ? Row(mainAxisAlignment: alignment, children: separatedChildren)
+        : Column(mainAxisAlignment: alignment, children: separatedChildren);
   }
 }

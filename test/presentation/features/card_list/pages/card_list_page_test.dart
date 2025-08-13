@@ -9,10 +9,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 class MockGetCardsUseCase extends Mock implements GetCardsUseCase {}
+
 class MockDeleteCardUseCase extends Mock implements DeleteCardUseCase {}
 
 // Fake classes for mocktail
 class FakeGetCardsParams extends Fake implements GetCardsParams {}
+
 class FakeDeleteCardParams extends Fake implements DeleteCardParams {}
 
 void main() {
@@ -52,24 +54,28 @@ void main() {
       mockDeleteCardUseCase = MockDeleteCardUseCase();
 
       // 預設成功回應
-      when(() => mockGetCardsUseCase.execute(any()))
-          .thenAnswer((_) async => testCards);
-      when(() => mockDeleteCardUseCase.execute(any()))
-          .thenAnswer((_) async => const DeleteCardResult(
-            isSuccess: true,
-            deletedCardId: '1',
-            deleteType: DeleteType.soft,
-            isReversible: true,
-            processingSteps: ['validation', 'soft_delete'],
-            warnings: [],
-          ));
+      when(
+        () => mockGetCardsUseCase.execute(any()),
+      ).thenAnswer((_) async => testCards);
+      when(() => mockDeleteCardUseCase.execute(any())).thenAnswer(
+        (_) async => const DeleteCardResult(
+          isSuccess: true,
+          deletedCardId: '1',
+          deleteType: DeleteType.soft,
+          isReversible: true,
+          processingSteps: ['validation', 'soft_delete'],
+          warnings: [],
+        ),
+      );
 
       container = ProviderContainer(
         overrides: [
-          cardListViewModelProvider.overrideWith((ref) => CardListViewModel(
-                getCardsUseCase: mockGetCardsUseCase,
-                deleteCardUseCase: mockDeleteCardUseCase,
-              )),
+          cardListViewModelProvider.overrideWith(
+            (ref) => CardListViewModel(
+              getCardsUseCase: mockGetCardsUseCase,
+              deleteCardUseCase: mockDeleteCardUseCase,
+            ),
+          ),
         ],
       );
     });
@@ -82,9 +88,7 @@ void main() {
     Widget createTestWidget() {
       return ProviderScope(
         parent: container,
-        child: MaterialApp(
-          home: const CardListPage(),
-        ),
+        child: MaterialApp(home: const CardListPage()),
       );
     }
 
@@ -266,8 +270,9 @@ void main() {
     group('錯誤處理', () {
       testWidgets('載入錯誤時應該顯示錯誤狀態', (tester) async {
         // 設定載入失敗
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenThrow(Exception('載入失敗'));
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenThrow(Exception('載入失敗'));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -280,15 +285,17 @@ void main() {
 
       testWidgets('點擊重試按鈕應該重新載入', (tester) async {
         // 先設定失敗，然後成功
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenThrow(Exception('載入失敗'));
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenThrow(Exception('載入失敗'));
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
 
         // 重設為成功
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => testCards);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => testCards);
 
         // 點擊重試
         await tester.tap(find.text('重試'));
@@ -303,8 +310,9 @@ void main() {
     group('空狀態', () {
       testWidgets('無名片時應該顯示空狀態', (tester) async {
         // 設定空列表
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => <BusinessCard>[]);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => <BusinessCard>[]);
 
         await tester.pumpWidget(createTestWidget());
         await tester.pumpAndSettle();
@@ -338,14 +346,12 @@ void main() {
 
         // 重設 mock 計數
         reset(mockGetCardsUseCase);
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => testCards);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => testCards);
 
         // 執行下拉刷新
-        await tester.drag(
-          find.byType(RefreshIndicator),
-          const Offset(0, 300),
-        );
+        await tester.drag(find.byType(RefreshIndicator), const Offset(0, 300));
         await tester.pumpAndSettle();
 
         // 驗證刷新被觸發
@@ -356,27 +362,32 @@ void main() {
     group('載入狀態', () {
       testWidgets('初始載入時應該顯示載入指示器', (tester) async {
         // 設定延遲回應
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async {
+        when(() => mockGetCardsUseCase.execute(any())).thenAnswer((_) async {
           await Future.delayed(const Duration(milliseconds: 500));
           return testCards;
         });
 
         await tester.pumpWidget(createTestWidget());
-        
+
         // 讓初始幀渲染完成
         await tester.pump();
-        
+
         // 檢查載入狀態（應該有載入指示器或載入中文字）
-        final hasLoadingIndicator = find.byType(CircularProgressIndicator).evaluate().isNotEmpty;
+        final hasLoadingIndicator = find
+            .byType(CircularProgressIndicator)
+            .evaluate()
+            .isNotEmpty;
         final hasLoadingText = find.text('載入中...').evaluate().isNotEmpty;
-        
-        expect(hasLoadingIndicator || hasLoadingText, isTrue, 
-               reason: 'Should show either loading indicator or loading text');
+
+        expect(
+          hasLoadingIndicator || hasLoadingText,
+          isTrue,
+          reason: 'Should show either loading indicator or loading text',
+        );
 
         // 等待載入完成
         await tester.pumpAndSettle();
-        
+
         // 載入完成後應該顯示內容
         expect(find.text('張三'), findsOneWidget);
       });

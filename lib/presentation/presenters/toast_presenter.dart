@@ -182,19 +182,19 @@ class ToastStyleConfig {
       case ToastType.info:
         return brightness == Brightness.light
             ? AppColors.infoLight
-            : AppColors.info.withOpacity(0.2);
+            : AppColors.info.withValues(alpha: 0.2);
       case ToastType.success:
         return brightness == Brightness.light
             ? AppColors.successLight
-            : AppColors.success.withOpacity(0.2);
+            : AppColors.success.withValues(alpha: 0.2);
       case ToastType.warning:
         return brightness == Brightness.light
             ? AppColors.warningLight
-            : AppColors.warning.withOpacity(0.2);
+            : AppColors.warning.withValues(alpha: 0.2);
       case ToastType.error:
         return brightness == Brightness.light
             ? AppColors.errorLight
-            : AppColors.error.withOpacity(0.2);
+            : AppColors.error.withValues(alpha: 0.2);
     }
   }
 
@@ -275,7 +275,7 @@ class ToastWidget extends ConsumerWidget {
           color: backgroundColor,
           borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
           border: Border.all(
-            color: textColor.withOpacity(0.3),
+            color: textColor.withValues(alpha: 0.3),
             width: AppDimensions.borderThin,
           ),
           boxShadow: AppDimensions.shadowMedium,
@@ -329,7 +329,7 @@ class ToastWidget extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppDimensions.space1),
                 child: Icon(
                   Icons.close,
-                  color: textColor.withOpacity(0.7),
+                  color: textColor.withValues(alpha: 0.7),
                   size: AppDimensions.iconSmall,
                 ),
               ),

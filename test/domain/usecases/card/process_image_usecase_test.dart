@@ -6,7 +6,6 @@ import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-
 /// Mock OCRRepository 用於測試
 class MockOCRRepository implements OCRRepository {
   OCRResult? _mockOCRResult;
@@ -17,33 +16,43 @@ class MockOCRRepository implements OCRRepository {
   OCREngineInfo? _mockCurrentEngine;
   OCREngineHealth? _mockEngineHealth;
   DomainFailure? _mockFailure;
-  
+
   void setMockOCRResult(OCRResult result) => _mockOCRResult = result;
   void setMockBatchResult(BatchOCRResult result) => _mockBatchResult = result;
-  void setMockPreprocessedImage(Uint8List image) => _mockPreprocessedImage = image;
+  void setMockPreprocessedImage(Uint8List image) =>
+      _mockPreprocessedImage = image;
   void setMockStatistics(OCRStatistics stats) => _mockStatistics = stats;
   void setMockEngines(List<OCREngineInfo> engines) => _mockEngines = engines;
-  void setMockCurrentEngine(OCREngineInfo engine) => _mockCurrentEngine = engine;
-  void setMockEngineHealth(OCREngineHealth health) => _mockEngineHealth = health;
+  void setMockCurrentEngine(OCREngineInfo engine) =>
+      _mockCurrentEngine = engine;
+  void setMockEngineHealth(OCREngineHealth health) =>
+      _mockEngineHealth = health;
   void setMockFailure(DomainFailure? failure) => _mockFailure = failure;
   void clearMockFailure() => _mockFailure = null;
 
   @override
-  Future<OCRResult> recognizeText(Uint8List imageData, {OCROptions? options}) async {
+  Future<OCRResult> recognizeText(
+    Uint8List imageData, {
+    OCROptions? options,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockOCRResult ?? OCRResult(
-      id: 'ocr-${DateTime.now().millisecondsSinceEpoch}',
-      rawText: 'Mock OCR result',
-      confidence: 0.85,
-      processingTimeMs: 1000,
-      processedAt: DateTime.now(),
-    );
+    return _mockOCRResult ??
+        OCRResult(
+          id: 'ocr-${DateTime.now().millisecondsSinceEpoch}',
+          rawText: 'Mock OCR result',
+          confidence: 0.85,
+          processingTimeMs: 1000,
+          processedAt: DateTime.now(),
+        );
   }
 
   @override
-  Future<BatchOCRResult> recognizeTexts(List<Uint8List> imageDataList, {OCROptions? options}) async {
+  Future<BatchOCRResult> recognizeTexts(
+    List<Uint8List> imageDataList, {
+    OCROptions? options,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
@@ -59,7 +68,10 @@ class MockOCRRepository implements OCRRepository {
   }
 
   @override
-  Future<List<OCRResult>> getOCRHistory({int limit = 50, bool includeImages = false}) async {
+  Future<List<OCRResult>> getOCRHistory({
+    int limit = 50,
+    bool includeImages = false,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
@@ -67,17 +79,21 @@ class MockOCRRepository implements OCRRepository {
   }
 
   @override
-  Future<OCRResult> getOCRResultById(String resultId, {bool includeImage = false}) async {
+  Future<OCRResult> getOCRResultById(
+    String resultId, {
+    bool includeImage = false,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockOCRResult ?? OCRResult(
-      id: resultId,
-      rawText: 'Test OCR result',
-      confidence: 0.8,
-      processingTimeMs: 1000,
-      processedAt: DateTime.now(),
-    );
+    return _mockOCRResult ??
+        OCRResult(
+          id: resultId,
+          rawText: 'Test OCR result',
+          confidence: 0.8,
+          processingTimeMs: 1000,
+          processedAt: DateTime.now(),
+        );
   }
 
   @override
@@ -101,16 +117,17 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockEngines ?? [
-      const OCREngineInfo(
-        id: 'google-ml-kit',
-        name: 'Google ML Kit',
-        version: '0.15.0',
-        supportedLanguages: ['zh-Hant', 'en'],
-        isAvailable: true,
-        platform: 'cross-platform',
-      ),
-    ];
+    return _mockEngines ??
+        [
+          const OCREngineInfo(
+            id: 'google-ml-kit',
+            name: 'Google ML Kit',
+            version: '0.15.0',
+            supportedLanguages: ['zh-Hant', 'en'],
+            isAvailable: true,
+            platform: 'cross-platform',
+          ),
+        ];
   }
 
   @override
@@ -125,14 +142,15 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockCurrentEngine ?? const OCREngineInfo(
-      id: 'google-ml-kit',
-      name: 'Google ML Kit',
-      version: '0.15.0',
-      supportedLanguages: ['zh-Hant', 'en'],
-      isAvailable: true,
-      platform: 'cross-platform',
-    );
+    return _mockCurrentEngine ??
+        const OCREngineInfo(
+          id: 'google-ml-kit',
+          name: 'Google ML Kit',
+          version: '0.15.0',
+          supportedLanguages: ['zh-Hant', 'en'],
+          isAvailable: true,
+          platform: 'cross-platform',
+        );
   }
 
   @override
@@ -140,16 +158,20 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockEngineHealth ?? OCREngineHealth(
-      engineId: engineId ?? 'google-ml-kit',
-      isHealthy: true,
-      responseTimeMs: 100,
-      checkedAt: DateTime.now(),
-    );
+    return _mockEngineHealth ??
+        OCREngineHealth(
+          engineId: engineId ?? 'google-ml-kit',
+          isHealthy: true,
+          responseTimeMs: 100,
+          checkedAt: DateTime.now(),
+        );
   }
 
   @override
-  Future<Uint8List> preprocessImage(Uint8List imageData, {ImagePreprocessOptions? options}) async {
+  Future<Uint8List> preprocessImage(
+    Uint8List imageData, {
+    ImagePreprocessOptions? options,
+  }) async {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
@@ -161,14 +183,15 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockStatistics ?? OCRStatistics(
-      totalProcessed: 100,
-      averageConfidence: 0.85,
-      averageProcessingTimeMs: 1200,
-      engineUsage: {'google-ml-kit': 100},
-      languageConfidence: {'zh-Hant': 0.9, 'en': 0.8},
-      lastUpdated: DateTime.now(),
-    );
+    return _mockStatistics ??
+        OCRStatistics(
+          totalProcessed: 100,
+          averageConfidence: 0.85,
+          averageProcessingTimeMs: 1200,
+          engineUsage: {'google-ml-kit': 100},
+          languageConfidence: {'zh-Hant': 0.9, 'en': 0.8},
+          lastUpdated: DateTime.now(),
+        );
   }
 }
 
@@ -181,7 +204,7 @@ void main() {
     setUp(() {
       mockOCRRepository = MockOCRRepository();
       useCase = ProcessImageUseCase(mockOCRRepository);
-      
+
       // 建立測試圖片資料
       testImageData = Uint8List.fromList([
         0xFF, 0xD8, 0xFF, 0xE0, // JPEG header
@@ -202,9 +225,9 @@ void main() {
         mockOCRRepository.setMockOCRResult(expectedOCRResult);
 
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData),
+        );
 
         // Assert
         expect(result.ocrResult.id, 'ocr-123');
@@ -216,15 +239,12 @@ void main() {
 
       test('should apply OCR options correctly', () async {
         // Arrange
-        const ocrOptions = OCROptions(
-          preferredLanguages: ['zh-Hant', 'en'],
-        );
+        const ocrOptions = OCROptions(preferredLanguages: ['zh-Hant', 'en']);
 
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          ocrOptions: ocrOptions,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData, ocrOptions: ocrOptions),
+        );
 
         // Assert
         expect(result.ocrResult, isNotNull);
@@ -246,11 +266,13 @@ void main() {
         );
 
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          preprocessOptions: preprocessOptions,
-          enablePreprocessing: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(
+            imageData: testImageData,
+            preprocessOptions: preprocessOptions,
+            enablePreprocessing: true,
+          ),
+        );
 
         // Assert
         expect(result.processingSteps, contains('圖片預處理'));
@@ -269,10 +291,12 @@ void main() {
         mockOCRRepository.setMockOCRResult(lowConfidenceResult);
 
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          confidenceThreshold: 0.7,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(
+            imageData: testImageData,
+            confidenceThreshold: 0.7,
+          ),
+        );
 
         // Assert
         expect(result.hasWarnings, true);
@@ -282,10 +306,9 @@ void main() {
 
       test('should save OCR result when requested', () async {
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          saveResult: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData, saveResult: true),
+        );
 
         // Assert
         expect(result.processingSteps, contains('OCR 結果儲存'));
@@ -300,9 +323,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: emptyImageData,
-          )),
+          () => useCase.execute(ProcessImageParams(imageData: emptyImageData)),
           throwsA(isA<InvalidInputFailure>()),
         );
       });
@@ -314,10 +335,12 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: oversizedImageData,
-            maxImageSizeBytes: maxSizeBytes,
-          )),
+          () => useCase.execute(
+            ProcessImageParams(
+              imageData: oversizedImageData,
+              maxImageSizeBytes: maxSizeBytes,
+            ),
+          ),
           throwsA(isA<InvalidInputFailure>()),
         );
       });
@@ -331,10 +354,12 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: invalidImageData,
-            validateImageFormat: true,
-          )),
+          () => useCase.execute(
+            ProcessImageParams(
+              imageData: invalidImageData,
+              validateImageFormat: true,
+            ),
+          ),
           throwsA(isA<InvalidInputFailure>()),
         );
       });
@@ -342,21 +367,25 @@ void main() {
       test('should validate confidence threshold range', () async {
         // Arrange - 確保沒有Mock failure
         mockOCRRepository.clearMockFailure();
-        
+
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: testImageData,
-            confidenceThreshold: 1.5, // 無效範圍
-          )),
+          () => useCase.execute(
+            ProcessImageParams(
+              imageData: testImageData,
+              confidenceThreshold: 1.5, // 無效範圍
+            ),
+          ),
           throwsA(isA<InvalidInputFailure>()),
         );
 
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: testImageData,
-            confidenceThreshold: -0.1, // 無效範圍
-          )),
+          () => useCase.execute(
+            ProcessImageParams(
+              imageData: testImageData,
+              confidenceThreshold: -0.1, // 無效範圍
+            ),
+          ),
           throwsA(isA<InvalidInputFailure>()),
         );
       });
@@ -367,8 +396,20 @@ void main() {
         // Arrange
         final imageDataList = [
           testImageData,
-          Uint8List.fromList([0xFF, 0xD8, 0xFF, 0xE0, ...List.filled(500, 0x01)]),
-          Uint8List.fromList([0xFF, 0xD8, 0xFF, 0xE0, ...List.filled(300, 0x02)]),
+          Uint8List.fromList([
+            0xFF,
+            0xD8,
+            0xFF,
+            0xE0,
+            ...List.filled(500, 0x01),
+          ]),
+          Uint8List.fromList([
+            0xFF,
+            0xD8,
+            0xFF,
+            0xE0,
+            ...List.filled(300, 0x02),
+          ]),
         ];
 
         final mockBatchResult = BatchOCRResult(
@@ -400,9 +441,9 @@ void main() {
         mockOCRRepository.setMockBatchResult(mockBatchResult);
 
         // Act
-        final results = await useCase.executeBatch(ProcessImageBatchParams(
-          imageDataList: imageDataList,
-        ));
+        final results = await useCase.executeBatch(
+          ProcessImageBatchParams(imageDataList: imageDataList),
+        );
 
         // Assert
         expect(results.successful.length, 3);
@@ -447,9 +488,9 @@ void main() {
         mockOCRRepository.setMockBatchResult(mockBatchResult);
 
         // Act
-        final results = await useCase.executeBatch(ProcessImageBatchParams(
-          imageDataList: imageDataList,
-        ));
+        final results = await useCase.executeBatch(
+          ProcessImageBatchParams(imageDataList: imageDataList),
+        );
 
         // Assert
         expect(results.successful.length, 2);
@@ -459,27 +500,37 @@ void main() {
 
       test('should support concurrent batch processing', () async {
         // Arrange
-        final imageDataList = List.generate(5, (index) => 
-          Uint8List.fromList([0xFF, 0xD8, 0xFF, 0xE0, ...List.filled(100, index)]),
+        final imageDataList = List.generate(
+          5,
+          (index) => Uint8List.fromList([
+            0xFF,
+            0xD8,
+            0xFF,
+            0xE0,
+            ...List.filled(100, index),
+          ]),
         );
 
         // 設定 Mock 批次結果
         final mockBatchResult = BatchOCRResult(
-          successful: List.generate(5, (index) => OCRResult(
-            id: 'concurrent-$index',
-            rawText: '併發處理結果 $index',
-            confidence: 0.85,
-            processingTimeMs: 1000,
-            processedAt: DateTime.now(),
-          )),
+          successful: List.generate(
+            5,
+            (index) => OCRResult(
+              id: 'concurrent-$index',
+              rawText: '併發處理結果 $index',
+              confidence: 0.85,
+              processingTimeMs: 1000,
+              processedAt: DateTime.now(),
+            ),
+          ),
           failed: [],
         );
         mockOCRRepository.setMockBatchResult(mockBatchResult);
 
         // Act
-        final results = await useCase.executeBatch(ProcessImageBatchParams(
-          imageDataList: imageDataList,
-        ));
+        final results = await useCase.executeBatch(
+          ProcessImageBatchParams(imageDataList: imageDataList),
+        );
 
         // Assert
         expect(results.successful.length + results.failed.length, 5);
@@ -573,15 +624,8 @@ void main() {
           totalProcessed: 1000,
           averageConfidence: 0.87,
           averageProcessingTimeMs: 1150.5,
-          engineUsage: {
-            'google-ml-kit': 800,
-            'ios-vision': 200,
-          },
-          languageConfidence: {
-            'zh-Hant': 0.9,
-            'en': 0.85,
-            'ja': 0.8,
-          },
+          engineUsage: {'google-ml-kit': 800, 'ios-vision': 200},
+          languageConfidence: {'zh-Hant': 0.9, 'en': 0.85, 'ja': 0.8},
           lastUpdated: DateTime.now(),
         );
         mockOCRRepository.setMockStatistics(mockStats);
@@ -598,17 +642,19 @@ void main() {
 
       test('should track processing metrics when enabled', () async {
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          trackMetrics: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData, trackMetrics: true),
+        );
 
         // Assert
         expect(result.metrics, isNotNull);
         expect(result.metrics!.totalProcessingTimeMs, greaterThanOrEqualTo(0));
         expect(result.metrics!.preprocessingTimeMs, greaterThanOrEqualTo(0));
         expect(result.metrics!.ocrProcessingTimeMs, greaterThanOrEqualTo(0));
-        expect(result.metrics!.startTime.isBefore(result.metrics!.endTime), true);
+        expect(
+          result.metrics!.startTime.isBefore(result.metrics!.endTime),
+          true,
+        );
       });
 
       test('should cleanup old OCR results', () async {
@@ -632,9 +678,7 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: testImageData,
-          )),
+          () => useCase.execute(ProcessImageParams(imageData: testImageData)),
           throwsA(isA<DataSourceFailure>()),
         );
       });
@@ -650,10 +694,12 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: testImageData,
-            timeout: const Duration(seconds: 1),
-          )),
+          () => useCase.execute(
+            ProcessImageParams(
+              imageData: testImageData,
+              timeout: const Duration(seconds: 1),
+            ),
+          ),
           throwsA(isA<DataSourceFailure>()),
         );
       });
@@ -670,10 +716,9 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: testImageData,
-            saveResult: true,
-          )),
+          () => useCase.execute(
+            ProcessImageParams(imageData: testImageData, saveResult: true),
+          ),
           throwsA(isA<StorageSpaceFailure>()),
         );
       });
@@ -694,9 +739,9 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(ProcessImageParams(
-            imageData: corruptedImageData,
-          )),
+          () => useCase.execute(
+            ProcessImageParams(imageData: corruptedImageData),
+          ),
           throwsA(isA<DataSourceFailure>()),
         );
       });
@@ -705,10 +750,9 @@ void main() {
     group('進階功能', () {
       test('should support dry run mode without saving', () async {
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          dryRun: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData, dryRun: true),
+        );
 
         // Assert
         expect(result.processingSteps, contains('乾執行模式'));
@@ -718,10 +762,9 @@ void main() {
 
       test('should auto-select best OCR engine', () async {
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          autoSelectEngine: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData, autoSelectEngine: true),
+        );
 
         // Assert
         expect(result.processingSteps, contains('自動選擇引擎'));
@@ -740,29 +783,36 @@ void main() {
         mockOCRRepository.setMockOCRResult(lowQualityResult);
 
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          validateQuality: true,
-          minTextLength: 10, // rawText 只有6個字符，會觸發品質警告
-          confidenceThreshold: 0.7, // 明確設定閾值
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(
+            imageData: testImageData,
+            validateQuality: true,
+            minTextLength: 10, // rawText 只有6個字符，會觸發品質警告
+            confidenceThreshold: 0.7, // 明確設定閾值
+          ),
+        );
 
         // Assert
         expect(result.hasWarnings, true);
-        expect(result.warnings.any((warning) => warning.contains('文字品質')), true);
+        expect(
+          result.warnings.any((warning) => warning.contains('文字品質')),
+          true,
+        );
       });
 
       test('should optimize image before processing', () async {
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          optimizeImage: true,
-          preprocessOptions: const ImagePreprocessOptions(
-            contrast: 15,
-            brightness: 5,
-            sharpen: true,
+        final result = await useCase.execute(
+          ProcessImageParams(
+            imageData: testImageData,
+            optimizeImage: true,
+            preprocessOptions: const ImagePreprocessOptions(
+              contrast: 15,
+              brightness: 5,
+              sharpen: true,
+            ),
           ),
-        ));
+        );
 
         // Assert
         expect(result.processingSteps, contains('圖片最佳化'));
@@ -774,10 +824,9 @@ void main() {
       test('should handle concurrent processing efficiently', () async {
         // Arrange
         final futures = List.generate(3, (index) {
-          return useCase.execute(ProcessImageParams(
-            imageData: testImageData,
-            trackMetrics: true,
-          ));
+          return useCase.execute(
+            ProcessImageParams(imageData: testImageData, trackMetrics: true),
+          );
         });
 
         // Act
@@ -793,10 +842,9 @@ void main() {
 
       test('should cleanup resources properly', () async {
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          autoCleanup: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData, autoCleanup: true),
+        );
 
         // Assert
         expect(result.processingSteps, contains('資源清理'));
@@ -807,11 +855,13 @@ void main() {
         final largeImageData = Uint8List(5 * 1024 * 1024); // 5MB
 
         // Act
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: largeImageData,
-          maxMemoryUsageMB: 10,
-          trackMetrics: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(
+            imageData: largeImageData,
+            maxMemoryUsageMB: 10,
+            trackMetrics: true,
+          ),
+        );
 
         // Assert
         expect(result.metrics, isNotNull);
@@ -821,10 +871,9 @@ void main() {
       test('should validate processing within reasonable time', () async {
         // Act
         final startTime = DateTime.now();
-        final result = await useCase.execute(ProcessImageParams(
-          imageData: testImageData,
-          trackMetrics: true,
-        ));
+        final result = await useCase.execute(
+          ProcessImageParams(imageData: testImageData, trackMetrics: true),
+        );
         final duration = DateTime.now().difference(startTime);
 
         // Assert

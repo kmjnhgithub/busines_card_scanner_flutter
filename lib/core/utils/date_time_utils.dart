@@ -1,7 +1,7 @@
 import 'package:intl/intl.dart';
 
 /// 日期時間處理工具類
-/// 
+///
 /// 提供常用的日期時間操作功能，包括：
 /// - 格式化顯示
 /// - 相對時間計算
@@ -27,12 +27,18 @@ class DateTimeUtils {
   }
 
   /// 格式化時間為顯示字串
-  static String formatTime(DateTime dateTime, {String format = displayTimeFormat}) {
+  static String formatTime(
+    DateTime dateTime, {
+    String format = displayTimeFormat,
+  }) {
     return DateFormat(format, 'zh_TW').format(dateTime);
   }
 
   /// 格式化日期時間為顯示字串
-  static String formatDateTime(DateTime dateTime, {String format = displayDateTimeFormat}) {
+  static String formatDateTime(
+    DateTime dateTime, {
+    String format = displayDateTimeFormat,
+  }) {
     return DateFormat(format, 'zh_TW').format(dateTime);
   }
 
@@ -51,7 +57,10 @@ class DateTimeUtils {
   }
 
   /// 安全地解析日期字串
-  static DateTime? parseDate(String dateString, {String format = defaultDateFormat}) {
+  static DateTime? parseDate(
+    String dateString, {
+    String format = defaultDateFormat,
+  }) {
     try {
       return DateFormat(format).parse(dateString);
     } on FormatException {
@@ -107,7 +116,7 @@ class DateTimeUtils {
     if (difference.inDays < 365) {
       return '${(difference.inDays / 30).floor()}個月前';
     }
-    
+
     final years = (difference.inDays / 365).floor();
     return years == 1 ? '1年前' : '$years年前';
   }
@@ -115,20 +124,26 @@ class DateTimeUtils {
   /// 檢查是否為今天
   static bool isToday(DateTime date) {
     final now = DateTime.now();
-    return date.year == now.year && date.month == now.month && date.day == now.day;
+    return date.year == now.year &&
+        date.month == now.month &&
+        date.day == now.day;
   }
 
   /// 檢查是否為昨天
   static bool isYesterday(DateTime date) {
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    return date.year == yesterday.year && date.month == yesterday.month && date.day == yesterday.day;
+    return date.year == yesterday.year &&
+        date.month == yesterday.month &&
+        date.day == yesterday.day;
   }
 
   /// 檢查是否為本週
   static bool isThisWeek(DateTime date) {
     final now = DateTime.now();
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    final endOfWeek = startOfWeek.add(const Duration(days: 6, hours: 23, minutes: 59, seconds: 59));
+    final endOfWeek = startOfWeek.add(
+      const Duration(days: 6, hours: 23, minutes: 59, seconds: 59),
+    );
     return date.isAfter(startOfWeek) && date.isBefore(endOfWeek);
   }
 
@@ -149,7 +164,7 @@ class DateTimeUtils {
     if (isSameDay(start, end)) {
       return formatDate(start);
     }
-    
+
     if (start.year == end.year) {
       if (start.month == end.month) {
         return '${start.year}年${start.month}月${start.day}日 - ${end.day}日';
@@ -163,9 +178,9 @@ class DateTimeUtils {
 
   /// 檢查兩個日期是否為同一天
   static bool isSameDay(DateTime date1, DateTime date2) {
-    return date1.year == date2.year && 
-           date1.month == date2.month && 
-           date1.day == date2.day;
+    return date1.year == date2.year &&
+        date1.month == date2.month &&
+        date1.day == date2.day;
   }
 
   /// 獲取一天的開始時間 (00:00:00)
@@ -207,18 +222,18 @@ class DateTimeUtils {
     if (end.isBefore(start)) {
       return 0;
     }
-    
+
     int workingDays = 0;
     DateTime current = startOfDay(start);
     final endDate = startOfDay(end);
-    
+
     while (!current.isAfter(endDate)) {
       if (current.weekday >= 1 && current.weekday <= 5) {
         workingDays++;
       }
       current = current.add(const Duration(days: 1));
     }
-    
+
     return workingDays;
   }
 
@@ -246,12 +261,13 @@ class DateTimeUtils {
   static int calculateAge(DateTime birthDate, {DateTime? asOf}) {
     final referenceDate = asOf ?? DateTime.now();
     int age = referenceDate.year - birthDate.year;
-    
+
     if (referenceDate.month < birthDate.month ||
-        (referenceDate.month == birthDate.month && referenceDate.day < birthDate.day)) {
+        (referenceDate.month == birthDate.month &&
+            referenceDate.day < birthDate.day)) {
       age--;
     }
-    
+
     return age;
   }
 

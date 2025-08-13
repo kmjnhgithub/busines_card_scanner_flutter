@@ -28,7 +28,11 @@ void main() {
 
         for (final email in validEmails) {
           final result = validationService.validateEmail(email);
-          expect(result.isRight(), true, reason: 'Email: $email should be valid');
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Email: $email should be valid',
+          );
         }
       });
 
@@ -50,14 +54,19 @@ void main() {
 
         for (final email in invalidEmails) {
           final result = validationService.validateEmail(email);
-          expect(result.isLeft(), true, reason: 'Email: $email should be invalid');
-          
+          expect(
+            result.isLeft(),
+            true,
+            reason: 'Email: $email should be invalid',
+          );
+
           result.fold(
             (failure) {
               expect(failure, isA<ValidationFailure>());
               expect(failure.field, 'email');
             },
-            (success) => fail('Should return failure for invalid email: $email'),
+            (success) =>
+                fail('Should return failure for invalid email: $email'),
           );
         }
       });
@@ -65,14 +74,11 @@ void main() {
       test('should handle null and empty email gracefully', () {
         final result = validationService.validateEmail('');
         expect(result.isLeft(), true);
-        
-        result.fold(
-          (failure) {
-            expect(failure, isA<ValidationFailure>());
-            expect(failure.userMessage, contains('請輸入有效的電子信箱'));
-          },
-          (success) => fail('Should return failure for empty email'),
-        );
+
+        result.fold((failure) {
+          expect(failure, isA<ValidationFailure>());
+          expect(failure.userMessage, contains('請輸入有效的電子信箱'));
+        }, (success) => fail('Should return failure for empty email'));
       });
 
       test('should handle extremely long email addresses', () {
@@ -85,21 +91,25 @@ void main() {
     group('Phone Number Validation', () {
       test('should return success for valid Taiwan phone numbers', () {
         final validPhones = [
-          '0912345678',      // Mobile format
-          '09-1234-5678',    // Mobile with dashes
-          '(09) 1234-5678',  // Mobile with parentheses
-          '02-12345678',     // Taipei landline
-          '(02) 1234-5678',  // Landline with parentheses
-          '04-12345678',     // Taichung landline
-          '07-1234567',      // Kaohsiung landline (7 digits)
+          '0912345678', // Mobile format
+          '09-1234-5678', // Mobile with dashes
+          '(09) 1234-5678', // Mobile with parentheses
+          '02-12345678', // Taipei landline
+          '(02) 1234-5678', // Landline with parentheses
+          '04-12345678', // Taichung landline
+          '07-1234567', // Kaohsiung landline (7 digits)
           '+886-9-1234-5678', // International format
           '+886 912 345 678', // International with spaces
-          '886912345678',    // International without +
+          '886912345678', // International without +
         ];
 
         for (final phone in validPhones) {
           final result = validationService.validatePhoneNumber(phone);
-          expect(result.isRight(), true, reason: 'Phone: $phone should be valid');
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Phone: $phone should be valid',
+          );
         }
       });
 
@@ -108,24 +118,29 @@ void main() {
           '',
           '123',
           'abcd1234',
-          '091234567',      // Too short mobile
-          '0912345678901',  // Too long
-          '00123456789',    // Invalid prefix
+          '091234567', // Too short mobile
+          '0912345678901', // Too long
+          '00123456789', // Invalid prefix
           '+1-555-123-4567', // US format (not Taiwan)
-          '02-123456',      // Too short landline
-          '123-456-7890',   // Invalid format
+          '02-123456', // Too short landline
+          '123-456-7890', // Invalid format
         ];
 
         for (final phone in invalidPhones) {
           final result = validationService.validatePhoneNumber(phone);
-          expect(result.isLeft(), true, reason: 'Phone: $phone should be invalid');
-          
+          expect(
+            result.isLeft(),
+            true,
+            reason: 'Phone: $phone should be invalid',
+          );
+
           result.fold(
             (failure) {
               expect(failure, isA<ValidationFailure>());
               expect(failure.field, 'phone');
             },
-            (success) => fail('Should return failure for invalid phone: $phone'),
+            (success) =>
+                fail('Should return failure for invalid phone: $phone'),
           );
         }
       });
@@ -156,9 +171,9 @@ void main() {
         final invalidUrls = [
           '',
           'not-a-url',
-          'example.com',     // Missing protocol
-          'http://',         // Incomplete URL
-          'https://.com',    // Invalid domain
+          'example.com', // Missing protocol
+          'http://', // Incomplete URL
+          'https://.com', // Invalid domain
           'http://exam ple.com', // Spaces
           'javascript:alert(1)', // Dangerous protocol
           'file:///etc/passwd', // Local file access
@@ -174,14 +189,14 @@ void main() {
     group('Name Validation', () {
       test('should return success for valid names', () {
         final validNames = [
-          '王小明',           // Chinese name
-          'John Doe',        // English name
-          'María García',    // Name with accents
-          'O\'Connor',       // Name with apostrophe
-          'Jean-Pierre',     // Hyphenated name
-          '李 大華',          // Name with space
-          'A',               // Single character
-          '王-小明',          // Chinese with hyphen
+          '王小明', // Chinese name
+          'John Doe', // English name
+          'María García', // Name with accents
+          'O\'Connor', // Name with apostrophe
+          'Jean-Pierre', // Hyphenated name
+          '李 大華', // Name with space
+          'A', // Single character
+          '王-小明', // Chinese with hyphen
         ];
 
         for (final name in validNames) {
@@ -192,19 +207,23 @@ void main() {
 
       test('should return ValidationFailure for invalid names', () {
         final invalidNames = [
-          '',                    // Empty
-          '123',                 // Only numbers
-          'John123',             // Numbers in name
-          'John@Doe',           // Special characters
-          'Name!',              // Exclamation mark
-          '  John  ',           // Leading/trailing spaces
-          'A' * 101,            // Too long (>100 characters)
-          'John\nDoe',          // Newline characters
+          '', // Empty
+          '123', // Only numbers
+          'John123', // Numbers in name
+          'John@Doe', // Special characters
+          'Name!', // Exclamation mark
+          '  John  ', // Leading/trailing spaces
+          'A' * 101, // Too long (>100 characters)
+          'John\nDoe', // Newline characters
         ];
 
         for (final name in invalidNames) {
           final result = validationService.validateName(name);
-          expect(result.isLeft(), true, reason: 'Name: $name should be invalid');
+          expect(
+            result.isLeft(),
+            true,
+            reason: 'Name: $name should be invalid',
+          );
         }
       });
     });
@@ -225,23 +244,31 @@ void main() {
 
         for (final company in validCompanyNames) {
           final result = validationService.validateCompanyName(company);
-          expect(result.isRight(), true, reason: 'Company: $company should be valid');
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Company: $company should be valid',
+          );
         }
       });
 
       test('should return ValidationFailure for invalid company names', () {
         final invalidCompanyNames = [
-          '',                    // Empty
-          'A',                   // Too short
-          'A' * 201,            // Too long (>200 characters)
-          'Company!!!',         // Multiple special characters
-          '123456',             // Only numbers
-          'Company\nName',      // Newline characters
+          '', // Empty
+          'A', // Too short
+          'A' * 201, // Too long (>200 characters)
+          'Company!!!', // Multiple special characters
+          '123456', // Only numbers
+          'Company\nName', // Newline characters
         ];
 
         for (final company in invalidCompanyNames) {
           final result = validationService.validateCompanyName(company);
-          expect(result.isLeft(), true, reason: 'Company: $company should be invalid');
+          expect(
+            result.isLeft(),
+            true,
+            reason: 'Company: $company should be invalid',
+          );
         }
       });
     });
@@ -249,17 +276,29 @@ void main() {
     group('Text Length Validation', () {
       test('should validate minimum length correctly', () {
         const minLength = 5;
-        final validTexts = ['12345', 'hello world', 'test string longer than minimum'];
+        final validTexts = [
+          '12345',
+          'hello world',
+          'test string longer than minimum',
+        ];
         final invalidTexts = ['', '1', '1234'];
 
         for (final text in validTexts) {
           final result = validationService.validateMinLength(text, minLength);
-          expect(result.isRight(), true, reason: 'Text: "$text" should meet minimum length');
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Text: "$text" should meet minimum length',
+          );
         }
 
         for (final text in invalidTexts) {
           final result = validationService.validateMinLength(text, minLength);
-          expect(result.isLeft(), true, reason: 'Text: "$text" should fail minimum length');
+          expect(
+            result.isLeft(),
+            true,
+            reason: 'Text: "$text" should fail minimum length',
+          );
         }
       });
 
@@ -270,12 +309,20 @@ void main() {
 
         for (final text in validTexts) {
           final result = validationService.validateMaxLength(text, maxLength);
-          expect(result.isRight(), true, reason: 'Text: "$text" should meet maximum length');
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Text: "$text" should meet maximum length',
+          );
         }
 
         for (final text in invalidTexts) {
           final result = validationService.validateMaxLength(text, maxLength);
-          expect(result.isLeft(), true, reason: 'Text: "$text" should fail maximum length');
+          expect(
+            result.isLeft(),
+            true,
+            reason: 'Text: "$text" should fail maximum length',
+          );
         }
       });
 
@@ -286,13 +333,29 @@ void main() {
         final invalidTexts = ['', '1234', '1234567890123456'];
 
         for (final text in validTexts) {
-          final result = validationService.validateLengthRange(text, minLength, maxLength);
-          expect(result.isRight(), true, reason: 'Text: "$text" should be in valid range');
+          final result = validationService.validateLengthRange(
+            text,
+            minLength,
+            maxLength,
+          );
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Text: "$text" should be in valid range',
+          );
         }
 
         for (final text in invalidTexts) {
-          final result = validationService.validateLengthRange(text, minLength, maxLength);
-          expect(result.isLeft(), true, reason: 'Text: "$text" should fail length range');
+          final result = validationService.validateLengthRange(
+            text,
+            minLength,
+            maxLength,
+          );
+          expect(
+            result.isLeft(),
+            true,
+            reason: 'Text: "$text" should fail length range',
+          );
         }
       });
     });
@@ -303,26 +366,41 @@ void main() {
 
         for (final input in validInputs) {
           final result = validationService.validateRequired(input, 'testField');
-          expect(result.isRight(), true, reason: 'Input: "$input" should be valid');
-        }
-      });
-
-      test('should return ValidationFailure for empty or whitespace strings', () {
-        final invalidInputs = ['', '   ', '\t', '\n', '  \t\n  '];
-
-        for (final input in invalidInputs) {
-          final result = validationService.validateRequired(input, 'testField');
-          expect(result.isLeft(), true, reason: 'Input: "$input" should be invalid');
-          
-          result.fold(
-            (failure) {
-              expect(failure, isA<ValidationFailure>());
-              expect(failure.field, 'testField');
-            },
-            (success) => fail('Should return failure for empty input: "$input"'),
+          expect(
+            result.isRight(),
+            true,
+            reason: 'Input: "$input" should be valid',
           );
         }
       });
+
+      test(
+        'should return ValidationFailure for empty or whitespace strings',
+        () {
+          final invalidInputs = ['', '   ', '\t', '\n', '  \t\n  '];
+
+          for (final input in invalidInputs) {
+            final result = validationService.validateRequired(
+              input,
+              'testField',
+            );
+            expect(
+              result.isLeft(),
+              true,
+              reason: 'Input: "$input" should be invalid',
+            );
+
+            result.fold(
+              (failure) {
+                expect(failure, isA<ValidationFailure>());
+                expect(failure.field, 'testField');
+              },
+              (success) =>
+                  fail('Should return failure for empty input: "$input"'),
+            );
+          }
+        },
+      );
     });
 
     group('Multiple Validation', () {
@@ -330,7 +408,11 @@ void main() {
         // Test valid email that also meets length requirements
         const email = 'test@example.com';
         final emailResult = validationService.validateEmail(email);
-        final lengthResult = validationService.validateLengthRange(email, 5, 50);
+        final lengthResult = validationService.validateLengthRange(
+          email,
+          5,
+          50,
+        );
 
         expect(emailResult.isRight(), true);
         expect(lengthResult.isRight(), true);
@@ -340,7 +422,11 @@ void main() {
         // Test invalid email that meets length requirements
         const invalidEmail = 'not-an-email-but-correct-length';
         final emailResult = validationService.validateEmail(invalidEmail);
-        final lengthResult = validationService.validateLengthRange(invalidEmail, 5, 50);
+        final lengthResult = validationService.validateLengthRange(
+          invalidEmail,
+          5,
+          50,
+        );
 
         expect(emailResult.isLeft(), true);
         expect(lengthResult.isRight(), true);
@@ -351,21 +437,24 @@ void main() {
       test('should handle very long strings without performance issues', () {
         final longString = 'a' * 10000;
         final stopwatch = Stopwatch()..start();
-        
+
         validationService.validateMaxLength(longString, 5000);
-        
+
         stopwatch.stop();
-        expect(stopwatch.elapsedMilliseconds, lessThan(100), 
-               reason: 'Validation should complete within 100ms');
+        expect(
+          stopwatch.elapsedMilliseconds,
+          lessThan(100),
+          reason: 'Validation should complete within 100ms',
+        );
       });
 
       test('should handle special Unicode characters', () {
         final unicodeInputs = [
-          '👨‍💼 Business',    // Emoji
-          'Café',             // Accented characters
-          'مرحبا',             // Arabic
-          '你好',              // Chinese
-          'Здравствуйте',     // Cyrillic
+          '👨‍💼 Business', // Emoji
+          'Café', // Accented characters
+          'مرحبا', // Arabic
+          '你好', // Chinese
+          'Здравствуйте', // Cyrillic
         ];
 
         for (final input in unicodeInputs) {

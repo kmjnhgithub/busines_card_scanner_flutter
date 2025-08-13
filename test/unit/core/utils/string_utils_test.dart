@@ -22,11 +22,14 @@ void main() {
     });
 
     group('removeControlCharacters', () {
-      test('should remove control characters but preserve newlines and tabs', () {
-        const input = 'hello\x00\x01world\n\ttest\x1F';
-        const expected = 'helloworld\n\ttest';
-        expect(StringUtils.removeControlCharacters(input), expected);
-      });
+      test(
+        'should remove control characters but preserve newlines and tabs',
+        () {
+          const input = 'hello\x00\x01world\n\ttest\x1F';
+          const expected = 'helloworld\n\ttest';
+          expect(StringUtils.removeControlCharacters(input), expected);
+        },
+      );
 
       test('should handle empty string', () {
         expect(StringUtils.removeControlCharacters(''), '');
@@ -96,7 +99,10 @@ void main() {
       test('should truncate long strings', () {
         expect(StringUtils.truncate('hello world', 8), 'hello...');
         expect(StringUtils.truncate('test', 10), 'test');
-        expect(StringUtils.truncate('hello world', 8, suffix: '---'), 'hello---');
+        expect(
+          StringUtils.truncate('hello world', 8, suffix: '---'),
+          'hello---',
+        );
       });
 
       test('should handle edge cases', () {
@@ -119,7 +125,10 @@ void main() {
       });
 
       test('should format international numbers', () {
-        expect(StringUtils.formatPhoneNumber('886912345678'), '+886 9 1234-5678');
+        expect(
+          StringUtils.formatPhoneNumber('886912345678'),
+          '+886 9 1234-5678',
+        );
       });
 
       test('should return original for unrecognized formats', () {
@@ -136,7 +145,10 @@ void main() {
       });
 
       test('should handle custom visible chars', () {
-        expect(StringUtils.maskSensitiveInfo('1234567890', visibleChars: 2), '********90');
+        expect(
+          StringUtils.maskSensitiveInfo('1234567890', visibleChars: 2),
+          '********90',
+        );
       });
     });
 
@@ -242,11 +254,11 @@ void main() {
       test('should handle large strings efficiently', () {
         final largeString = 'test ' * 10000;
         final stopwatch = Stopwatch()..start();
-        
+
         StringUtils.cleanWhitespace(largeString);
         StringUtils.truncate(largeString, 100);
         StringUtils.isNullOrWhitespace(largeString);
-        
+
         stopwatch.stop();
         expect(stopwatch.elapsedMilliseconds, lessThan(100));
       });

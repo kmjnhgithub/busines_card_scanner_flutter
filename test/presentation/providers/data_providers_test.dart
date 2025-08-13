@@ -10,8 +10,11 @@ import 'package:mocktail/mocktail.dart';
 
 // Mock classes
 class MockCleanAppDatabase extends Mock implements CleanAppDatabase {}
+
 class MockEnhancedSecureStorage extends Mock implements EnhancedSecureStorage {}
+
 class MockOpenAIService extends Mock implements OpenAIService {}
+
 void main() {
   group('Data Providers', () {
     late ProviderContainer container;
@@ -89,21 +92,27 @@ void main() {
     });
 
     group('Repository Providers', () {
-      test('cardRepositoryProvider should create CardRepositoryImpl with correct dependencies', () {
-        // Act
-        final repository = container.read(cardRepositoryProvider);
+      test(
+        'cardRepositoryProvider should create CardRepositoryImpl with correct dependencies',
+        () {
+          // Act
+          final repository = container.read(cardRepositoryProvider);
 
-        // Assert
-        expect(repository, isA<CardRepositoryImpl>());
-      });
+          // Assert
+          expect(repository, isA<CardRepositoryImpl>());
+        },
+      );
 
-      test('ocrRepositoryProvider should create OCRRepositoryImpl with correct dependencies', () {
-        // Act
-        final repository = container.read(ocrRepositoryProvider);
+      test(
+        'ocrRepositoryProvider should create OCRRepositoryImpl with correct dependencies',
+        () {
+          // Act
+          final repository = container.read(ocrRepositoryProvider);
 
-        // Assert
-        expect(repository, isA<OCRRepositoryImpl>());
-      });
+          // Assert
+          expect(repository, isA<OCRRepositoryImpl>());
+        },
+      );
 
       test('repository providers should be singletons', () {
         // Act
@@ -125,7 +134,7 @@ void main() {
 
         // Assert - 驗證 repository 有正確的依賴
         expect(repository, isA<CardRepositoryImpl>());
-        
+
         // 透過執行基本操作驗證依賴注入正確
         expect(repository.toString, returnsNormally);
       });
@@ -134,7 +143,7 @@ void main() {
         // Act - 讀取 providers 以建立依賴
         container.read(appDatabaseProvider);
         container.read(enhancedSecureStorageProvider);
-        
+
         // Assert - 驗證 dispose 不會拋出異常
         expect(() => container.dispose(), returnsNormally);
       });
@@ -145,9 +154,7 @@ void main() {
         // Arrange
         final customDatabase = MockCleanAppDatabase();
         final customContainer = ProviderContainer(
-          overrides: [
-            appDatabaseProvider.overrideWithValue(customDatabase),
-          ],
+          overrides: [appDatabaseProvider.overrideWithValue(customDatabase)],
         );
 
         // Act

@@ -201,4 +201,3 @@ class PermissionFailure extends Failure {
     return 'PermissionFailure(permission: $permission)';
   }
 }
-

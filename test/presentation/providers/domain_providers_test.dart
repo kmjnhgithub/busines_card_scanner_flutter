@@ -6,7 +6,8 @@ import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_ma
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
-import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart' as data;
+import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart'
+    as data;
 import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,7 +15,9 @@ import 'package:mocktail/mocktail.dart';
 
 // Mock classes
 class MockCardRepository extends Mock implements CardRepository {}
+
 class MockOCRRepository extends Mock implements OCRRepository {}
+
 void main() {
   group('Domain Providers', () {
     late ProviderContainer container;
@@ -46,29 +49,38 @@ void main() {
         expect(useCase, isA<GetCardsUseCase>());
       });
 
-      test('createCardFromImageUseCaseProvider should create CreateCardFromImageUseCase', () {
-        // Act
-        final useCase = container.read(createCardFromImageUseCaseProvider);
+      test(
+        'createCardFromImageUseCaseProvider should create CreateCardFromImageUseCase',
+        () {
+          // Act
+          final useCase = container.read(createCardFromImageUseCaseProvider);
 
-        // Assert
-        expect(useCase, isA<CreateCardFromImageUseCase>());
-      });
+          // Assert
+          expect(useCase, isA<CreateCardFromImageUseCase>());
+        },
+      );
 
-      test('createCardFromOCRUseCaseProvider should create CreateCardFromOCRUseCase', () {
-        // Act
-        final useCase = container.read(createCardFromOCRUseCaseProvider);
+      test(
+        'createCardFromOCRUseCaseProvider should create CreateCardFromOCRUseCase',
+        () {
+          // Act
+          final useCase = container.read(createCardFromOCRUseCaseProvider);
 
-        // Assert
-        expect(useCase, isA<CreateCardFromOCRUseCase>());
-      });
+          // Assert
+          expect(useCase, isA<CreateCardFromOCRUseCase>());
+        },
+      );
 
-      test('createCardManuallyUseCaseProvider should create CreateCardManuallyUseCase', () {
-        // Act
-        final useCase = container.read(createCardManuallyUseCaseProvider);
+      test(
+        'createCardManuallyUseCaseProvider should create CreateCardManuallyUseCase',
+        () {
+          // Act
+          final useCase = container.read(createCardManuallyUseCaseProvider);
 
-        // Assert
-        expect(useCase, isA<CreateCardManuallyUseCase>());
-      });
+          // Assert
+          expect(useCase, isA<CreateCardManuallyUseCase>());
+        },
+      );
 
       test('deleteCardUseCaseProvider should create DeleteCardUseCase', () {
         // Act
@@ -154,7 +166,9 @@ void main() {
     group('Provider Composition', () {
       test('should compose providers correctly for complex UseCases', () {
         // Act
-        final createFromImageUseCase = container.read(createCardFromImageUseCaseProvider);
+        final createFromImageUseCase = container.read(
+          createCardFromImageUseCaseProvider,
+        );
         final processImageUseCase = container.read(processImageUseCaseProvider);
 
         // Assert - 驗證複合依賴的 UseCase 正確創建

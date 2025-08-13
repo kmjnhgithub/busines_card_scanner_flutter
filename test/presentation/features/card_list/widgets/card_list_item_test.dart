@@ -79,11 +79,11 @@ void main() {
 
         // 應該只顯示姓名
         expect(find.text('李四'), findsOneWidget);
-        
+
         // 不應該顯示空的職稱和公司
         expect(find.text('軟體工程師'), findsNothing);
         expect(find.text('科技公司'), findsNothing);
-        
+
         // 不應該顯示聯絡資訊指示器
         expect(find.byIcon(Icons.email), findsNothing);
         expect(find.byIcon(Icons.phone), findsNothing);
@@ -93,10 +93,9 @@ void main() {
     group('互動行為', () {
       testWidgets('點擊應該觸發 onTap 回調', (tester) async {
         bool tapped = false;
-        await tester.pumpWidget(createTestWidget(
-          card: testCard,
-          onTap: () => tapped = true,
-        ));
+        await tester.pumpWidget(
+          createTestWidget(card: testCard, onTap: () => tapped = true),
+        );
 
         await tester.tap(find.byType(CardListItem));
         expect(tapped, isTrue);
@@ -104,10 +103,12 @@ void main() {
 
       testWidgets('長按應該觸發 onLongPress 回調', (tester) async {
         bool longPressed = false;
-        await tester.pumpWidget(createTestWidget(
-          card: testCard,
-          onLongPress: () => longPressed = true,
-        ));
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            onLongPress: () => longPressed = true,
+          ),
+        );
 
         await tester.longPress(find.byType(CardListItem));
         expect(longPressed, isTrue);
@@ -115,10 +116,12 @@ void main() {
 
       testWidgets('點擊更多按鈕應該觸發 onMoreActions 回調', (tester) async {
         bool moreActionsPressed = false;
-        await tester.pumpWidget(createTestWidget(
-          card: testCard,
-          onMoreActions: () => moreActionsPressed = true,
-        ));
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            onMoreActions: () => moreActionsPressed = true,
+          ),
+        );
 
         await tester.tap(find.byIcon(Icons.more_vert));
         expect(moreActionsPressed, isTrue);
@@ -127,31 +130,30 @@ void main() {
 
     group('顯示選項', () {
       testWidgets('showMoreButton = false 時不應該顯示更多按鈕', (tester) async {
-        await tester.pumpWidget(createTestWidget(
-          card: testCard,
-          showMoreButton: false,
-        ));
+        await tester.pumpWidget(
+          createTestWidget(card: testCard, showMoreButton: false),
+        );
 
         expect(find.byIcon(Icons.more_vert), findsNothing);
       });
 
       testWidgets('onMoreActions = null 時不應該顯示更多按鈕', (tester) async {
-        await tester.pumpWidget(createTestWidget(
-          card: testCard,
-          onMoreActions: null,
-        ));
+        await tester.pumpWidget(
+          createTestWidget(card: testCard, onMoreActions: null),
+        );
 
         expect(find.byIcon(Icons.more_vert), findsNothing);
       });
 
       testWidgets('isSelected = true 時應該顯示選中狀態', (tester) async {
-        await tester.pumpWidget(createTestWidget(
-          card: testCard,
-          isSelected: true,
-        ));
+        await tester.pumpWidget(
+          createTestWidget(card: testCard, isSelected: true),
+        );
 
         // 驗證選中狀態的視覺效果
-        final cardListItem = tester.widget<CardListItem>(find.byType(CardListItem));
+        final cardListItem = tester.widget<CardListItem>(
+          find.byType(CardListItem),
+        );
         expect(cardListItem.isSelected, isTrue);
       });
     });
@@ -178,11 +180,7 @@ void main() {
 
   group('CardListItemSkeleton Widget Tests', () {
     Widget createSkeletonTestWidget() {
-      return const MaterialApp(
-        home: Scaffold(
-          body: CardListItemSkeleton(),
-        ),
-      );
+      return const MaterialApp(home: Scaffold(body: CardListItemSkeleton()));
     }
 
     testWidgets('應該顯示骨架載入動畫', (tester) async {
@@ -190,7 +188,7 @@ void main() {
 
       // 驗證骨架元件存在
       expect(find.byType(CardListItemSkeleton), findsOneWidget);
-      
+
       // 測試動畫
       await tester.pump(const Duration(milliseconds: 100));
       await tester.pump(const Duration(milliseconds: 750));
@@ -200,11 +198,7 @@ void main() {
 
   group('CardListItemDivider Widget Tests', () {
     Widget createDividerTestWidget() {
-      return const MaterialApp(
-        home: Scaffold(
-          body: CardListItemDivider(),
-        ),
-      );
+      return const MaterialApp(home: Scaffold(body: CardListItemDivider()));
     }
 
     testWidgets('應該顯示分隔線', (tester) async {

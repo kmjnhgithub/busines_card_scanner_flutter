@@ -2,20 +2,20 @@ import 'package:busines_card_scanner_flutter/domain/exceptions/repository_except
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 
 /// DeleteCardUseCase - 刪除名片的業務用例
-/// 
+///
 /// 遵循單一職責原則（SRP），專注於名片刪除流程：
 /// 1. 驗證刪除請求
 /// 2. 執行刪除操作（硬刪除或軟刪除）
 /// 3. 提供復原功能（軟刪除）
 /// 4. 批次刪除和清理功能
-/// 
+///
 /// 支援：
 /// - 硬刪除（永久刪除）
 /// - 軟刪除（可復原）
 /// - 批次處理
 /// - 清理功能
 /// - 效能指標追蹤
-/// 
+///
 /// 遵循依賴反轉原則（DIP），依賴抽象而非具體實作
 class DeleteCardUseCase {
   const DeleteCardUseCase(this._cardWriter);
@@ -23,11 +23,11 @@ class DeleteCardUseCase {
   final CardWriter _cardWriter;
 
   /// 執行刪除名片的業務邏輯
-  /// 
+  ///
   /// [params] 包含要刪除的名片 ID 和刪除選項的參數
-  /// 
+  ///
   /// 回傳刪除結果，包含成功狀態和處理資訊
-  /// 
+  ///
   /// Throws:
   /// - [InvalidInputFailure] 當 card ID 無效或為空
   /// - [DataNotFoundFailure] 當找不到指定的名片
@@ -51,7 +51,7 @@ class DeleteCardUseCase {
       }
 
       bool deleteSuccess = false;
-      
+
       // 3. 乾執行模式檢查
       if (params.dryRun == true) {
         processingSteps.add('乾執行模式');
@@ -76,7 +76,8 @@ class DeleteCardUseCase {
       }
 
       // 6. 自訂保留政策（軟刪除）
-      if (params.customRetentionDays != null && params.deleteType == DeleteType.soft) {
+      if (params.customRetentionDays != null &&
+          params.deleteType == DeleteType.soft) {
         processingSteps.add('自訂保留政策');
       }
 
@@ -115,25 +116,25 @@ class DeleteCardUseCase {
         metrics: metrics,
         details: details,
       );
-
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
       if (e is DomainFailure) {
         rethrow;
       }
-      
+
       // 包裝未預期的異常
       throw DataSourceFailure(
         userMessage: '刪除名片時發生錯誤',
-        internalMessage: 'Unexpected error during card deletion: $e\nStack trace: $stackTrace',
+        internalMessage:
+            'Unexpected error during card deletion: $e\nStack trace: $stackTrace',
       );
     }
   }
 
   /// 復原軟刪除的名片
-  /// 
+  ///
   /// [params] 復原參數
-  /// 
+  ///
   /// 回傳復原結果
   Future<RestoreCardResult> executeRestore(RestoreCardParams params) async {
     try {
@@ -171,25 +172,27 @@ class DeleteCardUseCase {
         warnings: warnings,
         metrics: metrics,
       );
-
     } catch (e, stackTrace) {
       if (e is DomainFailure) {
         rethrow;
       }
-      
+
       throw DataSourceFailure(
         userMessage: '復原名片時發生錯誤',
-        internalMessage: 'Unexpected error during card restoration: $e\nStack trace: $stackTrace',
+        internalMessage:
+            'Unexpected error during card restoration: $e\nStack trace: $stackTrace',
       );
     }
   }
 
   /// 批次刪除多張名片
-  /// 
+  ///
   /// [params] 批次刪除參數
-  /// 
+  ///
   /// 回傳批次刪除結果
-  Future<DeleteCardBatchResult> executeBatch(DeleteCardBatchParams params) async {
+  Future<DeleteCardBatchResult> executeBatch(
+    DeleteCardBatchParams params,
+  ) async {
     try {
       final successful = <DeleteCardResult>[];
       final failed = <DeleteCardBatchError>[];
@@ -199,49 +202,52 @@ class DeleteCardUseCase {
 
       // 轉換成功的結果
       for (final cardId in batchResult.successful) {
-        successful.add(DeleteCardResult(
-          isSuccess: true,
-          deletedCardId: cardId,
-          deleteType: params.deleteType,
-          isReversible: params.deleteType == DeleteType.soft,
-          processingSteps: ['批次刪除執行'],
-          warnings: [],
-        ));
+        successful.add(
+          DeleteCardResult(
+            isSuccess: true,
+            deletedCardId: cardId,
+            deleteType: params.deleteType,
+            isReversible: params.deleteType == DeleteType.soft,
+            processingSteps: ['批次刪除執行'],
+            warnings: [],
+          ),
+        );
       }
 
       // 轉換失敗的結果
       for (int i = 0; i < batchResult.failed.length; i++) {
         final error = batchResult.failed[i];
-        failed.add(DeleteCardBatchError(
-          cardId: error.itemId,
-          error: error.error,
-          index: params.cardIds.indexOf(error.itemId),
-        ));
+        failed.add(
+          DeleteCardBatchError(
+            cardId: error.itemId,
+            error: error.error,
+            index: params.cardIds.indexOf(error.itemId),
+          ),
+        );
       }
 
-      return DeleteCardBatchResult(
-        successful: successful,
-        failed: failed,
-      );
-
+      return DeleteCardBatchResult(successful: successful, failed: failed);
     } catch (e, stackTrace) {
       if (e is DomainFailure) {
         rethrow;
       }
-      
+
       throw DataSourceFailure(
         userMessage: '批次刪除名片時發生錯誤',
-        internalMessage: 'Unexpected error during batch deletion: $e\nStack trace: $stackTrace',
+        internalMessage:
+            'Unexpected error during batch deletion: $e\nStack trace: $stackTrace',
       );
     }
   }
 
   /// 清理已刪除的名片
-  /// 
+  ///
   /// [params] 清理參數
-  /// 
+  ///
   /// 回傳清理結果
-  Future<PurgeDeletedCardsResult> executePurge(PurgeDeletedCardsParams params) async {
+  Future<PurgeDeletedCardsResult> executePurge(
+    PurgeDeletedCardsParams params,
+  ) async {
     try {
       final startTime = DateTime.now();
       final processingSteps = <String>[];
@@ -272,15 +278,15 @@ class DeleteCardUseCase {
         processingSteps: processingSteps,
         metrics: metrics,
       );
-
     } catch (e, stackTrace) {
       if (e is DomainFailure) {
         rethrow;
       }
-      
+
       throw DataSourceFailure(
         userMessage: '清理已刪除名片時發生錯誤',
-        internalMessage: 'Unexpected error during purging: $e\nStack trace: $stackTrace',
+        internalMessage:
+            'Unexpected error during purging: $e\nStack trace: $stackTrace',
       );
     }
   }
@@ -360,6 +366,7 @@ class DeleteCardUseCase {
 enum DeleteType {
   /// 硬刪除（永久刪除）
   hard,
+
   /// 軟刪除（可復原）
   soft,
 }
@@ -380,42 +387,39 @@ class DeleteCardParams {
 
   /// 要刪除的名片 ID
   final String cardId;
-  
+
   /// 刪除類型
   final DeleteType deleteType;
-  
+
   /// 是否驗證依賴關係
   final bool? validateDependencies;
-  
+
   /// 自訂保留天數（僅用於軟刪除）
   final int? customRetentionDays;
-  
+
   /// 是否包含詳細資訊
   final bool? includeDetails;
-  
+
   /// 是否為乾執行模式（不實際刪除）
   final bool? dryRun;
-  
+
   /// 是否追蹤效能指標
   final bool? trackMetrics;
-  
+
   /// 是否自動清理資源
   final bool? autoCleanup;
-  
+
   /// 操作超時時間
   final Duration? timeout;
 }
 
 /// 復原參數
 class RestoreCardParams {
-  const RestoreCardParams({
-    required this.cardId,
-    this.trackMetrics,
-  });
+  const RestoreCardParams({required this.cardId, this.trackMetrics});
 
   /// 要復原的名片 ID
   final String cardId;
-  
+
   /// 是否追蹤效能指標
   final bool? trackMetrics;
 }
@@ -433,33 +437,30 @@ class DeleteCardBatchParams {
 
   /// 要刪除的名片 ID 列表
   final List<String> cardIds;
-  
+
   /// 刪除類型
   final DeleteType deleteType;
-  
+
   /// 並行處理數量
   final int concurrency;
-  
+
   /// 是否驗證依賴關係
   final bool? validateDependencies;
-  
+
   /// 是否追蹤效能指標
   final bool? trackMetrics;
-  
+
   /// 是否自動清理資源
   final bool? autoCleanup;
 }
 
 /// 清理參數
 class PurgeDeletedCardsParams {
-  const PurgeDeletedCardsParams({
-    required this.daysOld,
-    this.trackMetrics,
-  });
+  const PurgeDeletedCardsParams({required this.daysOld, this.trackMetrics});
 
   /// 保留天數
   final int daysOld;
-  
+
   /// 是否追蹤效能指標
   final bool? trackMetrics;
 }
@@ -479,25 +480,25 @@ class DeleteCardResult {
 
   /// 是否成功
   final bool isSuccess;
-  
+
   /// 被刪除的名片 ID
   final String deletedCardId;
-  
+
   /// 刪除類型
   final DeleteType deleteType;
-  
+
   /// 是否可復原
   final bool isReversible;
-  
+
   /// 處理步驟
   final List<String> processingSteps;
-  
+
   /// 警告訊息
   final List<String> warnings;
-  
+
   /// 效能指標（可選）
   final ProcessingMetrics? metrics;
-  
+
   /// 詳細資訊（可選）
   final Map<String, dynamic>? details;
 
@@ -517,16 +518,16 @@ class RestoreCardResult {
 
   /// 是否成功
   final bool isSuccess;
-  
+
   /// 被復原的名片 ID
   final String restoredCardId;
-  
+
   /// 處理步驟
   final List<String> processingSteps;
-  
+
   /// 警告訊息
   final List<String> warnings;
-  
+
   /// 效能指標（可選）
   final ProcessingMetrics? metrics;
 
@@ -536,23 +537,20 @@ class RestoreCardResult {
 
 /// 批次刪除結果
 class DeleteCardBatchResult {
-  const DeleteCardBatchResult({
-    required this.successful,
-    required this.failed,
-  });
+  const DeleteCardBatchResult({required this.successful, required this.failed});
 
   /// 成功刪除的結果
   final List<DeleteCardResult> successful;
-  
+
   /// 失敗的錯誤
   final List<DeleteCardBatchError> failed;
 
   /// 是否有失敗
   bool get hasFailures => failed.isNotEmpty;
-  
+
   /// 成功數量
   int get successCount => successful.length;
-  
+
   /// 失敗數量
   int get failureCount => failed.length;
 }
@@ -567,10 +565,10 @@ class DeleteCardBatchError {
 
   /// 失敗的名片 ID
   final String cardId;
-  
+
   /// 錯誤訊息
   final String error;
-  
+
   /// 在批次中的索引位置
   final int index;
 }
@@ -587,16 +585,16 @@ class PurgeDeletedCardsResult {
 
   /// 是否成功
   final bool isSuccess;
-  
+
   /// 被清理的名片數量
   final int purgedCount;
-  
+
   /// 保留天數
   final int daysOld;
-  
+
   /// 處理步驟
   final List<String> processingSteps;
-  
+
   /// 效能指標（可選）
   final ProcessingMetrics? metrics;
 }
@@ -611,10 +609,10 @@ class ProcessingMetrics {
 
   /// 總處理時間（毫秒）
   final int totalProcessingTimeMs;
-  
+
   /// 開始時間
   final DateTime startTime;
-  
+
   /// 結束時間
   final DateTime endTime;
 }

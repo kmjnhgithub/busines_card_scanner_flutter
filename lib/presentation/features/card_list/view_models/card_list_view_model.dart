@@ -2,7 +2,8 @@ import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
-import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart' as domain;
+import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart'
+    as domain;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -12,12 +13,16 @@ part 'card_list_view_model.freezed.dart';
 enum CardListSortBy {
   /// 按姓名排序
   name,
+
   /// 按公司名稱排序
   company,
+
   /// 按職稱排序
   jobTitle,
+
   /// 按建立日期排序
   dateCreated,
+
   /// 按更新日期排序
   dateUpdated,
 }
@@ -26,6 +31,7 @@ enum CardListSortBy {
 enum SortOrder {
   /// 升序
   ascending,
+
   /// 降序
   descending,
 }
@@ -36,23 +42,29 @@ class CardListState with _$CardListState {
   const factory CardListState({
     /// 所有名片列表
     @Default([]) List<BusinessCard> cards,
+
     /// 過濾後的名片列表
     @Default([]) List<BusinessCard> filteredCards,
+
     /// 是否正在載入
     @Default(false) bool isLoading,
+
     /// 錯誤訊息
     String? error,
+
     /// 搜尋查詢字串
     @Default('') String searchQuery,
+
     /// 排序方式
     @Default(CardListSortBy.dateCreated) CardListSortBy sortBy,
+
     /// 排序順序
     @Default(SortOrder.descending) SortOrder sortOrder,
   }) = _CardListState;
 }
 
 /// 名片列表 ViewModel
-/// 
+///
 /// 負責管理名片列表的狀態和業務邏輯：
 /// - 載入名片列表
 /// - 搜尋名片
@@ -66,9 +78,9 @@ class CardListViewModel extends StateNotifier<CardListState> {
   CardListViewModel({
     required GetCardsUseCase getCardsUseCase,
     required DeleteCardUseCase deleteCardUseCase,
-  })  : _getCardsUseCase = getCardsUseCase,
-        _deleteCardUseCase = deleteCardUseCase,
-        super(const CardListState());
+  }) : _getCardsUseCase = getCardsUseCase,
+       _deleteCardUseCase = deleteCardUseCase,
+       super(const CardListState());
 
   /// 載入名片列表
   Future<void> loadCards() async {
@@ -76,25 +88,18 @@ class CardListViewModel extends StateNotifier<CardListState> {
 
     try {
       final cards = await _getCardsUseCase.execute(const GetCardsParams());
-      state = state.copyWith(
-        isLoading: false,
-        cards: cards,
-        error: null,
-      );
+      state = state.copyWith(isLoading: false, cards: cards, error: null);
       _applyFiltersAndSort();
     } on Exception catch (error) {
-      final errorMessage = error is Failure 
-          ? error.userMessage 
+      final errorMessage = error is Failure
+          ? error.userMessage
           : error.toString();
-      state = state.copyWith(
-        isLoading: false,
-        error: errorMessage,
-      );
+      state = state.copyWith(isLoading: false, error: errorMessage);
     }
   }
 
   /// 搜尋名片
-  /// 
+  ///
   /// 根據姓名、公司、職稱、電子郵件進行搜尋
   void searchCards(String query) {
     state = state.copyWith(searchQuery: query);
@@ -102,15 +107,14 @@ class CardListViewModel extends StateNotifier<CardListState> {
   }
 
   /// 刪除名片
-  /// 
+  ///
   /// 返回 true 表示刪除成功，false 表示刪除失敗
   Future<bool> deleteCard(String cardId) async {
     try {
-      final result = await _deleteCardUseCase.execute(DeleteCardParams(
-        cardId: cardId,
-        deleteType: DeleteType.soft,
-      ));
-      
+      final result = await _deleteCardUseCase.execute(
+        DeleteCardParams(cardId: cardId, deleteType: DeleteType.soft),
+      );
+
       if (result.isSuccess) {
         // 刪除成功後重新載入列表
         await loadCards();
@@ -120,8 +124,8 @@ class CardListViewModel extends StateNotifier<CardListState> {
         return false;
       }
     } on Exception catch (error) {
-      final errorMessage = error is Failure 
-          ? error.userMessage 
+      final errorMessage = error is Failure
+          ? error.userMessage
           : error.toString();
       state = state.copyWith(error: errorMessage);
       return false;
@@ -130,10 +134,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
 
   /// 排序名片
   void sortCards(CardListSortBy sortBy, SortOrder sortOrder) {
-    state = state.copyWith(
-      sortBy: sortBy,
-      sortOrder: sortOrder,
-    );
+    state = state.copyWith(sortBy: sortBy, sortOrder: sortOrder);
     _applyFiltersAndSort();
   }
 
@@ -201,8 +202,8 @@ class CardListViewModel extends StateNotifier<CardListState> {
 /// 名片列表 ViewModel Provider
 final cardListViewModelProvider =
     StateNotifierProvider<CardListViewModel, CardListState>((ref) {
-  return CardListViewModel(
-    getCardsUseCase: ref.read(domain.getCardsUseCaseProvider),
-    deleteCardUseCase: ref.read(domain.deleteCardUseCaseProvider),
-  );
-});
+      return CardListViewModel(
+        getCardsUseCase: ref.read(domain.getCardsUseCaseProvider),
+        deleteCardUseCase: ref.read(domain.deleteCardUseCaseProvider),
+      );
+    });

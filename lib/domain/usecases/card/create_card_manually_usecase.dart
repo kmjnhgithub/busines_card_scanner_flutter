@@ -2,17 +2,16 @@ import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart'
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dart';
 
-
 /// CreateCardManuallyUseCase - 手動建立名片的業務用例
-/// 
+///
 /// 遵循單一職責原則（SRP），專注於手動輸入處理流程：
 /// 1. 驗證手動輸入資料
 /// 2. 資料清理和格式化
 /// 3. 建立名片實體並儲存
-/// 
+///
 /// 遵循介面隔離原則（ISP），只依賴必要的 Repository 介面：
 /// - CardWriter：負責名片儲存
-/// 
+///
 /// 遵循依賴反轉原則（DIP），依賴抽象而非具體實作
 class CreateCardManuallyUseCase {
   const CreateCardManuallyUseCase(this._cardWriter);
@@ -20,17 +19,19 @@ class CreateCardManuallyUseCase {
   final CardWriter _cardWriter;
 
   /// 執行手動建立名片的業務邏輯
-  /// 
+  ///
   /// [params] 包含手動輸入資料和相關參數的執行參數
-  /// 
+  ///
   /// 回傳建立結果，包含成功建立的名片和處理資訊
-  /// 
+  ///
   /// Throws:
   /// - [DataValidationFailure] 當輸入資料無效
   /// - [StorageSpaceFailure] 當儲存空間不足
   /// - [DatabaseConnectionFailure] 當資料庫連線失敗
   /// - [DataSourceFailure] 當發生未預期的錯誤
-  Future<CreateCardManuallyResult> execute(CreateCardManuallyParams params) async {
+  Future<CreateCardManuallyResult> execute(
+    CreateCardManuallyParams params,
+  ) async {
     try {
       final startTime = DateTime.now();
       final processingSteps = <String>[];
@@ -68,7 +69,8 @@ class CreateCardManuallyUseCase {
       }
 
       // 6. 驗證網站 URL 格式
-      if (processedData.website != null && !_isValidUrl(processedData.website!)) {
+      if (processedData.website != null &&
+          !_isValidUrl(processedData.website!)) {
         warnings.add('網站網址格式可能不正確');
       }
 
@@ -121,45 +123,51 @@ class CreateCardManuallyUseCase {
         suggestions: suggestions.isNotEmpty ? suggestions : null,
         metrics: metrics,
       );
-
     } catch (e, stackTrace) {
       // 重新拋出已知的業務異常
       if (e is DomainFailure) {
         rethrow;
       }
-      
+
       // 包裝未預期的異常
       throw DataSourceFailure(
         userMessage: '手動建立名片時發生錯誤',
-        internalMessage: 'Unexpected error during manual card creation: $e\nStack trace: $stackTrace',
+        internalMessage:
+            'Unexpected error during manual card creation: $e\nStack trace: $stackTrace',
       );
     }
   }
 
   /// 批次處理多個手動輸入的名片資料
-  Future<CreateCardManuallyBatchResult> executeBatch(CreateCardManuallyBatchParams params) async {
+  Future<CreateCardManuallyBatchResult> executeBatch(
+    CreateCardManuallyBatchParams params,
+  ) async {
     final successful = <CreateCardManuallyResult>[];
     final failed = <CreateCardManuallyBatchError>[];
 
     for (int i = 0; i < params.cardsData.length; i++) {
       try {
-        final result = await execute(CreateCardManuallyParams(
-          manualData: params.cardsData[i],
-          autoFormatPhone: params.autoFormatPhone,
-          enableSanitization: params.enableSanitization,
-          checkDuplicates: params.checkDuplicates,
-          generateSuggestions: params.generateSuggestions,
-          dryRun: params.dryRun,
-          trackMetrics: params.trackMetrics,
-          autoCleanup: params.autoCleanup,
-        ));
+        final result = await execute(
+          CreateCardManuallyParams(
+            manualData: params.cardsData[i],
+            autoFormatPhone: params.autoFormatPhone,
+            enableSanitization: params.enableSanitization,
+            checkDuplicates: params.checkDuplicates,
+            generateSuggestions: params.generateSuggestions,
+            dryRun: params.dryRun,
+            trackMetrics: params.trackMetrics,
+            autoCleanup: params.autoCleanup,
+          ),
+        );
         successful.add(result);
       } on Exception catch (e) {
-        failed.add(CreateCardManuallyBatchError(
-          index: i,
-          error: e.toString(),
-          originalData: params.cardsData[i],
-        ));
+        failed.add(
+          CreateCardManuallyBatchError(
+            index: i,
+            error: e.toString(),
+            originalData: params.cardsData[i],
+          ),
+        );
       }
     }
 
@@ -170,9 +178,11 @@ class CreateCardManuallyUseCase {
   }
 
   /// 從各種格式匯入名片資料
-  Future<CreateCardManuallyBatchResult> executeImport(CreateCardManuallyImportParams params) async {
+  Future<CreateCardManuallyBatchResult> executeImport(
+    CreateCardManuallyImportParams params,
+  ) async {
     List<ManualCardData> parsedData;
-    
+
     // 根據格式解析資料
     switch (params.format) {
       case ImportFormat.csv:
@@ -187,13 +197,15 @@ class CreateCardManuallyUseCase {
     }
 
     // 批次處理解析的資料
-    return executeBatch(CreateCardManuallyBatchParams(
-      cardsData: parsedData,
-      autoFormatPhone: params.autoFormatPhone,
-      enableSanitization: params.enableSanitization,
-      checkDuplicates: params.checkDuplicates,
-      generateSuggestions: params.generateSuggestions,
-    ));
+    return executeBatch(
+      CreateCardManuallyBatchParams(
+        cardsData: parsedData,
+        autoFormatPhone: params.autoFormatPhone,
+        enableSanitization: params.enableSanitization,
+        checkDuplicates: params.checkDuplicates,
+        generateSuggestions: params.generateSuggestions,
+      ),
+    );
   }
 
   /// 驗證手動輸入資料
@@ -202,7 +214,7 @@ class CreateCardManuallyUseCase {
     if (data.name.trim().isEmpty) {
       throw DataValidationFailure(
         validationErrors: const {
-          'name': ['姓名不能為空']
+          'name': ['姓名不能為空'],
         },
         userMessage: '姓名不能為空',
       );
@@ -227,7 +239,10 @@ class CreateCardManuallyUseCase {
   String _sanitizeString(String input) {
     return input
         .replaceAll(RegExp('<[^>]*>'), '') // 移除 HTML 標籤
-        .replaceAll(RegExp('javascript:', caseSensitive: false), '') // 移除 JavaScript
+        .replaceAll(
+          RegExp('javascript:', caseSensitive: false),
+          '',
+        ) // 移除 JavaScript
         .replaceAll(RegExp(r'on\w+\s*=', caseSensitive: false), '') // 移除事件處理器
         .trim();
   }
@@ -244,16 +259,23 @@ class CreateCardManuallyUseCase {
 
   /// 驗證 Email 格式
   bool _isValidEmail(String email) {
-    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$').hasMatch(email);
+    return RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    ).hasMatch(email);
   }
 
   /// 驗證電話格式（寬鬆驗證，用於警告系統）
   bool _isValidPhone(String phone) {
     // 更寬鬆的電話號碼驗證，允許各種國際格式和分機號
     // 允許數字、空格、連字號、括號、加號、ext、extension
-    final phonePattern = RegExp(r'^[\+]?[0-9\-\(\)\s\.ext\w]*[0-9][\-\(\)\s\.ext\w]*$', caseSensitive: false);
+    final phonePattern = RegExp(
+      r'^[\+]?[0-9\-\(\)\s\.ext\w]*[0-9][\-\(\)\s\.ext\w]*$',
+      caseSensitive: false,
+    );
     final cleaned = phone.replaceAll(RegExp(r'[^\d]'), '');
-    return phonePattern.hasMatch(phone) && cleaned.length >= 7 && cleaned.length <= 20;
+    return phonePattern.hasMatch(phone) &&
+        cleaned.length >= 7 &&
+        cleaned.length <= 20;
   }
 
   /// 清理電話號碼以符合 BusinessCard 實體的驗證規則
@@ -261,16 +283,19 @@ class CreateCardManuallyUseCase {
     // BusinessCard 只支援：數字、連字號、括號、空格、加號
     // 移除分機號碼和其他不支援的字符
     String cleaned = phone;
-    
+
     // 移除分機號碼 (ext. 123, extension 123, x123 等)
-    cleaned = cleaned.replaceAll(RegExp(r'\s*(ext\.?|extension|x)\s*\d+.*$', caseSensitive: false), '');
-    
+    cleaned = cleaned.replaceAll(
+      RegExp(r'\s*(ext\.?|extension|x)\s*\d+.*$', caseSensitive: false),
+      '',
+    );
+
     // 只保留 BusinessCard 支援的字符
     cleaned = cleaned.replaceAll(RegExp(r'[^\+0-9\-\(\)\s]'), '');
-    
+
     // 清理多餘的空格
     cleaned = cleaned.replaceAll(RegExp(r'\s+'), ' ').trim();
-    
+
     return cleaned;
   }
 
@@ -292,7 +317,10 @@ class CreateCardManuallyUseCase {
   }
 
   /// 限制欄位長度並加入警告
-  ManualCardData _limitFieldLengths(ManualCardData data, List<String> warnings) {
+  ManualCardData _limitFieldLengths(
+    ManualCardData data,
+    List<String> warnings,
+  ) {
     const maxNameLength = 100;
     const maxNotesLength = 1000;
     const maxFieldLength = 255;
@@ -301,17 +329,23 @@ class CreateCardManuallyUseCase {
     bool hasLimits = false;
 
     if (data.name.length > maxNameLength) {
-      limitedData = limitedData.copyWith(name: data.name.substring(0, maxNameLength));
+      limitedData = limitedData.copyWith(
+        name: data.name.substring(0, maxNameLength),
+      );
       hasLimits = true;
     }
 
     if (data.notes != null && data.notes!.length > maxNotesLength) {
-      limitedData = limitedData.copyWith(notes: data.notes!.substring(0, maxNotesLength));
+      limitedData = limitedData.copyWith(
+        notes: data.notes!.substring(0, maxNotesLength),
+      );
       hasLimits = true;
     }
 
     if (data.company != null && data.company!.length > maxFieldLength) {
-      limitedData = limitedData.copyWith(company: data.company!.substring(0, maxFieldLength));
+      limitedData = limitedData.copyWith(
+        company: data.company!.substring(0, maxFieldLength),
+      );
       hasLimits = true;
     }
 
@@ -325,7 +359,7 @@ class CreateCardManuallyUseCase {
   /// 生成資料補完建議
   List<String> _generateSuggestions(ManualCardData data) {
     final suggestions = <String>[];
-    
+
     if (data.email == null) {
       suggestions.add('建議添加電子信箱');
     }
@@ -345,14 +379,14 @@ class CreateCardManuallyUseCase {
   /// 從手動資料建立 BusinessCard 實體
   BusinessCard _createBusinessCardFromManualData(ManualCardData data) {
     final tempId = 'temp-${DateTime.now().millisecondsSinceEpoch}';
-    
+
     // 對於無效的格式，我們將其清空以避免 BusinessCard 驗證失敗
     // 這樣可以讓警告系統正常運作，而不會阻止名片建立
     String? safeEmail = data.email;
     if (safeEmail != null && !_isValidEmail(safeEmail)) {
       safeEmail = null; // 清空無效的 email
     }
-    
+
     String? safePhone = data.phone;
     if (safePhone != null) {
       // 清理電話號碼，移除 BusinessCard 實體不支援的字符
@@ -362,12 +396,12 @@ class CreateCardManuallyUseCase {
         safePhone = null; // 清空無效的 phone
       }
     }
-    
+
     String? safeWebsite = data.website;
     if (safeWebsite != null && !_isValidUrl(safeWebsite)) {
       safeWebsite = null; // 清空無效的 website
     }
-    
+
     return BusinessCard(
       id: tempId,
       name: data.name,
@@ -389,7 +423,10 @@ class CreateCardManuallyUseCase {
 
   /// 解析 CSV 資料
   List<ManualCardData> _parseCSVData(String csvData) {
-    final lines = csvData.split('\n').where((line) => line.trim().isNotEmpty).toList();
+    final lines = csvData
+        .split('\n')
+        .where((line) => line.trim().isNotEmpty)
+        .toList();
     if (lines.isEmpty) {
       return [];
     }
@@ -401,7 +438,7 @@ class CreateCardManuallyUseCase {
     return dataLines.map((line) {
       final values = line.split(',').map((v) => v.trim()).toList();
       final record = <String, String>{};
-      
+
       for (int i = 0; i < headers.length && i < values.length; i++) {
         record[headers[i]] = values[i];
       }

@@ -9,17 +9,17 @@ import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.
 import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_image_usecase.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-
 /// Mock CardWriter 用於測試
 class MockCardWriter implements CardWriter {
   BusinessCard? _mockSavedCard;
   BatchSaveResult? _mockBatchResult;
   BatchDeleteResult? _mockDeleteResult;
   DomainFailure? _mockFailure;
-  
+
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
-  void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
+  void setMockDeleteResult(BatchDeleteResult result) =>
+      _mockDeleteResult = result;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override
@@ -31,14 +31,14 @@ class MockCardWriter implements CardWriter {
     if (_mockSavedCard != null) {
       return _mockSavedCard!;
     }
-    
+
     // 如果名片沒有 ID，分配一個新的 ID
     if (card.id.isEmpty) {
       return card.copyWith(
         id: 'generated-id-${DateTime.now().millisecondsSinceEpoch}',
       );
     }
-    
+
     return card;
   }
 
@@ -47,10 +47,7 @@ class MockCardWriter implements CardWriter {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockBatchResult ?? BatchSaveResult(
-      successful: cards,
-      failed: [],
-    );
+    return _mockBatchResult ?? BatchSaveResult(successful: cards, failed: []);
   }
 
   @override
@@ -66,10 +63,8 @@ class MockCardWriter implements CardWriter {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockDeleteResult ?? BatchDeleteResult(
-      successful: cardIds,
-      failed: [],
-    );
+    return _mockDeleteResult ??
+        BatchDeleteResult(successful: cardIds, failed: []);
   }
 
   @override
@@ -110,7 +105,7 @@ class MockOCRRepository implements OCRRepository {
   OCRResult? _mockOCRResult;
   BatchOCRResult? _mockBatchResult;
   DomainFailure? _mockFailure;
-  
+
   void setMockOCRResult(OCRResult result) => _mockOCRResult = result;
   void setMockBatchResult(BatchOCRResult result) => _mockBatchResult = result;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
@@ -123,13 +118,14 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockOCRResult ?? OCRResult(
-      id: 'ocr-${DateTime.now().millisecondsSinceEpoch}',
-      rawText: '模擬 OCR 結果',
-      confidence: 0.8,
-      processingTimeMs: 1000,
-      processedAt: DateTime.now(),
-    );
+    return _mockOCRResult ??
+        OCRResult(
+          id: 'ocr-${DateTime.now().millisecondsSinceEpoch}',
+          rawText: '模擬 OCR 結果',
+          confidence: 0.8,
+          processingTimeMs: 1000,
+          processedAt: DateTime.now(),
+        );
   }
 
   @override
@@ -140,10 +136,7 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockBatchResult ?? const BatchOCRResult(
-      successful: [],
-      failed: [],
-    );
+    return _mockBatchResult ?? const BatchOCRResult(successful: [], failed: []);
   }
 
   @override
@@ -173,13 +166,14 @@ class MockOCRRepository implements OCRRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockOCRResult ?? OCRResult(
-      id: resultId,
-      rawText: '測試文字',
-      confidence: 0.8,
-      processingTimeMs: 1000,
-      processedAt: DateTime.now(),
-    );
+    return _mockOCRResult ??
+        OCRResult(
+          id: resultId,
+          rawText: '測試文字',
+          confidence: 0.8,
+          processingTimeMs: 1000,
+          processedAt: DateTime.now(),
+        );
   }
 
   @override
@@ -273,7 +267,7 @@ class MockAIRepository implements AIRepository {
   ParsedCardData? _mockParsedData;
   BatchParseResult? _mockBatchResult;
   DomainFailure? _mockFailure;
-  
+
   void setMockParsedData(ParsedCardData data) => _mockParsedData = data;
   void setMockBatchResult(BatchParseResult result) => _mockBatchResult = result;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
@@ -286,16 +280,17 @@ class MockAIRepository implements AIRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockParsedData ?? ParsedCardData(
-      name: '王大明',
-      company: '科技股份有限公司',
-      jobTitle: '軟體工程師',
-      email: 'wang@tech.com',
-      phone: '02-1234-5678',
-      confidence: 0.85,
-      source: ParseSource.ai,
-      parsedAt: DateTime.now(),
-    );
+    return _mockParsedData ??
+        ParsedCardData(
+          name: '王大明',
+          company: '科技股份有限公司',
+          jobTitle: '軟體工程師',
+          email: 'wang@tech.com',
+          phone: '02-1234-5678',
+          confidence: 0.85,
+          source: ParseSource.ai,
+          parsedAt: DateTime.now(),
+        );
   }
 
   @override
@@ -306,10 +301,8 @@ class MockAIRepository implements AIRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockBatchResult ?? const BatchParseResult(
-      successful: [],
-      failed: [],
-    );
+    return _mockBatchResult ??
+        const BatchParseResult(successful: [], failed: []);
   }
 
   @override
@@ -320,10 +313,7 @@ class MockAIRepository implements AIRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return const CardCompletionSuggestions(
-      suggestions: {},
-      confidence: {},
-    );
+    return const CardCompletionSuggestions(suggestions: {}, confidence: {});
   }
 
   @override
@@ -333,12 +323,13 @@ class MockAIRepository implements AIRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return _mockParsedData ?? ParsedCardData(
-      name: '清理後名稱',
-      confidence: 0.9,
-      source: ParseSource.ai,
-      parsedAt: DateTime.now(),
-    );
+    return _mockParsedData ??
+        ParsedCardData(
+          name: '清理後名稱',
+          confidence: 0.9,
+          source: ParseSource.ai,
+          parsedAt: DateTime.now(),
+        );
   }
 
   @override
@@ -415,10 +406,7 @@ class MockAIRepository implements AIRepository {
     if (_mockFailure != null) {
       throw _mockFailure!;
     }
-    return FormattedFieldResult(
-      formattedValue: rawValue,
-      confidence: 0.9,
-    );
+    return FormattedFieldResult(formattedValue: rawValue, confidence: 0.9);
   }
 
   @override
@@ -462,7 +450,7 @@ void main() {
         mockOCRRepository,
         mockAIRepository,
       );
-      
+
       // 建立測試圖片資料
       testImageData = Uint8List.fromList([
         0xFF, 0xD8, 0xFF, 0xE0, // JPEG header
@@ -471,11 +459,13 @@ void main() {
     });
 
     group('成功創建名片流程', () {
-      test('should create card from image successfully with complete flow', () async {
-        // Arrange - 設定完整的成功流程
-        final testOCRResult = OCRResult(
-          id: 'ocr-123',
-          rawText: '''
+      test(
+        'should create card from image successfully with complete flow',
+        () async {
+          // Arrange - 設定完整的成功流程
+          final testOCRResult = OCRResult(
+            id: 'ocr-123',
+            rawText: '''
           王大明
           軟體工程師
           科技股份有限公司
@@ -483,59 +473,62 @@ void main() {
           Email: wang@tech.com
           地址：台北市信義區信義路五段7號
           ''',
-          confidence: 0.92,
-          processingTimeMs: 1200,
-          processedAt: DateTime.now(),
-        );
-        mockOCRRepository.setMockOCRResult(testOCRResult);
+            confidence: 0.92,
+            processingTimeMs: 1200,
+            processedAt: DateTime.now(),
+          );
+          mockOCRRepository.setMockOCRResult(testOCRResult);
 
-        final testParsedData = ParsedCardData(
-          name: '王大明',
-          company: '科技股份有限公司',
-          jobTitle: '軟體工程師',
-          email: 'wang@tech.com',
-          phone: '02-1234-5678',
-          address: '台北市信義區信義路五段7號',
-          confidence: 0.88,
-          source: ParseSource.ai,
-          parsedAt: DateTime.now(),
-        );
-        mockAIRepository.setMockParsedData(testParsedData);
+          final testParsedData = ParsedCardData(
+            name: '王大明',
+            company: '科技股份有限公司',
+            jobTitle: '軟體工程師',
+            email: 'wang@tech.com',
+            phone: '02-1234-5678',
+            address: '台北市信義區信義路五段7號',
+            confidence: 0.88,
+            source: ParseSource.ai,
+            parsedAt: DateTime.now(),
+          );
+          mockAIRepository.setMockParsedData(testParsedData);
 
-        final expectedCard = BusinessCard(
-          id: 'saved-card-123',
-          name: '王大明',
-          company: '科技股份有限公司',
-          jobTitle: '軟體工程師',
-          email: 'wang@tech.com',
-          phone: '02-1234-5678',
-          address: '台北市信義區信義路五段7號',
-          createdAt: DateTime.now(),
-        );
-        mockCardWriter.setMockSavedCard(expectedCard);
+          final expectedCard = BusinessCard(
+            id: 'saved-card-123',
+            name: '王大明',
+            company: '科技股份有限公司',
+            jobTitle: '軟體工程師',
+            email: 'wang@tech.com',
+            phone: '02-1234-5678',
+            address: '台北市信義區信義路五段7號',
+            createdAt: DateTime.now(),
+          );
+          mockCardWriter.setMockSavedCard(expectedCard);
 
-        // Act
-        late CreateCardFromImageResult result;
-        try {
-          result = await useCase.execute(CreateCardFromImageParams(
-            imageData: testImageData,
-            saveOCRResult: true,
-          ));
-        } catch (e) {
-          print('詳細錯誤: $e');
-          rethrow;
-        }
+          // Act
+          late CreateCardFromImageResult result;
+          try {
+            result = await useCase.execute(
+              CreateCardFromImageParams(
+                imageData: testImageData,
+                saveOCRResult: true,
+              ),
+            );
+          } catch (e) {
+            print('詳細錯誤: $e');
+            rethrow;
+          }
 
-        // Assert
-        expect(result.card.name, '王大明');
-        expect(result.card.company, '科技股份有限公司');
-        expect(result.card.jobTitle, '軟體工程師');
-        expect(result.card.email, 'wang@tech.com');
-        expect(result.card.phone, '02-1234-5678');
-        expect(result.ocrResult.rawText, contains('王大明'));
-        expect(result.parsedData.confidence, 0.88);
-        expect(result.processingSteps.length, greaterThan(0));
-      });
+          // Assert
+          expect(result.card.name, '王大明');
+          expect(result.card.company, '科技股份有限公司');
+          expect(result.card.jobTitle, '軟體工程師');
+          expect(result.card.email, 'wang@tech.com');
+          expect(result.card.phone, '02-1234-5678');
+          expect(result.ocrResult.rawText, contains('王大明'));
+          expect(result.parsedData.confidence, 0.88);
+          expect(result.processingSteps.length, greaterThan(0));
+        },
+      );
 
       test('should handle low OCR confidence with fallback', () async {
         // Arrange - 低信心度的 OCR 結果
@@ -558,10 +551,12 @@ void main() {
         mockAIRepository.setMockParsedData(fallbackParsedData);
 
         // Act
-        final result = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-          confidenceThreshold: 0.7, // 設定較高的信心度門檻
-        ));
+        final result = await useCase.execute(
+          CreateCardFromImageParams(
+            imageData: testImageData,
+            confidenceThreshold: 0.7, // 設定較高的信心度門檻
+          ),
+        );
 
         // Assert
         expect(result.card.name, '王先生');
@@ -584,12 +579,12 @@ void main() {
         mockOCRRepository.setMockOCRResult(customOCRResult);
 
         // Act
-        final result = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-          ocrOptions: const OCROptions(
-            preferredLanguages: ['en'],
+        final result = await useCase.execute(
+          CreateCardFromImageParams(
+            imageData: testImageData,
+            ocrOptions: const OCROptions(preferredLanguages: ['en']),
           ),
-        ));
+        );
 
         // Assert
         expect(result.ocrResult.confidence, 0.95);
@@ -609,15 +604,17 @@ void main() {
         mockAIRepository.setMockParsedData(hintedParsedData);
 
         // Act
-        final result = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-          parseHints: const ParseHints(
-            language: 'ja',
-            country: 'JP',
-            cardType: 'business',
-            industry: 'technology',
+        final result = await useCase.execute(
+          CreateCardFromImageParams(
+            imageData: testImageData,
+            parseHints: const ParseHints(
+              language: 'ja',
+              country: 'JP',
+              cardType: 'business',
+              industry: 'technology',
+            ),
           ),
-        ));
+        );
 
         // Assert
         expect(result.parsedData.name, '田中太郎');
@@ -633,9 +630,9 @@ void main() {
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: emptyImageData,
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(imageData: emptyImageData),
+          ),
           throwsA(isA<InvalidInputFailure>()),
         );
       });
@@ -649,14 +646,14 @@ void main() {
           const ImageTooLargeFailure(
             imageSize: maxSizeBytes + 1000,
             maxSize: maxSizeBytes,
-          )
+          ),
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: oversizedImageData,
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(imageData: oversizedImageData),
+          ),
           throwsA(isA<ImageTooLargeFailure>()),
         );
       });
@@ -669,14 +666,14 @@ void main() {
         ]);
 
         mockOCRRepository.setMockFailure(
-          const UnsupportedImageFormatFailure(mimeType: 'image/bmp')
+          const UnsupportedImageFormatFailure(mimeType: 'image/bmp'),
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: unsupportedImageData,
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(imageData: unsupportedImageData),
+          ),
           throwsA(isA<UnsupportedImageFormatFailure>()),
         );
       });
@@ -689,26 +686,28 @@ void main() {
         ]);
 
         // Mock 預處理結果
-        mockOCRRepository.setMockOCRResult(OCRResult(
-          id: 'ocr-preprocessed',
-          rawText: '清晰的文字辨識結果',
-          confidence: 0.95, // 預處理後信心度提升
-          processingTimeMs: 1000,
-          processedAt: DateTime.now(),
-        ));
+        mockOCRRepository.setMockOCRResult(
+          OCRResult(
+            id: 'ocr-preprocessed',
+            rawText: '清晰的文字辨識結果',
+            confidence: 0.95, // 預處理後信心度提升
+            processingTimeMs: 1000,
+            processedAt: DateTime.now(),
+          ),
+        );
 
         // Act
-        final result = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-          ocrOptions: const OCROptions(
-            
+        final result = await useCase.execute(
+          CreateCardFromImageParams(
+            imageData: testImageData,
+            ocrOptions: const OCROptions(),
+            preprocessOptions: const ImagePreprocessOptions(
+              contrast: 20,
+              brightness: 10,
+              sharpen: true,
+            ),
           ),
-          preprocessOptions: const ImagePreprocessOptions(
-            contrast: 20,
-            brightness: 10,
-            sharpen: true,
-          ),
-        ));
+        );
 
         // Assert
         expect(result.ocrResult.confidence, 0.95);
@@ -721,39 +720,41 @@ void main() {
       test('should handle OCR service unavailable', () async {
         // Arrange
         mockOCRRepository.setMockFailure(
-          const OCRServiceUnavailableFailure(reason: 'Service maintenance')
+          const OCRServiceUnavailableFailure(reason: 'Service maintenance'),
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: testImageData,
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(imageData: testImageData),
+          ),
           throwsA(isA<OCRServiceUnavailableFailure>()),
         );
       });
 
       test('should handle AI service quota exceeded', () async {
         // Arrange - OCR 成功但 AI 配額用盡
-        mockOCRRepository.setMockOCRResult(OCRResult(
-          id: 'ocr-success',
-          rawText: '成功的 OCR 結果',
-          confidence: 0.8,
-          processingTimeMs: 1000,
-          processedAt: DateTime.now(),
-        ));
+        mockOCRRepository.setMockOCRResult(
+          OCRResult(
+            id: 'ocr-success',
+            rawText: '成功的 OCR 結果',
+            confidence: 0.8,
+            processingTimeMs: 1000,
+            processedAt: DateTime.now(),
+          ),
+        );
 
         mockAIRepository.setMockFailure(
           AIQuotaExceededFailure(
             resetTime: DateTime.now().add(const Duration(hours: 1)),
-          )
+          ),
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: testImageData,
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(imageData: testImageData),
+          ),
           throwsA(isA<AIQuotaExceededFailure>()),
         );
       });
@@ -761,42 +762,42 @@ void main() {
       test('should handle AI rate limiting with retry suggestions', () async {
         // Arrange
         mockAIRepository.setMockFailure(
-          AIRateLimitFailure(
-            retryAfter: const Duration(seconds: 30),
-          )
+          AIRateLimitFailure(retryAfter: const Duration(seconds: 30)),
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: testImageData,
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(imageData: testImageData),
+          ),
           throwsA(isA<AIRateLimitFailure>()),
         );
       });
 
       test('should handle storage failure when saving card', () async {
         // Arrange - OCR 和 AI 都成功，但儲存失敗
-        mockOCRRepository.setMockOCRResult(OCRResult(
-          id: 'ocr-ok',
-          rawText: '測試文字',
-          confidence: 0.8,
-          processingTimeMs: 1000,
-          processedAt: DateTime.now(),
-        ));
+        mockOCRRepository.setMockOCRResult(
+          OCRResult(
+            id: 'ocr-ok',
+            rawText: '測試文字',
+            confidence: 0.8,
+            processingTimeMs: 1000,
+            processedAt: DateTime.now(),
+          ),
+        );
 
         mockCardWriter.setMockFailure(
           const StorageSpaceFailure(
             availableSpaceBytes: 100,
             requiredSpaceBytes: 1000,
-          )
+          ),
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: testImageData,
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(imageData: testImageData),
+          ),
           throwsA(isA<StorageSpaceFailure>()),
         );
       });
@@ -805,10 +806,12 @@ void main() {
     group('進階功能測試', () {
       test('should support dry run mode without saving', () async {
         // Arrange - 乾執行模式，不實際儲存
-        final dryRunResult = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-          dryRun: true, // 乾執行模式
-        ));
+        final dryRunResult = await useCase.execute(
+          CreateCardFromImageParams(
+            imageData: testImageData,
+            dryRun: true, // 乾執行模式
+          ),
+        );
 
         // Assert - 應該處理所有步驟但不儲存
         expect(dryRunResult.card.id, startsWith('temp-')); // 臨時 ID
@@ -834,9 +837,9 @@ void main() {
         mockAIRepository.setMockParsedData(safeParsedData);
 
         // Act
-        final result = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromImageParams(imageData: testImageData),
+        );
 
         // Assert - 確保資料已被清理
         expect(result.card.name, '王大明');
@@ -849,33 +852,52 @@ void main() {
       test('should track detailed processing metrics', () async {
         // Arrange - 設定各階段處理時間
         final startTime = DateTime.now();
-        
-        final result = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-          trackMetrics: true, // 啟用指標追蹤
-        ));
+
+        final result = await useCase.execute(
+          CreateCardFromImageParams(
+            imageData: testImageData,
+            trackMetrics: true, // 啟用指標追蹤
+          ),
+        );
 
         // Assert - 檢查處理指標
         expect(result.metrics, isNotNull);
         expect(result.metrics!.totalProcessingTimeMs, greaterThanOrEqualTo(0));
         expect(result.metrics!.ocrProcessingTimeMs, greaterThanOrEqualTo(0));
         expect(result.metrics!.aiProcessingTimeMs, greaterThanOrEqualTo(0));
-        expect(result.metrics!.startTime.isBefore(result.metrics!.endTime), true);
+        expect(
+          result.metrics!.startTime.isBefore(result.metrics!.endTime),
+          true,
+        );
       });
 
       test('should support batch processing multiple images', () async {
         // Arrange - 批次處理多張圖片
         final imageDataList = [
           testImageData,
-          Uint8List.fromList([0xFF, 0xD8, 0xFF, 0xE0, ...List.filled(500, 0x01)]),
-          Uint8List.fromList([0xFF, 0xD8, 0xFF, 0xE0, ...List.filled(300, 0x02)]),
+          Uint8List.fromList([
+            0xFF,
+            0xD8,
+            0xFF,
+            0xE0,
+            ...List.filled(500, 0x01),
+          ]),
+          Uint8List.fromList([
+            0xFF,
+            0xD8,
+            0xFF,
+            0xE0,
+            ...List.filled(300, 0x02),
+          ]),
         ];
 
         // Act
-        final results = await useCase.executeBatch(CreateCardFromImageBatchParams(
-          imageDataList: imageDataList,
-          concurrency: 2, // 並行處理
-        ));
+        final results = await useCase.executeBatch(
+          CreateCardFromImageBatchParams(
+            imageDataList: imageDataList,
+            concurrency: 2, // 並行處理
+          ),
+        );
 
         // Assert
         expect(results.successful.length, lessThanOrEqualTo(3));
@@ -888,10 +910,12 @@ void main() {
       test('should handle concurrent requests efficiently', () async {
         // Arrange - 並行請求
         final futures = List.generate(5, (index) {
-          return useCase.execute(CreateCardFromImageParams(
-            imageData: testImageData,
-            trackMetrics: true,
-          ));
+          return useCase.execute(
+            CreateCardFromImageParams(
+              imageData: testImageData,
+              trackMetrics: true,
+            ),
+          );
         });
 
         // Act
@@ -907,9 +931,9 @@ void main() {
 
       test('should cleanup resources properly', () async {
         // Arrange & Act
-        final result = await useCase.execute(CreateCardFromImageParams(
-          imageData: testImageData,
-        ));
+        final result = await useCase.execute(
+          CreateCardFromImageParams(imageData: testImageData),
+        );
 
         // Assert - 檢查資源清理
         expect(result.processingSteps, contains('資源清理'));
@@ -922,15 +946,17 @@ void main() {
             engineId: 'slow-engine',
             userMessage: '處理超時',
             internalMessage: 'Processing timeout exceeded',
-          )
+          ),
         );
 
         // Act & Assert
         expect(
-          () => useCase.execute(CreateCardFromImageParams(
-            imageData: testImageData,
-            timeout: const Duration(milliseconds: 100), // 很短的超時
-          )),
+          () => useCase.execute(
+            CreateCardFromImageParams(
+              imageData: testImageData,
+              timeout: const Duration(milliseconds: 100), // 很短的超時
+            ),
+          ),
           throwsA(isA<OCRProcessingFailure>()),
         );
       });

@@ -5,7 +5,7 @@ import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.
 import 'package:flutter/material.dart';
 
 /// 排序選項元件
-/// 
+///
 /// 提供名片列表的排序選項，包含：
 /// - 多種排序欄位選項
 /// - 升序/降序切換
@@ -13,7 +13,9 @@ import 'package:flutter/material.dart';
 /// - 底部模態選單格式
 class CardListSortOptions extends StatelessWidget {
   const CardListSortOptions({
-    required this.currentSortBy, required this.currentSortOrder, super.key,
+    required this.currentSortBy,
+    required this.currentSortOrder,
+    super.key,
     this.onSortChanged,
     this.showTitle = true,
     this.title = '排序方式',
@@ -49,13 +51,13 @@ class CardListSortOptions extends StatelessWidget {
           children: [
             // 拖曳指示器
             _buildDragIndicator(),
-            
+
             // 標題
             if (showTitle) _buildTitle(),
-            
+
             // 排序選項列表
             _buildSortOptions(context),
-            
+
             const SizedBox(height: AppDimensions.space2),
           ],
         ),
@@ -82,9 +84,7 @@ class CardListSortOptions extends StatelessWidget {
       padding: const EdgeInsets.all(AppDimensions.space4),
       child: Text(
         title,
-        style: AppTextStyles.headline5.copyWith(
-          color: AppColors.primaryText,
-        ),
+        style: AppTextStyles.headline5.copyWith(color: AppColors.primaryText),
       ),
     );
   }
@@ -129,7 +129,7 @@ class CardListSortOptions extends StatelessWidget {
   /// 建立排序選項項目
   Widget _buildSortOptionTile(BuildContext context, SortOptionItem option) {
     final isSelected = option.sortBy == currentSortBy;
-    
+
     return ListTile(
       leading: Icon(
         option.icon,
@@ -220,11 +220,12 @@ class SortOptionItem {
 }
 
 /// 排序方向指示器
-/// 
+///
 /// 顯示當前排序方向的簡潔指示器
 class SortDirectionIndicator extends StatelessWidget {
   const SortDirectionIndicator({
-    required this.sortOrder, super.key,
+    required this.sortOrder,
+    super.key,
     this.size = AppDimensions.iconSmall,
     this.color,
   });
@@ -241,8 +242,8 @@ class SortDirectionIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Icon(
-      sortOrder == SortOrder.ascending 
-          ? Icons.arrow_upward 
+      sortOrder == SortOrder.ascending
+          ? Icons.arrow_upward
           : Icons.arrow_downward,
       size: size,
       color: color ?? AppColors.primary,
@@ -251,11 +252,13 @@ class SortDirectionIndicator extends StatelessWidget {
 }
 
 /// 排序快速選擇器
-/// 
+///
 /// 提供水平排列的快速排序選項
 class QuickSortSelector extends StatelessWidget {
   const QuickSortSelector({
-    required this.currentSortBy, required this.currentSortOrder, super.key,
+    required this.currentSortBy,
+    required this.currentSortOrder,
+    super.key,
     this.onSortChanged,
     this.options = const [
       CardListSortBy.name,
@@ -284,11 +287,12 @@ class QuickSortSelector extends StatelessWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: options.length,
-        separatorBuilder: (context, index) => const SizedBox(width: AppDimensions.space2),
+        separatorBuilder: (context, index) =>
+            const SizedBox(width: AppDimensions.space2),
         itemBuilder: (context, index) {
           final sortBy = options[index];
           final isSelected = sortBy == currentSortBy;
-          
+
           return _buildQuickSortChip(sortBy, isSelected);
         },
       ),
@@ -299,10 +303,10 @@ class QuickSortSelector extends StatelessWidget {
   Widget _buildQuickSortChip(CardListSortBy sortBy, bool isSelected) {
     return GestureDetector(
       onTap: () {
-        final newOrder = isSelected 
-            ? (currentSortOrder == SortOrder.ascending 
-                ? SortOrder.descending 
-                : SortOrder.ascending)
+        final newOrder = isSelected
+            ? (currentSortOrder == SortOrder.ascending
+                  ? SortOrder.descending
+                  : SortOrder.ascending)
             : currentSortOrder;
         onSortChanged?.call(sortBy, newOrder);
       },
@@ -330,8 +334,8 @@ class QuickSortSelector extends StatelessWidget {
             if (isSelected) ...[
               const SizedBox(width: AppDimensions.space1),
               Icon(
-                currentSortOrder == SortOrder.ascending 
-                    ? Icons.arrow_upward 
+                currentSortOrder == SortOrder.ascending
+                    ? Icons.arrow_upward
                     : Icons.arrow_downward,
                 size: 12,
                 color: Colors.white,

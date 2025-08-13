@@ -9,10 +9,12 @@ import 'package:mocktail/mocktail.dart';
 
 // Mock classes
 class MockCleanAppDatabase extends Mock implements CleanAppDatabase {}
+
 class MockCardDao extends Mock implements CardDao {}
 
 // Fake classes for fallback values
-class FakeBusinessCardsCompanion extends Fake implements BusinessCardsCompanion {}
+class FakeBusinessCardsCompanion extends Fake
+    implements BusinessCardsCompanion {}
 
 void main() {
   setUpAll(() {
@@ -40,14 +42,13 @@ void main() {
       updatedAt: DateTime(2024, 1, 15, 10, 30),
     );
 
-
     setUp(() {
       mockDatabase = MockCleanAppDatabase();
       mockCardDao = MockCardDao();
-      
+
       // Mock cardDao getter
       when(() => mockDatabase.cardDao).thenReturn(mockCardDao);
-      
+
       repository = CardRepositoryImpl(mockDatabase);
     });
 
@@ -69,10 +70,10 @@ void main() {
       test('🔴 RED: should dispose resources properly', () async {
         // Arrange
         when(() => mockDatabase.close()).thenAnswer((_) async => {});
-        
+
         // Act & Assert - 基本測試
         await repository.dispose();
-        
+
         // 驗證 close 被調用
         verify(() => mockDatabase.close()).called(1);
       });
@@ -82,8 +83,9 @@ void main() {
       test('🔴 RED: should get all cards', () async {
         // Arrange
         final expectedCards = [testCard];
-        when(() => mockCardDao.getAllBusinessCards())
-            .thenAnswer((_) async => expectedCards);
+        when(
+          () => mockCardDao.getAllBusinessCards(),
+        ).thenAnswer((_) async => expectedCards);
 
         // Act
         final result = await repository.getCards();
@@ -97,8 +99,9 @@ void main() {
 
       test('🔴 RED: should get card by ID successfully', () async {
         // Arrange
-        when(() => mockCardDao.getBusinessCardById(int.parse(testCard.id)))
-            .thenAnswer((_) async => testCard);
+        when(
+          () => mockCardDao.getBusinessCardById(int.parse(testCard.id)),
+        ).thenAnswer((_) async => testCard);
 
         // Act
         final result = await repository.getCardById(testCard.id);
@@ -107,14 +110,17 @@ void main() {
         expect(result.id, equals(testCard.id));
         expect(result.name, equals(testCard.name));
         expect(result.email, equals(testCard.email));
-        verify(() => mockCardDao.getBusinessCardById(int.parse(testCard.id))).called(1);
+        verify(
+          () => mockCardDao.getBusinessCardById(int.parse(testCard.id)),
+        ).called(1);
       });
 
       test('🔴 RED: should throw exception when card not found', () async {
         // Arrange
         const nonExistentId = '999';
-        when(() => mockCardDao.getBusinessCardById(int.parse(nonExistentId)))
-            .thenAnswer((_) async => null);
+        when(
+          () => mockCardDao.getBusinessCardById(int.parse(nonExistentId)),
+        ).thenAnswer((_) async => null);
 
         // Act & Assert
         expect(
@@ -126,8 +132,9 @@ void main() {
       test('🔴 RED: should search cards by query', () async {
         // Arrange
         const searchQuery = 'John';
-        when(() => mockCardDao.searchBusinessCards(searchQuery))
-            .thenAnswer((_) async => [testCard]);
+        when(
+          () => mockCardDao.searchBusinessCards(searchQuery),
+        ).thenAnswer((_) async => [testCard]);
 
         // Act
         final result = await repository.searchCards(searchQuery);
@@ -141,8 +148,9 @@ void main() {
       test('🔴 RED: should get cards by company', () async {
         // Arrange
         const companyName = 'Tech Corp';
-        when(() => mockCardDao.searchBusinessCards(companyName))
-            .thenAnswer((_) async => [testCard]);
+        when(
+          () => mockCardDao.searchBusinessCards(companyName),
+        ).thenAnswer((_) async => [testCard]);
 
         // Act
         final result = await repository.getCardsByCompany(companyName);
@@ -162,11 +170,13 @@ void main() {
           id: '123',
           updatedAt: DateTime.now(),
         );
-        
-        when(() => mockCardDao.insertBusinessCard(any()))
-            .thenAnswer((_) async => 123);
-        when(() => mockCardDao.getBusinessCardById(123))
-            .thenAnswer((_) async => savedCard);
+
+        when(
+          () => mockCardDao.insertBusinessCard(any()),
+        ).thenAnswer((_) async => 123);
+        when(
+          () => mockCardDao.getBusinessCardById(123),
+        ).thenAnswer((_) async => savedCard);
 
         // Act
         final result = await repository.saveCard(newCard);
@@ -183,11 +193,13 @@ void main() {
           name: 'Updated Name',
           updatedAt: DateTime.now(),
         );
-        
-        when(() => mockCardDao.getBusinessCardById(int.parse(testCard.id)))
-            .thenAnswer((_) async => updatedCard); // 簡化，直接返回更新模型
-        when(() => mockCardDao.updateBusinessCard(any()))
-            .thenAnswer((_) async => true);
+
+        when(
+          () => mockCardDao.getBusinessCardById(int.parse(testCard.id)),
+        ).thenAnswer((_) async => updatedCard); // 簡化，直接返回更新模型
+        when(
+          () => mockCardDao.updateBusinessCard(any()),
+        ).thenAnswer((_) async => true);
 
         // Act
         final result = await repository.saveCard(updatedCard);
@@ -200,30 +212,39 @@ void main() {
 
       test('🔴 RED: should delete card successfully', () async {
         // Arrange
-        when(() => mockCardDao.deleteBusinessCard(int.parse(testCard.id)))
-            .thenAnswer((_) async => true);
+        when(
+          () => mockCardDao.deleteBusinessCard(int.parse(testCard.id)),
+        ).thenAnswer((_) async => true);
 
         // Act
         final result = await repository.deleteCard(testCard.id);
 
         // Assert
         expect(result, isTrue);
-        verify(() => mockCardDao.deleteBusinessCard(int.parse(testCard.id))).called(1);
+        verify(
+          () => mockCardDao.deleteBusinessCard(int.parse(testCard.id)),
+        ).called(1);
       });
 
-      test('🔴 RED: should return false when deleting non-existent card', () async {
-        // Arrange
-        const nonExistentId = '998';
-        when(() => mockCardDao.deleteBusinessCard(int.parse(nonExistentId)))
-            .thenAnswer((_) async => false);
+      test(
+        '🔴 RED: should return false when deleting non-existent card',
+        () async {
+          // Arrange
+          const nonExistentId = '998';
+          when(
+            () => mockCardDao.deleteBusinessCard(int.parse(nonExistentId)),
+          ).thenAnswer((_) async => false);
 
-        // Act
-        final result = await repository.deleteCard(nonExistentId);
+          // Act
+          final result = await repository.deleteCard(nonExistentId);
 
-        // Assert
-        expect(result, isFalse);
-        verify(() => mockCardDao.deleteBusinessCard(int.parse(nonExistentId))).called(1);
-      });
+          // Assert
+          expect(result, isFalse);
+          verify(
+            () => mockCardDao.deleteBusinessCard(int.parse(nonExistentId)),
+          ).called(1);
+        },
+      );
 
       test('🔴 RED: should update card successfully', () async {
         // Arrange
@@ -231,11 +252,13 @@ void main() {
         final finalUpdatedCard = updatedCard.copyWith(
           updatedAt: DateTime.now(),
         );
-        
-        when(() => mockCardDao.getBusinessCardById(int.parse(updatedCard.id)))
-            .thenAnswer((_) async => finalUpdatedCard); // 返回更新後的模型
-        when(() => mockCardDao.updateBusinessCard(any()))
-            .thenAnswer((_) async => true);
+
+        when(
+          () => mockCardDao.getBusinessCardById(int.parse(updatedCard.id)),
+        ).thenAnswer((_) async => finalUpdatedCard); // 返回更新後的模型
+        when(
+          () => mockCardDao.updateBusinessCard(any()),
+        ).thenAnswer((_) async => true);
 
         // Act
         final result = await repository.updateCard(updatedCard);
@@ -245,31 +268,34 @@ void main() {
         verify(() => mockCardDao.updateBusinessCard(any())).called(1);
       });
 
-      test('🔴 RED: should throw error when updating non-existent card', () async {
-        // Arrange
-        final nonExistentCard = testCard.copyWith(id: '997');
-        when(() => mockCardDao.getBusinessCardById(int.parse(nonExistentCard.id)))
-            .thenAnswer((_) async => null);
+      test(
+        '🔴 RED: should throw error when updating non-existent card',
+        () async {
+          // Arrange
+          final nonExistentCard = testCard.copyWith(id: '997');
+          when(
+            () =>
+                mockCardDao.getBusinessCardById(int.parse(nonExistentCard.id)),
+          ).thenAnswer((_) async => null);
 
-        // Act & Assert
-        expect(
-          () => repository.updateCard(nonExistentCard),
-          throwsA(isA<DataSourceFailure>()),
-        );
-      });
+          // Act & Assert
+          expect(
+            () => repository.updateCard(nonExistentCard),
+            throwsA(isA<DataSourceFailure>()),
+          );
+        },
+      );
     });
 
     group('錯誤處理測試', () {
       test('🔴 RED: should handle database errors gracefully', () async {
         // Arrange
-        when(() => mockCardDao.getAllBusinessCards())
-            .thenThrow(Exception('Database connection failed'));
+        when(
+          () => mockCardDao.getAllBusinessCards(),
+        ).thenThrow(Exception('Database connection failed'));
 
         // Act & Assert
-        expect(
-          () => repository.getCards(),
-          throwsA(isA<DataSourceFailure>()),
-        );
+        expect(() => repository.getCards(), throwsA(isA<DataSourceFailure>()));
       });
 
       test('🔴 RED: should validate card data before saving', () async {
@@ -287,8 +313,9 @@ void main() {
     group('邊界條件測試', () {
       test('🔴 RED: should handle empty search query', () async {
         // Arrange
-        when(() => mockCardDao.searchBusinessCards(''))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockCardDao.searchBusinessCards(''),
+        ).thenAnswer((_) async => []);
 
         // Act
         final result = await repository.searchCards('');
@@ -300,8 +327,9 @@ void main() {
       test('🔴 RED: should handle very long search queries', () async {
         // Arrange
         final longQuery = 'a' * 1000;
-        when(() => mockCardDao.searchBusinessCards(longQuery))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockCardDao.searchBusinessCards(longQuery),
+        ).thenAnswer((_) async => []);
 
         // Act
         final result = await repository.searchCards(longQuery);

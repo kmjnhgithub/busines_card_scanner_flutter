@@ -9,10 +9,10 @@ import 'package:busines_card_scanner_flutter/domain/repositories/card_writer.dar
 import 'package:drift/drift.dart' show Value;
 
 /// CardRepository 的 Drift 資料庫實作
-/// 
+///
 /// 遵循 Clean Architecture 原則，實作 Domain 層定義的 CardRepository 介面。
 /// 使用 Drift 作為本地資料儲存方案，提供完整的 CRUD 操作支援。
-/// 
+///
 /// 特點：
 /// - **依賴反轉**: 依賴 Domain 層的抽象介面，不依賴具體實作
 /// - **錯誤處理**: 將資料層錯誤轉換為 Domain 層的 Failure 類型
@@ -101,7 +101,10 @@ class CardRepositoryImpl implements CardRepository {
   }
 
   @override
-  Future<List<BusinessCard>> getCardsByCompany(String company, {int limit = 50}) async {
+  Future<List<BusinessCard>> getCardsByCompany(
+    String company, {
+    int limit = 50,
+  }) async {
     try {
       // Note: getCardsByCompany not implemented in CardDao, using search instead
       final models = await _database.cardDao.searchBusinessCards(company);
@@ -127,14 +130,11 @@ class CardRepositoryImpl implements CardRepository {
       // 暫時實作 - 未來需要在 CardDao 中加入分頁支援
       final allModels = await _database.cardDao.getAllBusinessCards();
       final totalCount = allModels.length;
-      
-      final paginatedModels = allModels
-          .skip(offset)
-          .take(limit)
-          .toList();
-          
+
+      final paginatedModels = allModels.skip(offset).take(limit).toList();
+
       final cards = paginatedModels.map((model) => model).toList();
-      
+
       return CardPageResult(
         cards: cards,
         totalCount: totalCount,
@@ -202,9 +202,9 @@ class CardRepositoryImpl implements CardRepository {
       offset: offset,
       limit: pageSize,
     );
-    
+
     final totalPages = (result.totalCount / pageSize).ceil();
-    
+
     return CardPageResult(
       cards: result.cards,
       totalCount: result.totalCount,
@@ -225,13 +225,13 @@ class CardRepositoryImpl implements CardRepository {
     try {
       // 驗證卡片資料
       _validateCard(card);
-      
+
       // 如果 ID 為空或卡片不存在，則插入新卡片
       if (card.id.isEmpty || !await cardExists(card.id)) {
         // 為新卡片生成 ID
         final newId = card.id.isEmpty ? _generateId() : card.id;
         final newCard = card.copyWith(id: newId);
-        
+
         // 建立 BusinessCardsCompanion 以插入資料庫
         final companion = BusinessCardsCompanion.insert(
           name: newCard.name,
@@ -243,10 +243,14 @@ class CardRepositoryImpl implements CardRepository {
           website: Value(newCard.website),
           notes: Value(newCard.notes),
         );
-        
-        final insertedId = await _database.cardDao.insertBusinessCard(companion);
+
+        final insertedId = await _database.cardDao.insertBusinessCard(
+          companion,
+        );
         // 插入後重新取得卡片
-        final savedCard = await _database.cardDao.getBusinessCardById(insertedId);
+        final savedCard = await _database.cardDao.getBusinessCardById(
+          insertedId,
+        );
         return savedCard!;
       } else {
         // 否則更新現有卡片
@@ -256,7 +260,9 @@ class CardRepositoryImpl implements CardRepository {
         if (cardIdInt == null) {
           throw ArgumentError('Invalid card ID format: ${card.id}');
         }
-        final updatedCard = await _database.cardDao.getBusinessCardById(cardIdInt);
+        final updatedCard = await _database.cardDao.getBusinessCardById(
+          cardIdInt,
+        );
         return updatedCard!;
       }
     } catch (e) {
@@ -296,18 +302,20 @@ class CardRepositoryImpl implements CardRepository {
           internalMessage: 'Cannot update card that does not exist: ${card.id}',
         );
       }
-      
+
       // 驗證卡片資料
       _validateCard(card);
-      
+
       await _database.cardDao.updateBusinessCard(card);
-      
+
       // 更新後重新取得卡片
       final cardIdInt = int.tryParse(card.id);
       if (cardIdInt == null) {
         throw ArgumentError('Invalid card ID format: ${card.id}');
       }
-      final updatedCard = await _database.cardDao.getBusinessCardById(cardIdInt);
+      final updatedCard = await _database.cardDao.getBusinessCardById(
+        cardIdInt,
+      );
       return updatedCard!;
     } catch (e) {
       if (e is DomainFailure) {
@@ -321,30 +329,29 @@ class CardRepositoryImpl implements CardRepository {
   }
 
   // ==================== 暫未實作的批次操作和軟刪除功能 ====================
-  
+
   @override
   Future<BatchSaveResult> saveCards(List<BusinessCard> cards) async {
     // 簡化實作：逐一儲存（未來可優化為真正的批次操作）
     final successful = <BusinessCard>[];
     final failed = <BatchOperationError>[];
-    
+
     for (final card in cards) {
       try {
         final savedCard = await saveCard(card);
         successful.add(savedCard);
       } on Exception catch (e) {
-        failed.add(BatchOperationError(
-          itemId: card.id,
-          error: e.toString(),
-          originalData: card,
-        ));
+        failed.add(
+          BatchOperationError(
+            itemId: card.id,
+            error: e.toString(),
+            originalData: card,
+          ),
+        );
       }
     }
-    
-    return BatchSaveResult(
-      successful: successful,
-      failed: failed,
-    );
+
+    return BatchSaveResult(successful: successful, failed: failed);
   }
 
   @override
@@ -352,30 +359,23 @@ class CardRepositoryImpl implements CardRepository {
     // 簡化實作：逐一刪除（未來可優化為真正的批次操作）
     final successful = <String>[];
     final failed = <BatchOperationError>[];
-    
+
     for (final cardId in cardIds) {
       try {
         final deleted = await deleteCard(cardId);
         if (deleted) {
           successful.add(cardId);
         } else {
-          failed.add(BatchOperationError(
-            itemId: cardId,
-            error: 'Card not found',
-          ));
+          failed.add(
+            BatchOperationError(itemId: cardId, error: 'Card not found'),
+          );
         }
       } on Exception catch (e) {
-        failed.add(BatchOperationError(
-          itemId: cardId,
-          error: e.toString(),
-        ));
+        failed.add(BatchOperationError(itemId: cardId, error: e.toString()));
       }
     }
-    
-    return BatchDeleteResult(
-      successful: successful,
-      failed: failed,
-    );
+
+    return BatchDeleteResult(successful: successful, failed: failed);
   }
 
   @override
@@ -415,7 +415,7 @@ class CardRepositoryImpl implements CardRepository {
         field: 'name',
       );
     }
-    
+
     if (card.name.length > 100) {
       throw const DomainValidationFailure(
         userMessage: 'Name is too long',
@@ -423,7 +423,7 @@ class CardRepositoryImpl implements CardRepository {
         field: 'name',
       );
     }
-    
+
     // 可以加入更多驗證規則
   }
 }

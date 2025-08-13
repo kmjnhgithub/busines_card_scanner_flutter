@@ -24,7 +24,7 @@ final appDatabaseProvider = Provider<CleanAppDatabase>((ref) {
   return CleanAppDatabase.defaultInstance();
 });
 
-/// Provider for EnhancedSecureStorage instance  
+/// Provider for EnhancedSecureStorage instance
 /// Provides secure storage for API keys and sensitive data
 final enhancedSecureStorageProvider = Provider<EnhancedSecureStorage>((ref) {
   return EnhancedSecureStorage.defaultInstance();
@@ -44,10 +44,7 @@ final dioProvider = Provider<Dio>((ref) {
 final openAIServiceProvider = Provider<OpenAIService>((ref) {
   final secureStorage = ref.watch(enhancedSecureStorageProvider);
   final dio = ref.watch(dioProvider);
-  return OpenAIServiceImpl(
-    dio: dio,
-    secureStorage: secureStorage,
-  );
+  return OpenAIServiceImpl(dio: dio, secureStorage: secureStorage);
 });
 
 /// Provider for OCRService instance
@@ -56,7 +53,7 @@ final ocrServiceProvider = Provider<OCRService>((ref) {
   return SimpleOCRService();
 });
 
-/// Provider for OCRCacheService instance  
+/// Provider for OCRCacheService instance
 /// Provides OCR result caching and history management
 final ocrCacheServiceProvider = Provider<OCRCacheService>((ref) {
   return SimpleOCRCacheService();
@@ -73,22 +70,17 @@ final cardRepositoryProvider = Provider<CardRepository>((ref) {
   return CardRepositoryImpl(database);
 });
 
-/// Provider for OCRRepository implementation  
+/// Provider for OCRRepository implementation
 /// Connects Domain layer with Data layer for OCR operations
 final ocrRepositoryProvider = Provider<OCRRepository>((ref) {
   final ocrService = ref.watch(ocrServiceProvider);
   final cacheService = ref.watch(ocrCacheServiceProvider);
-  return OCRRepositoryImpl(
-    ocrService: ocrService,
-    cacheService: cacheService,
-  );
+  return OCRRepositoryImpl(ocrService: ocrService, cacheService: cacheService);
 });
 
 /// Provider for AIRepository implementation
-/// Connects Domain layer with Data layer for AI operations  
+/// Connects Domain layer with Data layer for AI operations
 final aiRepositoryProvider = Provider<AIRepository>((ref) {
   final openAIService = ref.watch(openAIServiceProvider);
-  return AIRepositoryImpl(
-    openAIService: openAIService,
-  );
+  return AIRepositoryImpl(openAIService: openAIService);
 });

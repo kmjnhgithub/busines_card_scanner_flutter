@@ -7,10 +7,7 @@ import 'package:dio/dio.dart';
 
 /// OpenAI Service 抽象介面
 abstract class OpenAIService {
-  Future<ParsedCardData> parseCardFromText(
-    String ocrText, {
-    ParseHints? hints,
-  });
+  Future<ParsedCardData> parseCardFromText(String ocrText, {ParseHints? hints});
 
   Future<BatchParseResult> parseCardsFromTexts(
     List<String> ocrTexts, {
@@ -31,10 +28,7 @@ class OpenAIServiceImpl implements OpenAIService {
   static const int _maxTokens = 1000;
   static const int _maxTextLength = 10000;
 
-  OpenAIServiceImpl({
-    required this.dio,
-    required this.secureStorage,
-  });
+  OpenAIServiceImpl({required this.dio, required this.secureStorage});
 
   @override
   Future<ParsedCardData> parseCardFromText(
@@ -67,11 +61,8 @@ class OpenAIServiceImpl implements OpenAIService {
 
     // 取得 API Key
     final apiKeyResult = await secureStorage.getApiKey('openai_api_key');
-    final apiKey = apiKeyResult.fold(
-      (failure) => null,
-      (key) => key,
-    );
-    
+    final apiKey = apiKeyResult.fold((failure) => null, (key) => key);
+
     if (apiKey == null || apiKey.isEmpty) {
       throw const AIServiceUnavailableFailure(
         userMessage: 'AI service is not configured',
@@ -119,30 +110,21 @@ class OpenAIServiceImpl implements OpenAIService {
         final result = await parseCardFromText(ocrTexts[i], hints: hints);
         successful.add(result);
       } on Exception catch (e) {
-        failed.add(BatchParseError(
-          index: i,
-          error: e.toString(),
-        ));
+        failed.add(BatchParseError(index: i, error: e.toString()));
       }
     }
 
-    return BatchParseResult(
-      successful: successful,
-      failed: failed,
-    );
+    return BatchParseResult(successful: successful, failed: failed);
   }
 
   @override
   Future<AIServiceStatus> getServiceStatus() async {
     final startTime = DateTime.now();
-    
+
     try {
       final apiKeyResult = await secureStorage.getApiKey('openai_api_key');
-      final apiKey = apiKeyResult.fold(
-        (failure) => null,
-        (key) => key,
-      );
-      
+      final apiKey = apiKeyResult.fold((failure) => null, (key) => key);
+
       if (apiKey == null || apiKey.isEmpty) {
         return AIServiceStatus(
           isAvailable: false,
@@ -157,23 +139,28 @@ class OpenAIServiceImpl implements OpenAIService {
       // 檢查 API 狀態
       final response = await dio.get(
         '$_baseUrl/models',
-        options: Options(
-          headers: {'Authorization': 'Bearer $apiKey'},
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $apiKey'}),
       );
 
       final endTime = DateTime.now();
-      final responseTime = endTime.difference(startTime).inMilliseconds.toDouble();
+      final responseTime = endTime
+          .difference(startTime)
+          .inMilliseconds
+          .toDouble();
 
       // 解析配額資訊
       final headers = response.headers;
-      final remainingQuota = int.tryParse(
-        headers.value('x-ratelimit-remaining-requests') ?? '0',
-      ) ?? 0;
-      
-      final resetTime = DateTime.tryParse(
-        headers.value('x-ratelimit-reset-requests') ?? '',
-      ) ?? DateTime.now().add(const Duration(hours: 1));
+      final remainingQuota =
+          int.tryParse(
+            headers.value('x-ratelimit-remaining-requests') ?? '0',
+          ) ??
+          0;
+
+      final resetTime =
+          DateTime.tryParse(
+            headers.value('x-ratelimit-reset-requests') ?? '',
+          ) ??
+          DateTime.now().add(const Duration(hours: 1));
 
       return AIServiceStatus(
         isAvailable: true,
@@ -184,8 +171,11 @@ class OpenAIServiceImpl implements OpenAIService {
       );
     } on Exception catch (e) {
       final endTime = DateTime.now();
-      final responseTime = endTime.difference(startTime).inMilliseconds.toDouble();
-      
+      final responseTime = endTime
+          .difference(startTime)
+          .inMilliseconds
+          .toDouble();
+
       return AIServiceStatus(
         isAvailable: false,
         error: 'Service check failed: ${e.toString()}',
@@ -258,9 +248,9 @@ $ocrText
 
       final message = choices[0]['message'];
       final content = message['content'] as String;
-      
+
       final parsedData = jsonDecode(content) as Map<String, dynamic>;
-      
+
       return _sanitizeAndValidateResult(parsedData);
     } on Exception catch (e) {
       throw AIServiceUnavailableFailure(
@@ -295,13 +285,13 @@ $ocrText
     if (str.isEmpty) {
       return null;
     }
-    
+
     // 移除可能的惡意內容
     final sanitized = str
         .replaceAll(RegExp('<[^>]*>'), '') // 移除 HTML 標籤
         .replaceAll(RegExp('javascript:', caseSensitive: false), '')
         .replaceAll(RegExp(r'on\w+\s*='), ''); // 移除事件處理器
-    
+
     return sanitized.isEmpty ? null : sanitized;
   }
 
@@ -310,7 +300,7 @@ $ocrText
     if (phone == null || phone.isEmpty) {
       return null;
     }
-    
+
     // 簡單的電話號碼驗證
     final phonePattern = RegExp(r'^[+]?[\d\s\-()]{7,}$');
     return phonePattern.hasMatch(phone) ? phone : null;
@@ -321,7 +311,7 @@ $ocrText
     if (email == null || email.isEmpty) {
       return null;
     }
-    
+
     final emailPattern = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
     return emailPattern.hasMatch(email) ? email : null;
   }
@@ -331,7 +321,7 @@ $ocrText
     if (confidence == null) {
       return 0;
     }
-    
+
     final value = double.tryParse(confidence.toString()) ?? 0.0;
     return value.clamp(0.0, 1.0);
   }
@@ -355,8 +345,7 @@ $ocrText
   RepositoryException _handleDioException(DioException e) {
     if (e.response?.statusCode == 429) {
       final errorData = e.response?.data;
-      if (errorData is Map && 
-          errorData['error']?['code'] == 'quota_exceeded') {
+      if (errorData is Map && errorData['error']?['code'] == 'quota_exceeded') {
         return AIQuotaExceededFailure(
           resetTime: DateTime.now().add(const Duration(hours: 1)),
           userMessage: 'AI service quota has been exceeded',
@@ -367,7 +356,7 @@ $ocrText
         userMessage: 'Too many requests, please try again later',
       );
     }
-    
+
     if (e.type == DioExceptionType.receiveTimeout ||
         e.type == DioExceptionType.sendTimeout ||
         e.type == DioExceptionType.connectionTimeout) {
@@ -375,7 +364,7 @@ $ocrText
         userMessage: 'AI service request timed out',
       );
     }
-    
+
     return const AIServiceUnavailableFailure(
       userMessage: 'AI service is temporarily unavailable',
     );

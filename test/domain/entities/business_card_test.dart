@@ -330,7 +330,10 @@ void main() {
         expect(updatedCard.name, originalCard.name);
         expect(updatedCard.company, 'New Corp');
         expect(updatedCard.createdAt, originalCard.createdAt);
-        expect(updatedCard.updatedAt, testDateTime.add(const Duration(hours: 1)));
+        expect(
+          updatedCard.updatedAt,
+          testDateTime.add(const Duration(hours: 1)),
+        );
       });
 
       test('should get display name with fallback', () {
@@ -350,7 +353,10 @@ void main() {
 
         // Act & Assert
         expect(cardWithName.getDisplayName(), 'John Doe');
-        expect(cardWithEmail.getDisplayName(), 'Unknown Person'); // Should return name, not email
+        expect(
+          cardWithEmail.getDisplayName(),
+          'Unknown Person',
+        ); // Should return name, not email
       });
     });
 
@@ -369,7 +375,7 @@ void main() {
 
       test('should handle very long text fields', () {
         final longText = 'A' * 1000;
-        
+
         expect(
           () => BusinessCard(
             id: 'card-123',

@@ -11,7 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 名片列表頁面
-/// 
+///
 /// 顯示所有名片的列表，支援搜尋、排序、刪除等功能
 class CardListPage extends ConsumerStatefulWidget {
   const CardListPage({super.key});
@@ -53,11 +53,14 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立應用程式列
-  PreferredSizeWidget _buildAppBar(BuildContext context, CardListViewModel viewModel) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    CardListViewModel viewModel,
+  ) {
     return AppBar(
       backgroundColor: AppColors.background,
       elevation: 0,
-      title: _isSearchExpanded 
+      title: _isSearchExpanded
           ? _buildSearchField(viewModel)
           : Text(
               '名片',
@@ -116,7 +119,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
       decoration: InputDecoration(
         hintText: '搜尋姓名、公司、電話...',
-        hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.placeholder),
+        hintStyle: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.placeholder,
+        ),
         border: InputBorder.none,
         contentPadding: EdgeInsets.zero,
       ),
@@ -127,7 +132,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立主體內容
-  Widget _buildBody(BuildContext context, CardListState state, CardListViewModel viewModel) {
+  Widget _buildBody(
+    BuildContext context,
+    CardListState state,
+    CardListViewModel viewModel,
+  ) {
     if (state.isLoading && state.cards.isEmpty) {
       return _buildLoadingState();
     }
@@ -232,9 +241,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             ),
             const SizedBox(height: AppDimensions.space2),
             Text(
-              isSearchResult 
-                  ? '試著搜尋其他關鍵字'
-                  : '點擊右下角的 + 新增第一張名片',
+              isSearchResult ? '試著搜尋其他關鍵字' : '點擊右下角的 + 新增第一張名片',
               style: AppTextStyles.bodyMedium.copyWith(
                 color: AppColors.secondaryText,
               ),
@@ -264,7 +271,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立名片項目
-  Widget _buildCardItem(BuildContext context, BusinessCard card, CardListViewModel viewModel) {
+  Widget _buildCardItem(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppDimensions.space2),
       child: ThemedCard(
@@ -275,9 +286,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             _buildCardThumbnail(card),
             const SizedBox(width: AppDimensions.space4),
             // 名片資訊區域
-            Expanded(
-              child: _buildCardInfo(card),
-            ),
+            Expanded(child: _buildCardInfo(card)),
             // 更多操作按鈕
             _buildMoreActionsButton(context, card, viewModel),
           ],
@@ -294,12 +303,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       decoration: BoxDecoration(
         color: AppColors.secondaryBackground,
         borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
-        border: Border.all(
-          color: AppColors.separator,
-          width: 0.5,
-        ),
+        border: Border.all(color: AppColors.separator, width: 0.5),
       ),
-      child: card.imageUrl != null 
+      child: card.imageUrl != null
           ? ClipRRect(
               borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
               child: Image.network(
@@ -331,9 +337,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
         // 姓名
         Text(
           card.name,
-          style: AppTextStyles.headline6.copyWith(
-            color: AppColors.primaryText,
-          ),
+          style: AppTextStyles.headline6.copyWith(color: AppColors.primaryText),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -364,7 +368,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立更多操作按鈕
-  Widget _buildMoreActionsButton(BuildContext context, BusinessCard card, CardListViewModel viewModel) {
+  Widget _buildMoreActionsButton(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) {
     return IconButton(
       icon: const Icon(
         Icons.more_vert,
@@ -391,11 +399,13 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   /// 顯示排序選項
   void _showSortOptions(BuildContext context, CardListViewModel viewModel) {
     final state = ref.read(cardListViewModelProvider);
-    
+
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusLarge)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusLarge),
+        ),
       ),
       builder: (context) => SafeArea(
         child: Column(
@@ -405,7 +415,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.symmetric(vertical: AppDimensions.space2),
+              margin: const EdgeInsets.symmetric(
+                vertical: AppDimensions.space2,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.separator,
                 borderRadius: BorderRadius.circular(2),
@@ -461,7 +473,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     CardListViewModel viewModel,
   ) {
     final isSelected = sortBy == currentSortBy;
-    
+
     return ListTile(
       title: Text(
         title,
@@ -477,8 +489,8 @@ class _CardListPageState extends ConsumerState<CardListPage> {
                 IconButton(
                   icon: Icon(
                     Icons.arrow_upward,
-                    color: currentSortOrder == SortOrder.ascending 
-                        ? AppColors.primary 
+                    color: currentSortOrder == SortOrder.ascending
+                        ? AppColors.primary
                         : AppColors.secondaryText,
                     size: AppDimensions.iconSmall,
                   ),
@@ -490,8 +502,8 @@ class _CardListPageState extends ConsumerState<CardListPage> {
                 IconButton(
                   icon: Icon(
                     Icons.arrow_downward,
-                    color: currentSortOrder == SortOrder.descending 
-                        ? AppColors.primary 
+                    color: currentSortOrder == SortOrder.descending
+                        ? AppColors.primary
                         : AppColors.secondaryText,
                     size: AppDimensions.iconSmall,
                   ),
@@ -511,11 +523,17 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 顯示名片操作選項
-  void _showCardOptions(BuildContext context, BusinessCard card, CardListViewModel viewModel) {
+  void _showCardOptions(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusLarge)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusLarge),
+        ),
       ),
       builder: (context) => SafeArea(
         child: Column(
@@ -525,7 +543,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.symmetric(vertical: AppDimensions.space2),
+              margin: const EdgeInsets.symmetric(
+                vertical: AppDimensions.space2,
+              ),
               decoration: BoxDecoration(
                 color: AppColors.separator,
                 borderRadius: BorderRadius.circular(2),
@@ -535,7 +555,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
               leading: const Icon(Icons.edit, color: AppColors.primaryText),
               title: Text(
                 '編輯',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primaryText,
+                ),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -546,7 +568,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
               leading: const Icon(Icons.share, color: AppColors.primaryText),
               title: Text(
                 '分享',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primaryText,
+                ),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -557,7 +581,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
               leading: const Icon(Icons.delete, color: AppColors.error),
               title: Text(
                 '刪除',
-                style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error),
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.error,
+                ),
               ),
               onTap: () {
                 Navigator.pop(context);
@@ -572,7 +598,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 確認刪除名片
-  Future<void> _confirmDeleteCard(BuildContext context, BusinessCard card, CardListViewModel viewModel) async {
+  Future<void> _confirmDeleteCard(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) async {
     final confirmed = await DialogPresenter.showDeleteConfirmation(
       context,
       title: '刪除名片',
@@ -588,7 +618,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       if (!mounted) {
         return;
       }
-      
+
       if (success && mounted) {
         ToastHelper.showSnackBar(
           currentContext,
@@ -626,9 +656,6 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   /// 分享名片
   void _shareCard(BuildContext context, BusinessCard card) {
     // TODO: 實作名片分享功能
-    ToastHelper.showSnackBar(
-      context,
-      '分享功能尚未實作',
-    );
+    ToastHelper.showSnackBar(context, '分享功能尚未實作');
   }
 }
