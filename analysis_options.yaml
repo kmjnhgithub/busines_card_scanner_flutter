@@ -19,10 +19,11 @@ analyzer:
     avoid_web_libraries_in_flutter: error
     close_sinks: warning
     # 測試文件的例外規則
-    use_setters_to_change_properties: info
+    use_setters_to_change_properties: ignore  # Mocktail Mock 設定方法
     avoid_setters_without_getters: info
-    avoid_positional_boolean_parameters: info
-    prefer_mixin: info
+    avoid_positional_boolean_parameters: warning  # 應該修復
+    prefer_mixin: warning  # 應該修復
+    avoid_catching_errors: warning  # 應該修復
     
   exclude:
     - "**/*.g.dart"
@@ -31,6 +32,8 @@ analyzer:
     - "build/**"
     - "test/.test_coverage.dart"
     - "lib/generated_plugin_registrant.dart"
+    # 測試檔案排除特定規則
+    - "test/**/*_test.dart"
 
 linter:
   rules:

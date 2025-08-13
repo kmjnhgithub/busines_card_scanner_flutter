@@ -65,11 +65,15 @@ class MockCardReader implements CardReader {
       throw _mockFailure!;
     }
     final cards = _mockCards ?? [];
-    try {
-      return cards.firstWhere((card) => card.id == cardId);
-    } on StateError catch (_) {
+    // 使用更安全的方式避免 StateError
+    final foundCard = cards.cast<BusinessCard?>().firstWhere(
+      (card) => card?.id == cardId,
+      orElse: () => null,
+    );
+    if (foundCard == null) {
       throw CardNotFoundException(cardId);
     }
+    return foundCard;
   }
 
   @override

@@ -18,9 +18,9 @@ class MockCardWriter implements CardWriter {
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
   void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
-  void setMockDeleteSuccess(bool success) => _mockDeleteSuccess = success;
-  void setMockSoftDeleteSuccess(bool success) => _mockSoftDeleteSuccess = success;
-  void setMockRestoreSuccess(bool success) => _mockRestoreSuccess = success;
+  void setMockDeleteSuccess({required bool success}) => _mockDeleteSuccess = success;
+  void setMockSoftDeleteSuccess({required bool success}) => _mockSoftDeleteSuccess = success;
+  void setMockRestoreSuccess({required bool success}) => _mockRestoreSuccess = success;
   void setMockPurgeCount(int count) => _mockPurgeCount = count;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
@@ -116,7 +116,7 @@ void main() {
       test('should delete single card successfully', () async {
         // Arrange
         const cardId = 'card-123';
-        mockCardWriter.setMockDeleteSuccess(true);
+        mockCardWriter.setMockDeleteSuccess(success: true);
 
         // Act
         final result = await useCase.execute(
@@ -134,7 +134,7 @@ void main() {
       test('should handle delete failure gracefully', () async {
         // Arrange
         const cardId = 'card-456';
-        mockCardWriter.setMockDeleteSuccess(false);
+        mockCardWriter.setMockDeleteSuccess(success: false);
 
         // Act
         final result = await useCase.execute(
@@ -207,7 +207,7 @@ void main() {
       test('should soft delete card successfully', () async {
         // Arrange
         const cardId = 'card-soft-123';
-        mockCardWriter.setMockSoftDeleteSuccess(true);
+        mockCardWriter.setMockSoftDeleteSuccess(success: true);
 
         // Act
         final result = await useCase.execute(
@@ -225,7 +225,7 @@ void main() {
       test('should handle soft delete failure', () async {
         // Arrange
         const cardId = 'card-soft-fail';
-        mockCardWriter.setMockSoftDeleteSuccess(false);
+        mockCardWriter.setMockSoftDeleteSuccess(success: false);
 
         // Act
         final result = await useCase.execute(
@@ -240,7 +240,7 @@ void main() {
       test('should support restore functionality after soft delete', () async {
         // Arrange
         const cardId = 'card-restore';
-        mockCardWriter.setMockRestoreSuccess(true);
+        mockCardWriter.setMockRestoreSuccess(success: true);
 
         // Act
         final result = await useCase.executeRestore(
@@ -256,7 +256,7 @@ void main() {
       test('should handle restore failure', () async {
         // Arrange
         const cardId = 'card-restore-fail';
-        mockCardWriter.setMockRestoreSuccess(false);
+        mockCardWriter.setMockRestoreSuccess(success: false);
 
         // Act
         final result = await useCase.executeRestore(
