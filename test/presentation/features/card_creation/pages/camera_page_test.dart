@@ -10,6 +10,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../helpers/test_helpers.dart';
+
 // Mock 類別
 class MockCameraViewModel extends StateNotifier<CameraState>
     with Mock
@@ -32,6 +34,7 @@ void main() {
     late MockToastPresenter mockToastPresenter;
     late MockCameraController mockCameraController;
     late MockNavigatorObserver mockNavigatorObserver;
+    late ProviderContainer container;
 
     // 測試資料
     const mockCameraDescription = CameraDescription(
@@ -64,19 +67,32 @@ void main() {
           description: mockCameraDescription,
         ),
       );
-    });
 
-    Widget createTestWidget({CameraState? state}) {
-      return ProviderScope(
+      container = TestHelpers.createTestContainer(
         overrides: [
           cameraViewModelProvider.overrideWith((ref) => mockCameraViewModel),
           loadingPresenterProvider.overrideWith((ref) => mockLoadingPresenter),
           toastPresenterProvider.overrideWith((ref) => mockToastPresenter),
         ],
-        child: MaterialApp(
-          home: const CameraPage(),
-          navigatorObservers: [mockNavigatorObserver],
-        ),
+      );
+    });
+
+    tearDown(() {
+      TestHelpers.disposeContainer(container);
+    });
+
+    Widget createTestWidget({CameraState? state}) {
+      if (state != null) {
+        mockCameraViewModel.state = state;
+      }
+      
+      return TestHelpers.createTestWidget(
+        container: container,
+        child: const CameraPage(),
+        routes: {
+          '/ocr-processing': (context) => Container(),
+          '/card-edit': (context) => Container(),
+        },
       );
     }
 
@@ -87,7 +103,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -103,7 +119,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.byType(CameraPreview), findsOneWidget);
@@ -119,7 +135,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.byKey(const Key('camera_shutter_button')), findsOneWidget);
@@ -137,7 +153,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('相機錯誤'), findsOneWidget);
@@ -154,7 +170,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.byKey(const Key('camera_overlay')), findsOneWidget);
@@ -170,7 +186,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         final flashButton = find.byKey(const Key('flash_toggle_button'));
@@ -197,7 +213,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('camera_shutter_button')));
         await tester.pump();
@@ -215,7 +231,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('flash_toggle_button')));
         await tester.pump();
@@ -233,7 +249,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('photo_library_button')));
         await tester.pump();
@@ -252,7 +268,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('close_camera_button')));
         await tester.pump();
@@ -271,7 +287,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // 點擊相機預覽的中心
         await tester.tap(find.byType(CameraPreview));
@@ -289,7 +305,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.text('重試'));
         await tester.pump();
@@ -310,7 +326,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         // 這裡應該檢查導航到 OCR 處理頁面
@@ -323,7 +339,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert - 應該顯示載入中
         expect(find.byType(CircularProgressIndicator), findsOneWidget);
@@ -352,7 +368,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert - 應該顯示 torch 圖示
         expect(find.byIcon(Icons.flash_on), findsOneWidget);
@@ -379,7 +395,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         // 這裡會檢查是否請求了相機權限
@@ -415,7 +431,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         final cameraPreview = tester.widget<CameraPreview>(
@@ -437,7 +453,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.bySemanticsLabel('拍照'), findsOneWidget);
@@ -455,7 +471,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('將名片放入框內'), findsOneWidget);

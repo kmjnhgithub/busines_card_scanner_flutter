@@ -11,6 +11,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
+import '../../../../helpers/test_helpers.dart';
+
 // Mock 類別
 class MockOCRProcessingViewModel extends StateNotifier<OCRProcessingState>
     with Mock
@@ -34,6 +36,7 @@ void main() {
     late MockLoadingPresenter mockLoadingPresenter;
     late MockToastPresenter mockToastPresenter;
     late MockNavigatorObserver mockNavigatorObserver;
+    late ProviderContainer container;
 
     // 測試資料
     const testImagePath = '/test/path/image.jpg';
@@ -59,14 +62,8 @@ void main() {
       mockLoadingPresenter = MockLoadingPresenter();
       mockToastPresenter = MockToastPresenter();
       mockNavigatorObserver = MockNavigatorObserver();
-    });
 
-    Widget createTestWidget({OCRProcessingState? state}) {
-      if (state != null) {
-        mockOCRProcessingViewModel.state = state;
-      }
-      
-      return ProviderScope(
+      container = TestHelpers.createTestContainer(
         overrides: [
           ocrProcessingViewModelProvider.overrideWith(
             (ref) => mockOCRProcessingViewModel,
@@ -74,10 +71,25 @@ void main() {
           loadingPresenterProvider.overrideWith((ref) => mockLoadingPresenter),
           toastPresenterProvider.overrideWith((ref) => mockToastPresenter),
         ],
-        child: MaterialApp(
-          home: const OCRProcessingPage(imagePath: testImagePath),
-          navigatorObservers: [mockNavigatorObserver],
-        ),
+      );
+    });
+
+    tearDown(() {
+      TestHelpers.disposeContainer(container);
+    });
+
+    Widget createTestWidget({OCRProcessingState? state}) {
+      if (state != null) {
+        mockOCRProcessingViewModel.state = state;
+      }
+      
+      return TestHelpers.createTestWidget(
+        container: container,
+        child: const OCRProcessingPage(imagePath: testImagePath),
+        routes: {
+          '/card-edit': (context) => Container(),
+          '/camera': (context) => Container(),
+        },
       );
     }
 
@@ -90,7 +102,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('載入圖片中...'), findsOneWidget);
@@ -105,7 +117,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.byType(Image), findsOneWidget);
@@ -120,7 +132,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('文字識別中...'), findsOneWidget);
@@ -136,7 +148,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('識別文字'), findsOneWidget);
@@ -153,7 +165,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('AI 解析中...'), findsOneWidget);
@@ -170,7 +182,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('處理完成'), findsOneWidget);
@@ -188,7 +200,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('處理失敗'), findsOneWidget);
@@ -204,7 +216,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.byKey(const Key('progress_steps')), findsOneWidget);
@@ -230,7 +242,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.byIcon(Icons.warning), findsOneWidget);
@@ -247,7 +259,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('start_processing_button')));
         await tester.pump();
@@ -266,7 +278,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('retake_photo_button')));
         await tester.pump();
@@ -284,7 +296,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('edit_text_button')));
         await tester.pump();
@@ -303,7 +315,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // 編輯文字
         await tester.enterText(find.byType(TextField), '編輯後的文字');
@@ -325,7 +337,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('reprocess_ai_button')));
         await tester.pump();
@@ -343,7 +355,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('complete_processing_button')));
         await tester.pump();
@@ -364,7 +376,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('save_card_button')));
         await tester.pump();
@@ -382,7 +394,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byKey(const Key('retry_button')));
         await tester.pump();
@@ -401,7 +413,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert - 應該顯示 OCR 處理進度
         expect(find.text('文字識別中...'), findsOneWidget);
@@ -428,7 +440,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert - 應該顯示只讀文字
         expect(find.text(testOCRResult.rawText), findsOneWidget);
@@ -458,7 +470,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert - 不應該顯示警告
         expect(find.byIcon(Icons.warning), findsNothing);
@@ -488,7 +500,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         // Assert
         expect(find.text('處理名片'), findsOneWidget);
@@ -503,7 +515,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget());
-        await tester.pump();
+        await TestHelpers.testLoadingState(tester);
 
         await tester.tap(find.byTooltip('Back'));
         await tester.pump();
