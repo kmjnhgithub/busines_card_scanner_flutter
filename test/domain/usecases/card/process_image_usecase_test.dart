@@ -30,7 +30,9 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<OCRResult> recognizeText(Uint8List imageData, {OCROptions? options}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockOCRResult ?? OCRResult(
       id: 'ocr-${DateTime.now().millisecondsSinceEpoch}',
       rawText: 'Mock OCR result',
@@ -42,25 +44,33 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<BatchOCRResult> recognizeTexts(List<Uint8List> imageDataList, {OCROptions? options}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? const BatchOCRResult(successful: [], failed: []);
   }
 
   @override
   Future<OCRResult> saveOCRResult(OCRResult result) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return result;
   }
 
   @override
   Future<List<OCRResult>> getOCRHistory({int limit = 50, bool includeImages = false}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return [];
   }
 
   @override
   Future<OCRResult> getOCRResultById(String resultId, {bool includeImage = false}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockOCRResult ?? OCRResult(
       id: resultId,
       rawText: 'Test OCR result',
@@ -72,19 +82,25 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<bool> deleteOCRResult(String resultId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<int> cleanupOldResults({int daysOld = 30}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return 5;
   }
 
   @override
   Future<List<OCREngineInfo>> getAvailableEngines() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockEngines ?? [
       const OCREngineInfo(
         id: 'google-ml-kit',
@@ -99,12 +115,16 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<void> setPreferredEngine(String engineId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
   }
 
   @override
   Future<OCREngineInfo> getCurrentEngine() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockCurrentEngine ?? const OCREngineInfo(
       id: 'google-ml-kit',
       name: 'Google ML Kit',
@@ -117,7 +137,9 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<OCREngineHealth> testEngine({String? engineId}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockEngineHealth ?? OCREngineHealth(
       engineId: engineId ?? 'google-ml-kit',
       isHealthy: true,
@@ -128,13 +150,17 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<Uint8List> preprocessImage(Uint8List imageData, {ImagePreprocessOptions? options}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockPreprocessedImage ?? imageData;
   }
 
   @override
   Future<OCRStatistics> getStatistics() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockStatistics ?? OCRStatistics(
       totalProcessed: 100,
       averageConfidence: 0.85,

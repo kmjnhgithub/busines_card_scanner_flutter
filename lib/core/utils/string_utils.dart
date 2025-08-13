@@ -148,16 +148,24 @@ class StringUtils {
   /// 計算字串的位元組長度（UTF-8）
   static int getByteLength(String input) {
     return input.codeUnits.fold(0, (length, codeUnit) {
-      if (codeUnit <= 0x7F) return length + 1;
-      if (codeUnit <= 0x7FF) return length + 2;
-      if (codeUnit <= 0xFFFF) return length + 3;
+      if (codeUnit <= 0x7F) {
+        return length + 1;
+      }
+      if (codeUnit <= 0x7FF) {
+        return length + 2;
+      }
+      if (codeUnit <= 0xFFFF) {
+        return length + 3;
+      }
       return length + 4;
     });
   }
 
   /// 安全地比較兩個字串（防止時間攻擊）
   static bool safeEquals(String a, String b) {
-    if (a.length != b.length) return false;
+    if (a.length != b.length) {
+      return false;
+    }
     
     int result = 0;
     for (int i = 0; i < a.length; i++) {
@@ -168,7 +176,9 @@ class StringUtils {
 
   /// 清理檔案名稱，移除不安全字元
   static String sanitizeFileName(String fileName) {
-    if (fileName.isEmpty) return 'unnamed';
+    if (fileName.isEmpty) {
+      return 'unnamed';
+    }
     
     // 移除路徑分隔符號和其他危險字元
     const dangerousChars = r'[<>:"/\|?*\x00-\x1F]';
@@ -178,14 +188,18 @@ class StringUtils {
     cleaned = cleaned.replaceAll(RegExp(r'^[.\s]+|[.\s]+$'), '');
     
     // 確保不為空
-    if (cleaned.isEmpty) cleaned = 'unnamed';
+    if (cleaned.isEmpty) {
+      cleaned = 'unnamed';
+    }
     
     return cleaned;
   }
 
   /// 從文字中提取可能的電子信箱地址
   static List<String> extractEmails(String text) {
-    if (text.isEmpty) return [];
+    if (text.isEmpty) {
+      return [];
+    }
     
     final emailRegex = RegExp(
       r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b',
@@ -200,7 +214,9 @@ class StringUtils {
 
   /// 從文字中提取可能的電話號碼（支援國際格式）
   static List<String> extractPhoneNumbers(String text) {
-    if (text.isEmpty) return [];
+    if (text.isEmpty) {
+      return [];
+    }
     
     // 支援多種國際電話格式的正則表達式
     final phoneRegex = RegExp(

@@ -204,7 +204,9 @@ class DateTimeUtils {
 
   /// 計算兩個日期之間的工作日數量（週一到週五）
   static int getWorkingDays(DateTime start, DateTime end) {
-    if (end.isBefore(start)) return 0;
+    if (end.isBefore(start)) {
+      return 0;
+    }
     
     int workingDays = 0;
     DateTime current = startOfDay(start);

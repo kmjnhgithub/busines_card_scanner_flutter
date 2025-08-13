@@ -262,8 +262,12 @@ void main() {
           options: any(named: 'options')
         )).thenAnswer((invocation) async {
           final imageData = invocation.positionalArguments[0] as Uint8List;
-          if (imageData.first == 1) return expectedResults[0];
-          if (imageData.first == 4) return expectedResults[1];
+          if (imageData.first == 1) {
+            return expectedResults[0];
+          }
+          if (imageData.first == 4) {
+            return expectedResults[1];
+          }
           return expectedResults[2];
         });
         

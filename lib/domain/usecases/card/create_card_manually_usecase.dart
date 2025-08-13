@@ -390,7 +390,9 @@ class CreateCardManuallyUseCase {
   /// 解析 CSV 資料
   List<ManualCardData> _parseCSVData(String csvData) {
     final lines = csvData.split('\n').where((line) => line.trim().isNotEmpty).toList();
-    if (lines.isEmpty) return [];
+    if (lines.isEmpty) {
+      return [];
+    }
 
     // 假設第一行是標題
     final headers = lines.first.split(',').map((h) => h.trim()).toList();

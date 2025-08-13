@@ -21,7 +21,9 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     if (_mockSavedCard != null) {
       return _mockSavedCard!;
     }
@@ -37,7 +39,9 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BatchSaveResult> saveCards(List<BusinessCard> cards) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? BatchSaveResult(
       successful: cards,
       failed: [],
@@ -46,13 +50,17 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<bool> deleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<BatchDeleteResult> deleteCards(List<String> cardIds) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockDeleteResult ?? BatchDeleteResult(
       successful: cardIds,
       failed: [],
@@ -61,25 +69,33 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> updateCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockSavedCard ?? card;
   }
 
   @override
   Future<bool> softDeleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<bool> restoreCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<int> purgeDeletedCards({int daysOld = 30}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return 0;
   }
 }
@@ -96,7 +112,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<ParsedCardData> parseCardFromText(String ocrText, {ParseHints? hints}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockParsedData ?? ParsedCardData(
       name: '王大明',
       company: '科技股份有限公司',
@@ -112,7 +130,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<BatchParseResult> parseCardsFromTexts(List<OCRResult> ocrResults, {ParseHints? hints}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? const BatchParseResult(
       successful: [],
       failed: [],
@@ -121,13 +141,17 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<CardCompletionSuggestions> suggestCardCompletion(BusinessCard incompleteCard, {CompletionContext? context}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return const CardCompletionSuggestions(suggestions: {}, confidence: {});
   }
 
   @override
   Future<ParsedCardData> validateAndSanitizeResult(Map<String, dynamic> parsedData) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return ParsedCardData(
       name: parsedData['name']?.toString() ?? 'Unknown',
       company: parsedData['company']?.toString(),
@@ -145,7 +169,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<AIServiceStatus> getServiceStatus() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return AIServiceStatus(
       isAvailable: true,
       responseTimeMs: 200,
@@ -157,18 +183,24 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<List<AIModelInfo>> getAvailableModels() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return [];
   }
 
   @override
   Future<void> setPreferredModel(String modelId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
   }
 
   @override
   Future<AIModelInfo> getCurrentModel() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return const AIModelInfo(
       id: 'mock-model',
       name: 'Mock Model',
@@ -180,7 +212,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<AIUsageStatistics> getUsageStatistics() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return AIUsageStatistics(
       totalRequests: 0,
       successfulRequests: 0,
@@ -193,25 +227,33 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<bool> isTextSafeForProcessing(String text) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<FormattedFieldResult> formatField(String fieldName, String rawValue) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return FormattedFieldResult(formattedValue: rawValue, confidence: 0.9);
   }
 
   @override
   Future<DuplicateDetectionResult> detectDuplicates(ParsedCardData cardData, List<BusinessCard> existingCards) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return const DuplicateDetectionResult(hasDuplicates: false, potentialDuplicates: [], similarityScores: {});
   }
 
   @override
   Future<String> generateCardSummary(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return 'Mock summary for ${card.name}';
   }
 }

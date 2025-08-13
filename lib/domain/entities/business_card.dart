@@ -131,7 +131,9 @@ class BusinessCard extends Equatable {
 
   /// 清理字串欄位（移除多餘空白）
   static String? _cleanString(String? value) {
-    if (value == null) return null;
+    if (value == null) {
+      return null;
+    }
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed.replaceAll(RegExp(r'\s+'), ' ');
   }
@@ -160,9 +162,15 @@ class BusinessCard extends Equatable {
   /// 
   /// 優先顯示姓名，如果姓名為空則使用email或其他識別資訊
   String getDisplayName() {
-    if (name.isNotEmpty) return name;
-    if (email != null && email!.isNotEmpty) return email!;
-    if (company != null && company!.isNotEmpty) return company!;
+    if (name.isNotEmpty) {
+      return name;
+    }
+    if (email != null && email!.isNotEmpty) {
+      return email!;
+    }
+    if (company != null && company!.isNotEmpty) {
+      return company!;
+    }
     return 'Unknown Contact';
   }
 

@@ -322,7 +322,9 @@ class GoogleMLKitOCRService implements OCRService {
 
   /// 估算文字識別信心度
   double _estimateConfidence(String text) {
-    if (text.isEmpty) return 0;
+    if (text.isEmpty) {
+      return 0;
+    }
     
     double confidence = 0.8; // 基礎信心度
     
@@ -411,7 +413,9 @@ class GoogleMLKitOCRService implements OCRService {
 
   /// 檢查圖片格式
   bool _isValidImageFormat(Uint8List imageData) {
-    if (imageData.length < 8) return false;
+    if (imageData.length < 8) {
+      return false;
+    }
     
     // JPEG 檔頭: FF D8 FF
     if (imageData[0] == 0xFF && imageData[1] == 0xD8 && imageData[2] == 0xFF) {

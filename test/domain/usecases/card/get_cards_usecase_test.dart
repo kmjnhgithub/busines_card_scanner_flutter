@@ -17,7 +17,9 @@ class MockCardReader implements CardReader {
 
   @override
   Future<List<BusinessCard>> getCards({int limit = 50}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     final cards = _mockCards ?? [];
     return cards.take(limit).toList();
   }
@@ -27,7 +29,9 @@ class MockCardReader implements CardReader {
     int page = 1,
     int pageSize = 20,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockPageResult ?? CardPageResult(
       cards: _mockCards ?? [],
       totalCount: _mockCards?.length ?? 0,
@@ -45,7 +49,9 @@ class MockCardReader implements CardReader {
     CardSortField sortBy = CardSortField.createdAt,
     SortOrder sortOrder = SortOrder.descending,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockPageResult ?? CardPageResult(
       cards: _mockCards ?? [],
       totalCount: _mockCards?.length ?? 0,
@@ -57,7 +63,9 @@ class MockCardReader implements CardReader {
 
   @override
   Future<BusinessCard> getCardById(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     final cards = _mockCards ?? [];
     try {
       return cards.firstWhere((card) => card.id == cardId);
@@ -71,7 +79,9 @@ class MockCardReader implements CardReader {
     String query, {
     int limit = 50,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     final cards = _mockCards ?? [];
     return cards.where((card) => 
       card.name.toLowerCase().contains(query.toLowerCase()) ||
@@ -81,13 +91,17 @@ class MockCardReader implements CardReader {
 
   @override
   Future<int> getCardCount() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockCards?.length ?? 0;
   }
 
   @override
   Future<List<BusinessCard>> getRecentCards({int limit = 10}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     final cards = _mockCards ?? [];
     final sorted = List<BusinessCard>.from(cards)
       ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
@@ -99,7 +113,9 @@ class MockCardReader implements CardReader {
     String company, {
     int limit = 50,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     final cards = _mockCards ?? [];
     return cards.where((card) => 
       card.company?.toLowerCase() == company.toLowerCase()
@@ -108,7 +124,9 @@ class MockCardReader implements CardReader {
 
   @override
   Future<bool> cardExists(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     final cards = _mockCards ?? [];
     return cards.any((card) => card.id == cardId);
   }

@@ -24,7 +24,9 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     // 模擬儲存後分配 ID
     if (_mockSavedCard != null) {
       return _mockSavedCard!;
@@ -42,7 +44,9 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BatchSaveResult> saveCards(List<BusinessCard> cards) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? BatchSaveResult(
       successful: cards,
       failed: [],
@@ -51,13 +55,17 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<bool> deleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<BatchDeleteResult> deleteCards(List<String> cardIds) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockDeleteResult ?? BatchDeleteResult(
       successful: cardIds,
       failed: [],
@@ -66,25 +74,33 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> updateCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockSavedCard ?? card;
   }
 
   @override
   Future<bool> softDeleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<bool> restoreCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<int> purgeDeletedCards({int daysOld = 30}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return 0;
   }
 }
@@ -104,7 +120,9 @@ class MockOCRRepository implements OCRRepository {
     Uint8List imageData, {
     OCROptions? options,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockOCRResult ?? OCRResult(
       id: 'ocr-${DateTime.now().millisecondsSinceEpoch}',
       rawText: '模擬 OCR 結果',
@@ -119,7 +137,9 @@ class MockOCRRepository implements OCRRepository {
     List<Uint8List> imageDataList, {
     OCROptions? options,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? const BatchOCRResult(
       successful: [],
       failed: [],
@@ -128,7 +148,9 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<OCRResult> saveOCRResult(OCRResult result) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return result;
   }
 
@@ -137,7 +159,9 @@ class MockOCRRepository implements OCRRepository {
     int limit = 50,
     bool includeImages = false,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return [];
   }
 
@@ -146,7 +170,9 @@ class MockOCRRepository implements OCRRepository {
     String resultId, {
     bool includeImage = false,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockOCRResult ?? OCRResult(
       id: resultId,
       rawText: '測試文字',
@@ -158,30 +184,40 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<bool> deleteOCRResult(String resultId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<int> cleanupOldResults({int daysOld = 30}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return 0;
   }
 
   @override
   Future<List<OCREngineInfo>> getAvailableEngines() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return [];
   }
 
   @override
   Future<void> setPreferredEngine(String engineId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
   }
 
   @override
   Future<OCREngineInfo> getCurrentEngine() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return const OCREngineInfo(
       id: 'test-engine',
       name: 'Test Engine',
@@ -194,7 +230,9 @@ class MockOCRRepository implements OCRRepository {
 
   @override
   Future<OCREngineHealth> testEngine({String? engineId}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return OCREngineHealth(
       engineId: engineId ?? 'test-engine',
       isHealthy: true,
@@ -208,13 +246,17 @@ class MockOCRRepository implements OCRRepository {
     Uint8List imageData, {
     ImagePreprocessOptions? options,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return imageData; // 回傳原始圖片（模擬預處理）
   }
 
   @override
   Future<OCRStatistics> getStatistics() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return OCRStatistics(
       totalProcessed: 0,
       averageConfidence: 0,
@@ -241,7 +283,9 @@ class MockAIRepository implements AIRepository {
     String ocrText, {
     ParseHints? hints,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockParsedData ?? ParsedCardData(
       name: '王大明',
       company: '科技股份有限公司',
@@ -259,7 +303,9 @@ class MockAIRepository implements AIRepository {
     List<OCRResult> ocrResults, {
     ParseHints? hints,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? const BatchParseResult(
       successful: [],
       failed: [],
@@ -271,7 +317,9 @@ class MockAIRepository implements AIRepository {
     BusinessCard incompleteCard, {
     CompletionContext? context,
   }) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return const CardCompletionSuggestions(
       suggestions: {},
       confidence: {},
@@ -282,7 +330,9 @@ class MockAIRepository implements AIRepository {
   Future<ParsedCardData> validateAndSanitizeResult(
     Map<String, dynamic> parsedData,
   ) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockParsedData ?? ParsedCardData(
       name: '清理後名稱',
       confidence: 0.9,
@@ -293,7 +343,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<AIServiceStatus> getServiceStatus() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return AIServiceStatus(
       isAvailable: true,
       responseTimeMs: 200,
@@ -305,18 +357,24 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<List<AIModelInfo>> getAvailableModels() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return [];
   }
 
   @override
   Future<void> setPreferredModel(String modelId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
   }
 
   @override
   Future<AIModelInfo> getCurrentModel() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return const AIModelInfo(
       id: 'test-model',
       name: 'Test Model',
@@ -328,7 +386,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<AIUsageStatistics> getUsageStatistics() async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return AIUsageStatistics(
       totalRequests: 0,
       successfulRequests: 0,
@@ -341,7 +401,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<bool> isTextSafeForProcessing(String text) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true; // 假設所有文字都安全
   }
 
@@ -350,7 +412,9 @@ class MockAIRepository implements AIRepository {
     String fieldName,
     String rawValue,
   ) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return FormattedFieldResult(
       formattedValue: rawValue,
       confidence: 0.9,
@@ -362,7 +426,9 @@ class MockAIRepository implements AIRepository {
     ParsedCardData cardData,
     List<BusinessCard> existingCards,
   ) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return const DuplicateDetectionResult(
       hasDuplicates: false,
       potentialDuplicates: [],
@@ -372,7 +438,9 @@ class MockAIRepository implements AIRepository {
 
   @override
   Future<String> generateCardSummary(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return '${card.name} - ${card.company ?? "公司"}的名片';
   }
 }

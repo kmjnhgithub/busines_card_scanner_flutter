@@ -19,7 +19,9 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     if (_mockSavedCard != null) {
       return _mockSavedCard!;
     }
@@ -35,7 +37,9 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BatchSaveResult> saveCards(List<BusinessCard> cards) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? BatchSaveResult(
       successful: cards.map((card) => card.id.startsWith('temp-') 
         ? card.copyWith(id: 'saved-${DateTime.now().millisecondsSinceEpoch}') 
@@ -46,13 +50,17 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<bool> deleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<BatchDeleteResult> deleteCards(List<String> cardIds) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockDeleteResult ?? BatchDeleteResult(
       successful: cardIds,
       failed: [],
@@ -61,25 +69,33 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> updateCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockSavedCard ?? card;
   }
 
   @override
   Future<bool> softDeleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<bool> restoreCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return true;
   }
 
   @override
   Future<int> purgeDeletedCards({int daysOld = 30}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return 0;
   }
 }

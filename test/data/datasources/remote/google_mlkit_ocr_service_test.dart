@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:busines_card_scanner_flutter/core/errors/failures.dart';
@@ -532,11 +533,10 @@ void main() {
         // Arrange
         when(() => mockSecurityService.validateContent(any()))
             .thenReturn(const Right('validated'));
+        // 創建一個永不完成的 Future 來模擬超時情況
+        final neverCompletingCompleter = Completer<RecognizedText>();
         when(() => mockTextRecognizer.processImage(any()))
-            .thenAnswer((_) async {
-              await Future.delayed(const Duration(seconds: 31)); // 超過 30 秒超時
-              return mockRecognizedText;
-            });
+            .thenAnswer((_) => neverCompletingCompleter.future);
 
         // Act & Assert
         await expectLater(

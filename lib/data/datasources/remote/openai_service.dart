@@ -286,9 +286,13 @@ $ocrText
 
   /// 清理字串
   String? _sanitizeString(value) {
-    if (value == null) return null;
+    if (value == null) {
+      return null;
+    }
     final str = value.toString().trim();
-    if (str.isEmpty) return null;
+    if (str.isEmpty) {
+      return null;
+    }
     
     // 移除可能的惡意內容
     final sanitized = str
@@ -301,7 +305,9 @@ $ocrText
 
   /// 驗證電話號碼
   String? _validatePhone(String? phone) {
-    if (phone == null || phone.isEmpty) return null;
+    if (phone == null || phone.isEmpty) {
+      return null;
+    }
     
     // 簡單的電話號碼驗證
     final phonePattern = RegExp(r'^[+]?[\d\s\-()]{7,}$');
@@ -310,7 +316,9 @@ $ocrText
 
   /// 驗證 email
   String? _validateEmail(String? email) {
-    if (email == null || email.isEmpty) return null;
+    if (email == null || email.isEmpty) {
+      return null;
+    }
     
     final emailPattern = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
     return emailPattern.hasMatch(email) ? email : null;
@@ -318,7 +326,9 @@ $ocrText
 
   /// 驗證信心度
   double _validateConfidence(confidence) {
-    if (confidence == null) return 0;
+    if (confidence == null) {
+      return 0;
+    }
     
     final value = double.tryParse(confidence.toString()) ?? 0.0;
     return value.clamp(0.0, 1.0);

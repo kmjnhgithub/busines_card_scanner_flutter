@@ -126,7 +126,9 @@ class LoggerUtils {
     Object? error,
     StackTrace? stackTrace,
   }) {
-    if (!_isEnabled || level.index < _currentLevel.index) return;
+    if (!_isEnabled || level.index < _currentLevel.index) {
+      return;
+    }
 
     final timestamp = DateTime.now().toIso8601String();
     final levelString = level.name.toUpperCase();
@@ -206,7 +208,9 @@ class LoggerUtils {
 
   /// 截斷過長的字串
   static String _truncate(String input, int maxLength) {
-    if (input.length <= maxLength) return input;
+    if (input.length <= maxLength) {
+      return input;
+    }
     return '${input.substring(0, maxLength - 3)}...';
   }
 

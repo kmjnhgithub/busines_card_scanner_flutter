@@ -75,7 +75,9 @@ class CardRepositoryImpl implements CardRepository {
       }
       return model;
     } catch (e) {
-      if (e is DataSourceFailure) rethrow;
+      if (e is DataSourceFailure) {
+        rethrow;
+      }
       throw DataSourceFailure(
         userMessage: 'Failed to get card',
         internalMessage: 'CardRepositoryImpl.getCardById error: $e',
@@ -258,7 +260,9 @@ class CardRepositoryImpl implements CardRepository {
         return updatedCard!;
       }
     } catch (e) {
-      if (e is DomainFailure) rethrow;
+      if (e is DomainFailure) {
+        rethrow;
+      }
       throw DataSourceFailure(
         userMessage: 'Failed to save card',
         internalMessage: 'CardRepositoryImpl.saveCard error: $e',
@@ -306,7 +310,9 @@ class CardRepositoryImpl implements CardRepository {
       final updatedCard = await _database.cardDao.getBusinessCardById(cardIdInt);
       return updatedCard!;
     } catch (e) {
-      if (e is DomainFailure) rethrow;
+      if (e is DomainFailure) {
+        rethrow;
+      }
       throw DataSourceFailure(
         userMessage: 'Failed to update card',
         internalMessage: 'CardRepositoryImpl.updateCard error: $e',

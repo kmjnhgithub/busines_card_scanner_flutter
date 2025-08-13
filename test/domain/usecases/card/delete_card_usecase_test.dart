@@ -27,25 +27,33 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> saveCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockSavedCard ?? card;
   }
 
   @override
   Future<BatchSaveResult> saveCards(List<BusinessCard> cards) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockBatchResult ?? BatchSaveResult(successful: cards, failed: []);
   }
 
   @override
   Future<bool> deleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockDeleteSuccess;
   }
 
   @override
   Future<BatchDeleteResult> deleteCards(List<String> cardIds) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockDeleteResult ?? BatchDeleteResult(
       successful: _mockDeleteSuccess ? cardIds : [],
       failed: _mockDeleteSuccess ? [] : cardIds.map((id) => BatchOperationError(
@@ -57,25 +65,33 @@ class MockCardWriter implements CardWriter {
 
   @override
   Future<BusinessCard> updateCard(BusinessCard card) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockSavedCard ?? card;
   }
 
   @override
   Future<bool> softDeleteCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockSoftDeleteSuccess;
   }
 
   @override
   Future<bool> restoreCard(String cardId) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockRestoreSuccess;
   }
 
   @override
   Future<int> purgeDeletedCards({int daysOld = 30}) async {
-    if (_mockFailure != null) throw _mockFailure!;
+    if (_mockFailure != null) {
+      throw _mockFailure!;
+    }
     return _mockPurgeCount;
   }
 }
