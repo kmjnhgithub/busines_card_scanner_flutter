@@ -18,6 +18,11 @@ analyzer:
     avoid_relative_lib_imports: error
     avoid_web_libraries_in_flutter: error
     close_sinks: warning
+    # 測試文件的例外規則
+    use_setters_to_change_properties: info
+    avoid_setters_without_getters: info
+    avoid_positional_boolean_parameters: info
+    prefer_mixin: info
     
   exclude:
     - "**/*.g.dart"

@@ -365,7 +365,7 @@ Future<List<String>> _extractImports(File file) async {
         }
       }
     }
-  } catch (e) {
+  } on Exception {
     // 如果檔案讀取失敗，回傳空列表
     return [];
   }

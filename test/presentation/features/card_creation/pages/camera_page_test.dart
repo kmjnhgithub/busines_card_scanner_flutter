@@ -11,8 +11,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 // Mock 類別
+mixin _MockCameraViewModelMixin on Mock {
+  // Mixin specific methods can be added here if needed
+}
+
 class MockCameraViewModel extends StateNotifier<CameraState>
-    with Mock
+    with Mock, _MockCameraViewModelMixin
     implements CameraViewModel {
   MockCameraViewModel() : super(const CameraState());
 }

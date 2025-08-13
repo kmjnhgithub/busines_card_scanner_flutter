@@ -19,14 +19,11 @@ class MockOCRRepository implements OCRRepository {
 
   void setMockOCRResult(OCRResult result) => _mockOCRResult = result;
   void setMockBatchResult(BatchOCRResult result) => _mockBatchResult = result;
-  void setMockPreprocessedImage(Uint8List image) =>
-      _mockPreprocessedImage = image;
+  void setMockPreprocessedImage(Uint8List image) => _mockPreprocessedImage = image;
   void setMockStatistics(OCRStatistics stats) => _mockStatistics = stats;
   void setMockEngines(List<OCREngineInfo> engines) => _mockEngines = engines;
-  void setMockCurrentEngine(OCREngineInfo engine) =>
-      _mockCurrentEngine = engine;
-  void setMockEngineHealth(OCREngineHealth health) =>
-      _mockEngineHealth = health;
+  void setMockCurrentEngine(OCREngineInfo engine) => _mockCurrentEngine = engine;
+  void setMockEngineHealth(OCREngineHealth health) => _mockEngineHealth = health;
   void setMockFailure(DomainFailure? failure) => _mockFailure = failure;
   void clearMockFailure() => _mockFailure = null;
 

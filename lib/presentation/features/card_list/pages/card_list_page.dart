@@ -613,22 +613,19 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
     if (confirmed == true) {
       final success = await viewModel.deleteCard(card.id);
-      if (!mounted) {
+      if (!context.mounted) {
         return;
       }
 
-      // Context 在 mounted 檢查後是安全的
-      final currentContext = context;
-
       if (success) {
         ToastHelper.showSnackBar(
-          currentContext,
+          context,
           '名片已刪除',
           type: ToastType.success,
         );
       } else {
         ToastHelper.showSnackBar(
-          currentContext,
+          context,
           '刪除名片失敗',
           type: ToastType.error,
         );

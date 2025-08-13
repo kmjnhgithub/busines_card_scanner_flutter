@@ -18,8 +18,7 @@ class MockCardWriter implements CardWriter {
 
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
-  void setMockDeleteResult(BatchDeleteResult result) =>
-      _mockDeleteResult = result;
+  void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 
   @override

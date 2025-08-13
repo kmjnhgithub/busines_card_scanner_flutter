@@ -67,7 +67,7 @@ class MockCardReader implements CardReader {
     final cards = _mockCards ?? [];
     try {
       return cards.firstWhere((card) => card.id == cardId);
-    } catch (_) {
+    } on StateError catch (_) {
       throw CardNotFoundException(cardId);
     }
   }
