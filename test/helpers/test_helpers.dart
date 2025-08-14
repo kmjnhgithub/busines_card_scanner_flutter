@@ -20,7 +20,7 @@ void suppressDatabaseWarnings() {
 void registerCommonFallbackValues() {
   // Camera 相關
   registerFallbackValue(FlashMode.auto);
-  registerFallbackValue(const Offset(0.0, 0.0));
+  registerFallbackValue(const Offset(0, 0));
   registerFallbackValue(ExposureMode.auto);
   registerFallbackValue(FocusMode.auto);
   

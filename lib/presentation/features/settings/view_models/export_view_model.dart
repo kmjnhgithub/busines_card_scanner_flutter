@@ -197,7 +197,7 @@ class ExportViewModel extends StateNotifier<ExportState> {
       // 重置狀態
       state = state.copyWith(
         isExporting: true,
-        progress: 0.0,
+        progress: 0,
         errorMessage: null,
         exportedFilePath: null,
       );
@@ -244,7 +244,7 @@ class ExportViewModel extends StateNotifier<ExportState> {
       // 完成匯出
       state = state.copyWith(
         isExporting: false,
-        progress: 1.0,
+        progress: 1,
         exportedFilePath: filePath,
       );
 
@@ -252,7 +252,7 @@ class ExportViewModel extends StateNotifier<ExportState> {
     } catch (e) {
       state = state.copyWith(
         isExporting: false,
-        progress: 0.0,
+        progress: 0,
         errorMessage: '匯出失敗：$e',
       );
       _exportCompleter!.complete();
