@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
+import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
 /// OpenAI Service 抽象介面
@@ -15,6 +17,12 @@ abstract class OpenAIService {
   });
 
   Future<AIServiceStatus> getServiceStatus();
+
+  /// 驗證 API Key 是否有效
+  Future<Either<DomainFailure, bool>> validateApiKey(String apiKey);
+
+  /// 取得使用量統計
+  Future<Either<DomainFailure, UsageStats>> getUsageStats(String apiKey);
 }
 
 /// OpenAI Service 實作
@@ -368,5 +376,113 @@ $ocrText
     return const AIServiceUnavailableFailure(
       userMessage: 'AI service is temporarily unavailable',
     );
+  }
+
+  @override
+  Future<Either<DomainFailure, bool>> validateApiKey(String apiKey) async {
+    try {
+      final response = await dio.get(
+        '$_baseUrl/models',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $apiKey',
+            'Content-Type': 'application/json',
+          },
+          validateStatus: (status) => status != null && status < 500,
+        ),
+      );
+
+      if (response.statusCode == 200) {
+        return const Right(true);
+      } else if (response.statusCode == 401) {
+        return const Right(false);
+      } else {
+        return Left(NetworkConnectionFailure(
+          endpoint: '$_baseUrl/models',
+          userMessage: 'API 驗證失敗: HTTP ${response.statusCode}',
+        ));
+      }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout || 
+          e.type == DioExceptionType.receiveTimeout) {
+        return const Left(NetworkConnectionFailure(
+          userMessage: '網路連線逾時',
+        ));
+      }
+      
+      return Left(NetworkConnectionFailure(
+        endpoint: '$_baseUrl/models',
+        userMessage: '網路連線失敗: ${e.message ?? 'Unknown network error'}',
+      ));
+    } catch (e) {
+      return Left(DataSourceFailure(
+        userMessage: 'API Key 驗證時發生未預期錯誤',
+        internalMessage: e.toString(),
+      ));
+    }
+  }
+
+  @override
+  Future<Either<DomainFailure, UsageStats>> getUsageStats(String apiKey) async {
+    try {
+      // 注意：OpenAI 的使用量 API 端點可能會變更，這裡使用模擬數據
+      // 實際應用中需要使用正確的 API 端點
+      final response = await dio.get(
+        '$_baseUrl/usage',
+        options: Options(
+          headers: {
+            'Authorization': 'Bearer $apiKey',
+            'Content-Type': 'application/json',
+          },
+          validateStatus: (status) => status != null && status < 500,
+        ),
+        queryParameters: {
+          'date': DateTime.now().toIso8601String().substring(0, 10),
+        },
+      );
+
+      if (response.statusCode == 200) {
+        // 解析回應數據
+        final data = response.data as Map<String, dynamic>;
+        
+        // 由於 OpenAI API 格式可能變更，這裡提供基本的解析邏輯
+        final usageStats = UsageStats(
+          totalRequests: (data['total_requests'] as int?) ?? 0,
+          totalTokens: (data['total_tokens'] as int?) ?? 0,
+          currentMonth: DateTime.now(),
+          dailyUsage: [], // 實際應該解析每日使用量
+        );
+        
+        return Right(usageStats);
+      } else if (response.statusCode == 401) {
+        return const Left(InsufficientPermissionFailure(
+          permission: 'usage_access',
+          operation: 'get_usage_stats',
+          userMessage: 'API Key 沒有存取使用量統計的權限',
+        ));
+      } else {
+        return Left(NetworkConnectionFailure(
+          endpoint: '$_baseUrl/usage',
+          userMessage: '載入使用量統計失敗: HTTP ${response.statusCode}',
+        ));
+      }
+    } on DioException catch (e) {
+      if (e.type == DioExceptionType.connectionTimeout || 
+          e.type == DioExceptionType.receiveTimeout) {
+        return const Left(NetworkConnectionFailure(
+          userMessage: '網路連線逾時',
+        ));
+      }
+      
+      return Left(NetworkConnectionFailure(
+        endpoint: '$_baseUrl/usage',
+        userMessage: '網路連線失敗: ${e.message ?? 'Unknown network error'}',
+      ));
+    } catch (e) {
+      return Left(DataSourceFailure(
+        userMessage: '載入使用量統計時發生未預期錯誤',
+        internalMessage: e.toString(),
+      ));
+    }
   }
 }
