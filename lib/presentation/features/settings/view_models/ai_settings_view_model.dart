@@ -1,19 +1,17 @@
+import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:json_annotation/json_annotation.dart';
-
-import '../../../../data/datasources/local/secure/enhanced_secure_storage.dart';
-import '../../../../data/datasources/remote/openai_service.dart';
 
 part 'ai_settings_view_model.freezed.dart';
 part 'ai_settings_view_model.g.dart';
 
 /// 連線狀態列舉
 enum ConnectionStatus {
-  unknown,      // 未知狀態
-  connecting,   // 連線中
-  connected,    // 已連線
-  failed,       // 連線失敗
+  unknown, // 未知狀態
+  connecting, // 連線中
+  connected, // 已連線
+  failed, // 連線失敗
 }
 
 /// 使用量統計
@@ -26,7 +24,8 @@ class UsageStats with _$UsageStats {
     required List<DailyUsage> dailyUsage,
   }) = _UsageStats;
 
-  factory UsageStats.fromJson(Map<String, dynamic> json) => _$UsageStatsFromJson(json);
+  factory UsageStats.fromJson(Map<String, dynamic> json) =>
+      _$UsageStatsFromJson(json);
 }
 
 /// 每日使用量
@@ -38,7 +37,8 @@ class DailyUsage with _$DailyUsage {
     required int tokens,
   }) = _DailyUsage;
 
-  factory DailyUsage.fromJson(Map<String, dynamic> json) => _$DailyUsageFromJson(json);
+  factory DailyUsage.fromJson(Map<String, dynamic> json) =>
+      _$DailyUsageFromJson(json);
 }
 
 /// AI 設定頁面狀態
@@ -53,7 +53,8 @@ class AISettingsState with _$AISettingsState {
     String? error,
   }) = _AISettingsState;
 
-  factory AISettingsState.fromJson(Map<String, dynamic> json) => _$AISettingsStateFromJson(json);
+  factory AISettingsState.fromJson(Map<String, dynamic> json) =>
+      _$AISettingsStateFromJson(json);
 }
 
 /// AI 設定頁面 ViewModel
@@ -64,9 +65,9 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
   AISettingsViewModel({
     required EnhancedSecureStorage secureStorage,
     required OpenAIService openAIService,
-  })  : _secureStorage = secureStorage,
-        _openAIService = openAIService,
-        super(const AISettingsState()) {
+  }) : _secureStorage = secureStorage,
+       _openAIService = openAIService,
+       super(const AISettingsState()) {
     _initializeApiKeyStatus();
   }
 
@@ -155,10 +156,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
         },
       );
     } on Exception catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: '刪除 API Key 時發生未預期錯誤：$e',
-      );
+      state = state.copyWith(isLoading: false, error: '刪除 API Key 時發生未預期錯誤：$e');
     }
   }
 
@@ -169,20 +167,19 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
 
       // 取得儲存的 API Key
       final getKeyResult = await _secureStorage.getApiKey('openai');
-      final apiKey = getKeyResult.fold(
-        (failure) {
-          state = state.copyWith(
-            isLoading: false,
-            error: '請先設定 API Key',
-            isApiKeyValid: false,
-            connectionStatus: ConnectionStatus.failed,
-          );
-          return null;
-        },
-        (key) => key,
-      );
+      final apiKey = getKeyResult.fold((failure) {
+        state = state.copyWith(
+          isLoading: false,
+          error: '請先設定 API Key',
+          isApiKeyValid: false,
+          connectionStatus: ConnectionStatus.failed,
+        );
+        return null;
+      }, (key) => key);
 
-      if (apiKey == null) return;
+      if (apiKey == null) {
+        return;
+      }
 
       // 驗證 API Key
       final validationResult = await _openAIService.validateApiKey(apiKey);
@@ -230,18 +227,14 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
 
       // 取得儲存的 API Key
       final getKeyResult = await _secureStorage.getApiKey('openai');
-      final apiKey = getKeyResult.fold(
-        (failure) {
-          state = state.copyWith(
-            isLoading: false,
-            error: '請先設定 API Key',
-          );
-          return null;
-        },
-        (key) => key,
-      );
+      final apiKey = getKeyResult.fold((failure) {
+        state = state.copyWith(isLoading: false, error: '請先設定 API Key');
+        return null;
+      }, (key) => key);
 
-      if (apiKey == null) return;
+      if (apiKey == null) {
+        return;
+      }
 
       // 載入使用量統計
       final statsResult = await _openAIService.getUsageStats(apiKey);
@@ -261,10 +254,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
         },
       );
     } on Exception catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: '載入使用量統計時發生未預期錯誤：$e',
-      );
+      state = state.copyWith(isLoading: false, error: '載入使用量統計時發生未預期錯誤：$e');
     }
   }
 
@@ -281,7 +271,8 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
       await validateApiKey();
 
       // 如果驗證成功，則載入使用量統計
-      if (state.isApiKeyValid && state.connectionStatus == ConnectionStatus.connected) {
+      if (state.isApiKeyValid &&
+          state.connectionStatus == ConnectionStatus.connected) {
         await loadUsageStats();
       }
     } on Exception catch (e) {
@@ -323,6 +314,9 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
 }
 
 /// AISettingsViewModel Provider
-final aiSettingsViewModelProvider = StateNotifierProvider<AISettingsViewModel, AISettingsState>(
-  (ref) => throw UnimplementedError('AISettingsViewModel provider must be overridden'),
-);
+final aiSettingsViewModelProvider =
+    StateNotifierProvider<AISettingsViewModel, AISettingsState>(
+      (ref) => throw UnimplementedError(
+        'AISettingsViewModel provider must be overridden',
+      ),
+    );

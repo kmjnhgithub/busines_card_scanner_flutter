@@ -11,6 +11,7 @@ import 'package:busines_card_scanner_flutter/presentation/features/settings/view
 
 // Mock classes
 class MockEnhancedSecureStorage extends Mock implements EnhancedSecureStorage {}
+
 class MockOpenAIService extends Mock implements OpenAIService {}
 
 void main() {
@@ -57,8 +58,9 @@ void main() {
 
       test('應該檢查已存在的 API Key', () async {
         // Arrange
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right('sk-test12345'));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right('sk-test12345'));
 
         // 重新建立 container 以觸發初始化
         container.dispose();
@@ -75,7 +77,7 @@ void main() {
 
         // Act - 取得 ViewModel 實例以觸發初始化
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
-        
+
         // 等待異步初始化完成
         await Future.delayed(const Duration(milliseconds: 200));
 
@@ -90,8 +92,9 @@ void main() {
       test('應該成功儲存有效的 API Key', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.storeApiKey('openai', apiKey))
-            .thenAnswer((_) async => const Right(null));
+        when(
+          () => mockSecureStorage.storeApiKey('openai', apiKey),
+        ).thenAnswer((_) async => const Right(null));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -126,11 +129,14 @@ void main() {
       test('應該處理儲存失敗的情況', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.storeApiKey('openai', apiKey))
-            .thenAnswer((_) async => const Left(DataSourceFailure(
+        when(() => mockSecureStorage.storeApiKey('openai', apiKey)).thenAnswer(
+          (_) async => const Left(
+            DataSourceFailure(
               userMessage: '儲存失敗',
               internalMessage: 'Storage error',
-            )));
+            ),
+          ),
+        );
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -146,8 +152,9 @@ void main() {
       test('API Key 儲存期間應該顯示載入狀態', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.storeApiKey('openai', apiKey))
-            .thenAnswer((_) async => const Right(null));
+        when(
+          () => mockSecureStorage.storeApiKey('openai', apiKey),
+        ).thenAnswer((_) async => const Right(null));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
         bool loadingStateObserved = false;
 
@@ -166,8 +173,9 @@ void main() {
 
       test('應該成功刪除 API Key', () async {
         // Arrange
-        when(() => mockSecureStorage.deleteApiKey('openai'))
-            .thenAnswer((_) async => const Right(null));
+        when(
+          () => mockSecureStorage.deleteApiKey('openai'),
+        ).thenAnswer((_) async => const Right(null));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -185,11 +193,14 @@ void main() {
 
       test('應該處理刪除失敗的情況', () async {
         // Arrange
-        when(() => mockSecureStorage.deleteApiKey('openai'))
-            .thenAnswer((_) async => const Left(DataSourceFailure(
+        when(() => mockSecureStorage.deleteApiKey('openai')).thenAnswer(
+          (_) async => const Left(
+            DataSourceFailure(
               userMessage: '刪除失敗',
               internalMessage: 'Delete error',
-            )));
+            ),
+          ),
+        );
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -206,10 +217,12 @@ void main() {
       test('應該成功驗證有效的 API Key', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.validateApiKey(apiKey))
-            .thenAnswer((_) async => const Right(true));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.validateApiKey(apiKey),
+        ).thenAnswer((_) async => const Right(true));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -227,10 +240,12 @@ void main() {
       test('應該處理無效的 API Key', () async {
         // Arrange
         const apiKey = 'sk-proj-invalid123456789012345678901234567890';
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.validateApiKey(apiKey))
-            .thenAnswer((_) async => const Right(false));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.validateApiKey(apiKey),
+        ).thenAnswer((_) async => const Right(false));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -247,12 +262,13 @@ void main() {
       test('應該處理網路連線失敗', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.validateApiKey(apiKey))
-            .thenAnswer((_) async => const Left(NetworkConnectionFailure(
-              userMessage: '網路連線失敗',
-            )));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(() => mockOpenAIService.validateApiKey(apiKey)).thenAnswer(
+          (_) async =>
+              const Left(NetworkConnectionFailure(userMessage: '網路連線失敗')),
+        );
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -268,11 +284,14 @@ void main() {
 
       test('應該處理沒有儲存 API Key 的情況', () async {
         // Arrange
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Left(DataSourceFailure(
+        when(() => mockSecureStorage.getApiKey('openai')).thenAnswer(
+          (_) async => const Left(
+            DataSourceFailure(
               userMessage: 'API key not found',
               internalMessage: 'No key stored',
-            )));
+            ),
+          ),
+        );
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -289,10 +308,12 @@ void main() {
       test('驗證期間應該顯示載入狀態', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.validateApiKey(apiKey))
-            .thenAnswer((_) async => const Right(true));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.validateApiKey(apiKey),
+        ).thenAnswer((_) async => const Right(true));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
         bool loadingStateObserved = false;
 
@@ -323,10 +344,12 @@ void main() {
           ],
         );
 
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.getUsageStats(apiKey))
-            .thenAnswer((_) async => Right(mockUsageStats));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.getUsageStats(apiKey),
+        ).thenAnswer((_) async => Right(mockUsageStats));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -345,12 +368,13 @@ void main() {
       test('應該處理載入使用量統計失敗', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.getUsageStats(apiKey))
-            .thenAnswer((_) async => const Left(NetworkConnectionFailure(
-              userMessage: '載入失敗',
-            )));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(() => mockOpenAIService.getUsageStats(apiKey)).thenAnswer(
+          (_) async =>
+              const Left(NetworkConnectionFailure(userMessage: '載入失敗')),
+        );
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -373,10 +397,12 @@ void main() {
           dailyUsage: [],
         );
 
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.getUsageStats(apiKey))
-            .thenAnswer((_) async => Right(mockUsageStats));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.getUsageStats(apiKey),
+        ).thenAnswer((_) async => Right(mockUsageStats));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
         bool loadingStateObserved = false;
 
@@ -405,12 +431,15 @@ void main() {
           dailyUsage: [],
         );
 
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.validateApiKey(apiKey))
-            .thenAnswer((_) async => const Right(true));
-        when(() => mockOpenAIService.getUsageStats(apiKey))
-            .thenAnswer((_) async => Right(mockUsageStats));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.validateApiKey(apiKey),
+        ).thenAnswer((_) async => const Right(true));
+        when(
+          () => mockOpenAIService.getUsageStats(apiKey),
+        ).thenAnswer((_) async => Right(mockUsageStats));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -430,10 +459,12 @@ void main() {
       test('連線測試失敗時應該停止後續操作', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.validateApiKey(apiKey))
-            .thenAnswer((_) async => const Right(false));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.validateApiKey(apiKey),
+        ).thenAnswer((_) async => const Right(false));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act
@@ -453,11 +484,14 @@ void main() {
     group('錯誤處理', () {
       test('應該能清除錯誤狀態', () async {
         // Arrange
-        when(() => mockSecureStorage.deleteApiKey('openai'))
-            .thenAnswer((_) async => const Left(DataSourceFailure(
+        when(() => mockSecureStorage.deleteApiKey('openai')).thenAnswer(
+          (_) async => const Left(
+            DataSourceFailure(
               userMessage: '測試錯誤',
               internalMessage: 'Test error',
-            )));
+            ),
+          ),
+        );
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // 產生錯誤
@@ -519,12 +553,15 @@ void main() {
       test('同時進行多個操作時應該正確處理', () async {
         // Arrange
         const apiKey = 'sk-proj-test123456789012345678901234567890123456';
-        when(() => mockSecureStorage.storeApiKey('openai', apiKey))
-            .thenAnswer((_) async => const Right(null));
-        when(() => mockSecureStorage.getApiKey('openai'))
-            .thenAnswer((_) async => const Right(apiKey));
-        when(() => mockOpenAIService.validateApiKey(apiKey))
-            .thenAnswer((_) async => const Right(true));
+        when(
+          () => mockSecureStorage.storeApiKey('openai', apiKey),
+        ).thenAnswer((_) async => const Right(null));
+        when(
+          () => mockSecureStorage.getApiKey('openai'),
+        ).thenAnswer((_) async => const Right(apiKey));
+        when(
+          () => mockOpenAIService.validateApiKey(apiKey),
+        ).thenAnswer((_) async => const Right(true));
         final viewModel = container.read(aiSettingsViewModelProvider.notifier);
 
         // Act - 同時執行多個操作

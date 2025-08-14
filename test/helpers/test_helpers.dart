@@ -1,14 +1,12 @@
-import 'dart:typed_data';
-
+import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
+import 'package:camera/camera.dart';
+import 'package:drift/drift.dart' hide isNotNull;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:drift/drift.dart' hide isNotNull;
-import 'package:camera/camera.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 
 // 防止資料庫多實例警告
 void suppressDatabaseWarnings() {
@@ -20,22 +18,21 @@ void suppressDatabaseWarnings() {
 void registerCommonFallbackValues() {
   // Camera 相關
   registerFallbackValue(FlashMode.auto);
-  registerFallbackValue(const Offset(0, 0));
+  registerFallbackValue(Offset.zero);
   registerFallbackValue(ExposureMode.auto);
   registerFallbackValue(FocusMode.auto);
-  
+
   // Process Image 相關
   registerFallbackValue(
     ProcessImageParams(imageData: Uint8List.fromList([1, 2, 3])),
   );
-  
+
   // Card UseCases 相關
   registerFallbackValue(const GetCardsParams());
-  registerFallbackValue(const DeleteCardParams(
-    cardId: 'test',
-    deleteType: DeleteType.soft,
-  ));
-  
+  registerFallbackValue(
+    const DeleteCardParams(cardId: 'test', deleteType: DeleteType.soft),
+  );
+
   // 通用型別
   registerFallbackValue(Uint8List(0));
   registerFallbackValue(DateTime.now());
@@ -60,7 +57,7 @@ class TestHelpers {
   }) {
     // 確保資料庫警告被抑制
     suppressDatabaseWarnings();
-    
+
     return UncontrolledProviderScope(
       container: container,
       child: MaterialApp(
@@ -81,9 +78,7 @@ class TestHelpers {
   }) {
     return ProviderScope(
       overrides: overrides ?? [],
-      child: MaterialApp(
-        home: child,
-      ),
+      child: MaterialApp(home: child),
     );
   }
 
@@ -93,27 +88,21 @@ class TestHelpers {
   static ProviderContainer createTestContainer({
     required List<Override> overrides,
   }) {
-    return ProviderContainer(
-      overrides: overrides,
-    );
+    return ProviderContainer(overrides: overrides);
   }
 
   /// 建立包含 Scaffold 的測試 Widget
   ///
   /// 用於需要 Scaffold 環境的 widget 測試
   static Widget wrapWithScaffold(Widget child) {
-    return Scaffold(
-      body: child,
-    );
+    return Scaffold(body: child);
   }
 
   /// 建立包含 Material 環境的測試 Widget
   ///
   /// 用於需要 Material 主題的 widget 測試
   static Widget wrapWithMaterial(Widget child) {
-    return Material(
-      child: child,
-    );
+    return Material(child: child);
   }
 
   /// 測試非同步載入狀態
@@ -143,7 +132,7 @@ class TestHelpers {
         EnginePhase.sendSemanticsUpdate,
         timeout,
       );
-    } catch (e) {
+    } on Exception {
       // 如果超時，至少 pump 一次以更新狀態
       await tester.pump();
     }
@@ -153,14 +142,12 @@ class TestHelpers {
   static Map<String, WidgetBuilder> createTestRoutes({
     Map<String, WidgetBuilder>? additionalRoutes,
   }) {
-    final routes = <String, WidgetBuilder>{
-      '/': (context) => Container(),
-    };
-    
+    final routes = <String, WidgetBuilder>{'/': (context) => Container()};
+
     if (additionalRoutes != null) {
       routes.addAll(additionalRoutes);
     }
-    
+
     return routes;
   }
 
@@ -193,13 +180,13 @@ class TestHelpers {
 class TestDelays {
   /// 短延遲（用於狀態更新）
   static const Duration short = Duration(milliseconds: 100);
-  
+
   /// 中等延遲（用於動畫）
   static const Duration medium = Duration(milliseconds: 500);
-  
+
   /// 長延遲（用於網路請求模擬）
   static const Duration long = Duration(seconds: 1);
-  
+
   /// 超長延遲（用於超時測試）
   static const Duration veryLong = Duration(seconds: 3);
 }
@@ -210,32 +197,32 @@ class TestFinders {
   static Finder loadingIndicator() {
     return find.byType(CircularProgressIndicator);
   }
-  
+
   /// 找到載入文字
   static Finder loadingText([String text = '載入中...']) {
     return find.text(text);
   }
-  
+
   /// 找到錯誤訊息
   static Finder errorMessage(String message) {
     return find.text(message);
   }
-  
+
   /// 找到空狀態
   static Finder emptyState([String message = '沒有資料']) {
     return find.text(message);
   }
-  
+
   /// 找到按鈕
   static Finder button(String text) {
     return find.widgetWithText(ElevatedButton, text);
   }
-  
+
   /// 找到圖標按鈕
   static Finder iconButton(IconData icon) {
     return find.byIcon(icon);
   }
-  
+
   /// 找到 Snackbar
   static Finder snackbar([String? text]) {
     if (text != null) {
@@ -246,7 +233,7 @@ class TestFinders {
     }
     return find.byType(SnackBar);
   }
-  
+
   /// 找到對話框
   static Finder dialog([String? title]) {
     if (title != null) {

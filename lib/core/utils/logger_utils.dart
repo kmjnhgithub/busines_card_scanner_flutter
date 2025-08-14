@@ -33,7 +33,6 @@ class LoggerUtils {
     'apikey',
   ];
 
-
   /// Debug 日誌
   static void debug(
     String message, {

@@ -1,4 +1,3 @@
-
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_image_usecase.dart';

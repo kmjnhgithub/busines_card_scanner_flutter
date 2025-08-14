@@ -83,7 +83,7 @@ void main() {
       if (state != null) {
         mockOCRProcessingViewModel.state = state;
       }
-      
+
       return TestHelpers.createTestWidget(
         container: container,
         child: const OCRProcessingPage(imagePath: testImagePath),
@@ -97,9 +97,7 @@ void main() {
     group('UI 顯示測試', () {
       testWidgets('初始狀態下應該顯示圖片載入', (WidgetTester tester) async {
         // Arrange
-        mockOCRProcessingViewModel.state = const OCRProcessingState(
-          
-        );
+        mockOCRProcessingViewModel.state = const OCRProcessingState();
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -542,7 +540,7 @@ void main() {
         // 檢查 AppBar 存在（有返回按鈕功能）
         final appBar = find.byType(AppBar);
         expect(appBar, findsOneWidget);
-        
+
         // 檢查 AppBar 標題
         expect(find.text('處理名片'), findsOneWidget);
       });
@@ -561,7 +559,7 @@ void main() {
         await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // Assert
-        
+
         // TODO: 圖片預覽的語義標籤在測試環境中有問題，先跳過
         // expect(find.bySemanticsLabel('名片圖片預覽'), findsOneWidget);
         expect(find.bySemanticsLabel('保存名片'), findsAtLeastNWidgets(1));
@@ -576,7 +574,7 @@ void main() {
         // Act
         await tester.pumpWidget(createTestWidget(state: processingState));
         await tester.pump();
-        
+
         // 等待動畫或狀態更新，但不使用 pumpAndSettle 避免超時
         await tester.pump(const Duration(milliseconds: 100));
 

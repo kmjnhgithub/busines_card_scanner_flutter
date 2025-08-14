@@ -1,4 +1,3 @@
-
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/camera_view_model.dart';
@@ -126,7 +125,9 @@ void main() {
         final state = container.read(cameraViewModelProvider);
         expect(state.isInitialized, isFalse);
         expect(state.error, contains('相機初始化失敗'));
-        verify(() => mockToastPresenter.showError(any(that: contains('相機初始化失敗')))).called(1);
+        verify(
+          () => mockToastPresenter.showError(any(that: contains('相機初始化失敗'))),
+        ).called(1);
       });
 
       test('沒有可用相機時應該設定錯誤', () async {
@@ -145,7 +146,7 @@ void main() {
       test('拍照成功時應該更新狀態', () async {
         // 這個測試需要重新設計，因為CameraViewModel不允許外部設定CameraController
         // 我們應該測試在真實相機已初始化的情況下的拍照行為
-        
+
         // 由於CameraController的mock比較複雜，我們先跳過這個測試
         // 在實際專案中，建議使用Widget測試來測試整個相機流程
       }, skip: '需要重新設計測試架構以符合CameraViewModel的實際實作');

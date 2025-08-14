@@ -451,10 +451,7 @@ void main() {
 
         // Assert
         final state = container.read(cardListViewModelProvider);
-        expect(
-          state.filteredCards.first.createdAt,
-          equals(DateTime(2024)),
-        );
+        expect(state.filteredCards.first.createdAt, equals(DateTime(2024)));
         expect(
           state.filteredCards.last.createdAt,
           equals(DateTime(2024, 1, 2)),

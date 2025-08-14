@@ -53,15 +53,11 @@ Uint8List _createValidTestImageData({
   img.Format format = img.Format.uint8,
 }) {
   // 創建一個簡單的測試圖像
-  final image = img.Image(
-    width: width,
-    height: height,
-    format: format,
-  );
-  
+  final image = img.Image(width: width, height: height, format: format);
+
   // 填充一些顏色以模擬真實圖像內容
   img.fill(image, color: img.ColorRgb8(255, 255, 255)); // 白色背景
-  
+
   // 添加一些簡單的圖形來模擬文字內容
   img.drawRect(
     image,
@@ -71,24 +67,18 @@ Uint8List _createValidTestImageData({
     y2: 30,
     color: img.ColorRgb8(0, 0, 0), // 黑色矩形
   );
-  
+
   // 編碼為 PNG 格式
   return Uint8List.fromList(img.encodePng(image));
 }
 
 /// 創建有效的 JPEG 測試圖像資料
-Uint8List _createValidJpegTestImageData({
-  int width = 100,
-  int height = 100,
-}) {
-  final image = img.Image(
-    width: width,
-    height: height,
-  );
-  
+Uint8List _createValidJpegTestImageData({int width = 100, int height = 100}) {
+  final image = img.Image(width: width, height: height);
+
   // 填充藍色背景以模擬名片
   img.fill(image, color: img.ColorRgb8(135, 206, 235)); // 天空藍
-  
+
   // 添加文字區域的黑色矩形
   img.drawRect(
     image,
@@ -98,7 +88,7 @@ Uint8List _createValidJpegTestImageData({
     y2: 40,
     color: img.ColorRgb8(0, 0, 0),
   );
-  
+
   // 編碼為 JPEG 格式
   return Uint8List.fromList(img.encodeJpg(image, quality: 85));
 }
@@ -691,9 +681,9 @@ void main() {
             () => mockSecurityService.validateContent(any()),
           ).thenReturn(const Right('validated'));
           // 直接拋出 TimeoutException 來模擬超時情況
-          when(
-            () => mockTextRecognizer.processImage(any()),
-          ).thenThrow(TimeoutException('OCR 處理超時', const Duration(seconds: 30)));
+          when(() => mockTextRecognizer.processImage(any())).thenThrow(
+            TimeoutException('OCR 處理超時', const Duration(seconds: 30)),
+          );
 
           // Act & Assert
           await expectLater(

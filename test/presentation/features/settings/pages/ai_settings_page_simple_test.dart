@@ -9,29 +9,30 @@ import '../../../../helpers/test_helpers.dart';
 
 /// 簡化版的 Mock ViewModel（不使用 Mock 套件）
 class TestAISettingsViewModel extends AISettingsViewModel {
-  TestAISettingsViewModel() : super(
-    secureStorage: throw UnimplementedError(),
-    openAIService: throw UnimplementedError(),
-  );
-  
+  TestAISettingsViewModel()
+    : super(
+        secureStorage: throw UnimplementedError(),
+        openAIService: throw UnimplementedError(),
+      );
+
   @override
   AISettingsState get state => const AISettingsState();
-  
+
   @override
   Future<void> saveApiKey(String apiKey) async {}
-  
+
   @override
   Future<void> deleteApiKey() async {}
-  
+
   @override
   Future<void> validateApiKey() async {}
-  
+
   @override
   Future<void> loadUsageStats() async {}
-  
+
   @override
   Future<void> testConnection() async {}
-  
+
   @override
   void clearError() {}
 }
@@ -75,7 +76,7 @@ void main() {
       expect(find.byType(Scaffold), findsOneWidget);
       expect(find.byType(AppBar), findsOneWidget);
       expect(find.text('AI 設定'), findsOneWidget);
-      
+
       // 檢查主要區塊標題
       expect(find.text('API Key 管理'), findsOneWidget);
       expect(find.text('連線測試'), findsOneWidget);

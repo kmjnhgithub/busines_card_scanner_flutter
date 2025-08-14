@@ -1,9 +1,8 @@
+import 'package:busines_card_scanner_flutter/presentation/features/settings/constants/settings_constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-
-import '../constants/settings_constants.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 part 'settings_view_model.freezed.dart';
 part 'settings_view_model.g.dart';
@@ -11,8 +10,8 @@ part 'settings_view_model.g.dart';
 /// 語言設定列舉
 enum SettingsLanguage {
   system(SettingsConstants.systemLanguage),
-  zh_TW(SettingsConstants.chineseTWLanguage),
-  en_US(SettingsConstants.englishLanguage);
+  zhTw(SettingsConstants.chineseTWLanguage),
+  enUs(SettingsConstants.englishLanguage);
 
   const SettingsLanguage(this.code);
   final String code;
@@ -20,9 +19,9 @@ enum SettingsLanguage {
   static SettingsLanguage fromString(String? value) {
     switch (value) {
       case SettingsConstants.chineseTWLanguage:
-        return SettingsLanguage.zh_TW;
+        return SettingsLanguage.zhTw;
       case SettingsConstants.englishLanguage:
-        return SettingsLanguage.en_US;
+        return SettingsLanguage.enUs;
       case SettingsConstants.systemLanguage:
       default:
         return SettingsLanguage.system;
@@ -70,10 +69,9 @@ class SettingsState with _$SettingsState {
 class SettingsViewModel extends StateNotifier<SettingsState> {
   final SharedPreferences _preferences;
 
-  SettingsViewModel({
-    required SharedPreferences preferences,
-  })  : _preferences = preferences,
-        super(const SettingsState()) {
+  SettingsViewModel({required SharedPreferences preferences})
+    : _preferences = preferences,
+      super(const SettingsState()) {
     _initializeSettings();
   }
 
@@ -87,15 +85,16 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
       final theme = SettingsTheme.fromString(
         _preferences.getString(SettingsConstants.themeKey),
       );
-      final notificationsEnabled = _preferences.getBool(SettingsConstants.notificationsKey) 
-          ?? SettingsConstants.defaultNotifications;
+      final notificationsEnabled =
+          _preferences.getBool(SettingsConstants.notificationsKey) ??
+          SettingsConstants.defaultNotifications;
 
       state = state.copyWith(
         language: language,
         theme: theme,
         notificationsEnabled: notificationsEnabled,
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         error: '${SettingsConstants.loadSettingsError}：$e',
       );
@@ -107,13 +106,13 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
     try {
       state = state.copyWith(isLoading: true, error: null);
 
-      await _preferences.setString(SettingsConstants.languageKey, language.code);
-
-      state = state.copyWith(
-        language: language,
-        isLoading: false,
+      await _preferences.setString(
+        SettingsConstants.languageKey,
+        language.code,
       );
-    } catch (e) {
+
+      state = state.copyWith(language: language, isLoading: false);
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '${SettingsConstants.saveLanguageError}：$e',
@@ -128,11 +127,8 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
 
       await _preferences.setString(SettingsConstants.themeKey, theme.code);
 
-      state = state.copyWith(
-        theme: theme,
-        isLoading: false,
-      );
-    } catch (e) {
+      state = state.copyWith(theme: theme, isLoading: false);
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '${SettingsConstants.saveThemeError}：$e',
@@ -147,11 +143,8 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
 
       await _preferences.setBool(SettingsConstants.notificationsKey, enabled);
 
-      state = state.copyWith(
-        notificationsEnabled: enabled,
-        isLoading: false,
-      );
-    } catch (e) {
+      state = state.copyWith(notificationsEnabled: enabled, isLoading: false);
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '${SettingsConstants.saveNotificationError}：$e',
@@ -169,10 +162,8 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
         appVersion: packageInfo.version,
         buildNumber: packageInfo.buildNumber,
       );
-    } catch (e) {
-      state = state.copyWith(
-        error: '${SettingsConstants.loadVersionError}：$e',
-      );
+    } on Exception catch (e) {
+      state = state.copyWith(error: '${SettingsConstants.loadVersionError}：$e');
     }
   }
 
@@ -193,7 +184,7 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
         notificationsEnabled: SettingsConstants.defaultNotifications,
         isLoading: false,
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '${SettingsConstants.resetSettingsError}：$e',
@@ -206,4 +197,3 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
     state = state.copyWith(error: null);
   }
 }
-

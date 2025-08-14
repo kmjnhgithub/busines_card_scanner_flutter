@@ -1,4 +1,3 @@
-
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/camera_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/camera_view_model.dart';
@@ -52,7 +51,7 @@ void main() {
     suppressDatabaseWarnings();
     registerCommonFallbackValues();
   });
-  
+
   group('CameraPage Widget Tests', () {
     late MockCameraViewModel mockCameraViewModel;
     late MockLoadingPresenter mockLoadingPresenter;
@@ -67,7 +66,7 @@ void main() {
       lensDirection: CameraLensDirection.back,
       sensorOrientation: 0,
     );
-    
+
     const mockCameraSize = Size(1920, 1080);
 
     setUp(() {
@@ -96,9 +95,11 @@ void main() {
           previewSize: mockCameraSize,
         ),
       );
-      
+
       // Mock controller 的重要方法
-      when(() => mockCameraController.description).thenReturn(mockCameraDescription);
+      when(
+        () => mockCameraController.description,
+      ).thenReturn(mockCameraDescription);
       when(() => mockCameraController.dispose()).thenAnswer((_) async {});
 
       container = TestHelpers.createTestContainer(
@@ -109,7 +110,9 @@ void main() {
           loadingPresenterProvider.overrideWith((ref) => mockLoadingPresenter),
           toastPresenterProvider.overrideWith((ref) => mockToastPresenter),
           // 覆寫底層依賴，避免 Provider 依賴鏈問題
-          processImageUseCaseProvider.overrideWith((ref) => MockProcessImageUseCase()),
+          processImageUseCaseProvider.overrideWith(
+            (ref) => MockProcessImageUseCase(),
+          ),
         ],
       );
     });
@@ -123,12 +126,13 @@ void main() {
       if (state != null) {
         mockCameraViewModel.state = state;
       }
-      
+
       return TestHelpers.createTestWidget(
         container: container,
         child: const CameraPage(),
         routes: {
-          '/ocr-processing': (context) => const Scaffold(body: Text('OCR Page')),
+          '/ocr-processing': (context) =>
+              const Scaffold(body: Text('OCR Page')),
           '/card-edit': (context) => const Scaffold(body: Text('Edit Page')),
         },
         navigatorObservers: [mockNavigatorObserver],
@@ -187,9 +191,7 @@ void main() {
       testWidgets('錯誤狀態時應該顯示錯誤訊息', (WidgetTester tester) async {
         // Arrange
         const errorMessage = '相機初始化失敗';
-        mockCameraViewModel.state = const CameraState(
-          error: errorMessage,
-        );
+        mockCameraViewModel.state = const CameraState(error: errorMessage);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -332,7 +334,9 @@ void main() {
         await TestHelpers.testLoadingState(tester);
 
         // 點擊相機預覽區域（使用 GestureDetector 或相機容器）
-        final cameraContainer = find.byKey(const Key('camera_preview_container'));
+        final cameraContainer = find.byKey(
+          const Key('camera_preview_container'),
+        );
         if (cameraContainer.evaluate().isNotEmpty) {
           await tester.tap(cameraContainer);
           await tester.pump();
@@ -346,9 +350,7 @@ void main() {
 
       testWidgets('錯誤狀態下點擊重試按鈕應該重新初始化', (WidgetTester tester) async {
         // Arrange
-        mockCameraViewModel.state = const CameraState(
-          error: '相機錯誤',
-        );
+        mockCameraViewModel.state = const CameraState(error: '相機錯誤');
 
         // Act
         await tester.pumpWidget(createTestWidget());

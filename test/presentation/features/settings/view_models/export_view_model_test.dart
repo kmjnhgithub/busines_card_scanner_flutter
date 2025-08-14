@@ -9,9 +9,13 @@ import 'package:busines_card_scanner_flutter/presentation/features/settings/view
 
 // Mock classes
 class MockGetCardsUseCase extends Mock implements GetCardsUseCase {}
+
 class MockFileSystemService extends Mock implements FileSystemService {}
+
 class MockShareService extends Mock implements ShareService {}
+
 class MockDirectory extends Mock implements Directory {}
+
 class MockFile extends Mock implements File {}
 
 void main() {
@@ -52,7 +56,7 @@ void main() {
           createdAt: DateTime(2024, 1, 1),
         ),
         BusinessCard(
-          id: '2', 
+          id: '2',
           name: '李小明',
           jobTitle: '產品經理',
           company: '創新科技',
@@ -66,7 +70,7 @@ void main() {
         BusinessCard(
           id: '3',
           name: 'Jane Smith',
-          jobTitle: 'Designer', 
+          jobTitle: 'Designer',
           company: 'Creative Studio',
           email: 'jane@creative.com',
           phone: '+44-20-7123-4567',
@@ -75,20 +79,26 @@ void main() {
       ];
 
       // 設定 Mock 預設回傳值
-      when(() => mockGetCardsUseCase.execute(any()))
-          .thenAnswer((_) async => testCards);
-      when(() => mockGetCardsUseCase.searchCards(any()))
-          .thenAnswer((_) async => testCards.take(2).toList());
-      
+      when(
+        () => mockGetCardsUseCase.execute(any()),
+      ).thenAnswer((_) async => testCards);
+      when(
+        () => mockGetCardsUseCase.searchCards(any()),
+      ).thenAnswer((_) async => testCards.take(2).toList());
+
       when(() => mockDirectory.path).thenReturn('/mock/documents');
-      when(() => mockFileSystemService.getApplicationDocumentsDirectory())
-          .thenAnswer((_) async => mockDirectory);
-      when(() => mockFileSystemService.writeFile(any(), any()))
-          .thenAnswer((_) async => mockFile);
-      when(() => mockFileSystemService.fileExists(any()))
-          .thenAnswer((_) async => true);
-      when(() => mockShareService.shareFile(any(), any()))
-          .thenAnswer((_) async {});
+      when(
+        () => mockFileSystemService.getApplicationDocumentsDirectory(),
+      ).thenAnswer((_) async => mockDirectory);
+      when(
+        () => mockFileSystemService.writeFile(any(), any()),
+      ).thenAnswer((_) async => mockFile);
+      when(
+        () => mockFileSystemService.fileExists(any()),
+      ).thenAnswer((_) async => true);
+      when(
+        () => mockShareService.shareFile(any(), any()),
+      ).thenAnswer((_) async {});
 
       container = ProviderContainer(
         overrides: [
@@ -162,9 +172,7 @@ void main() {
         final viewModel = container.read(exportViewModelProvider.notifier);
 
         // 先設定一個錯誤狀態
-        viewModel.state = viewModel.state.copyWith(
-          errorMessage: '測試錯誤',
-        );
+        viewModel.state = viewModel.state.copyWith(errorMessage: '測試錯誤');
         expect(viewModel.state.errorMessage, isNotNull);
 
         // 切換格式
@@ -204,9 +212,7 @@ void main() {
         final viewModel = container.read(exportViewModelProvider.notifier);
 
         // 先設定一個錯誤狀態
-        viewModel.state = viewModel.state.copyWith(
-          errorMessage: '測試錯誤',
-        );
+        viewModel.state = viewModel.state.copyWith(errorMessage: '測試錯誤');
 
         viewModel.selectCards(['1']);
 
@@ -288,8 +294,9 @@ void main() {
       });
 
       test('匯出失敗時應該顯示錯誤', () async {
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenThrow(Exception('資料庫連線失敗'));
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenThrow(Exception('資料庫連線失敗'));
         final viewModel = container.read(exportViewModelProvider.notifier);
 
         await viewModel.exportAllCards();
@@ -303,8 +310,9 @@ void main() {
       });
 
       test('無名片資料時應該顯示適當錯誤', () async {
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => []);
         final viewModel = container.read(exportViewModelProvider.notifier);
 
         await viewModel.exportAllCards();
@@ -315,14 +323,18 @@ void main() {
 
       test('大量名片應該分批處理', () async {
         // 準備大量測試資料
-        final largeCardList = List.generate(150, (index) => BusinessCard(
-          id: 'card_$index',
-          name: 'User $index',
-          createdAt: DateTime.now(),
-        ));
+        final largeCardList = List.generate(
+          150,
+          (index) => BusinessCard(
+            id: 'card_$index',
+            name: 'User $index',
+            createdAt: DateTime.now(),
+          ),
+        );
 
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => largeCardList);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => largeCardList);
 
         final viewModel = container.read(exportViewModelProvider.notifier);
         final progressValues = <double>[];
@@ -369,8 +381,9 @@ void main() {
       });
 
       test('選定的名片不存在時應該顯示錯誤', () async {
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => []);
         final viewModel = container.read(exportViewModelProvider.notifier);
 
         viewModel.selectCards(['999', '888']);
@@ -384,13 +397,13 @@ void main() {
     group('取消匯出', () {
       test('應該能夠取消進行中的匯出', () async {
         final viewModel = container.read(exportViewModelProvider.notifier);
-        
+
         // 開始匯出（不等待完成）
         final exportFuture = viewModel.exportAllCards();
-        
+
         // 立即取消
         viewModel.cancelExport();
-        
+
         // 等待匯出完成
         await exportFuture;
 
@@ -453,8 +466,9 @@ void main() {
       });
 
       test('檔案不存在時分享應該顯示錯誤', () async {
-        when(() => mockFileSystemService.fileExists(any()))
-            .thenAnswer((_) async => false);
+        when(
+          () => mockFileSystemService.fileExists(any()),
+        ).thenAnswer((_) async => false);
 
         final viewModel = container.read(exportViewModelProvider.notifier);
 
@@ -473,11 +487,12 @@ void main() {
     group('格式轉換', () {
       test('CSV 格式應該包含正確的標題列', () async {
         String? capturedContent;
-        when(() => mockFileSystemService.writeFile(any(), any()))
-            .thenAnswer((invocation) async {
-              capturedContent = invocation.positionalArguments[1] as String;
-              return mockFile;
-            });
+        when(() => mockFileSystemService.writeFile(any(), any())).thenAnswer((
+          invocation,
+        ) async {
+          capturedContent = invocation.positionalArguments[1] as String;
+          return mockFile;
+        });
 
         final viewModel = container.read(exportViewModelProvider.notifier);
 
@@ -497,15 +512,17 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => [cardWithSpecialChars]);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => [cardWithSpecialChars]);
 
         String? capturedContent;
-        when(() => mockFileSystemService.writeFile(any(), any()))
-            .thenAnswer((invocation) async {
-              capturedContent = invocation.positionalArguments[1] as String;
-              return mockFile;
-            });
+        when(() => mockFileSystemService.writeFile(any(), any())).thenAnswer((
+          invocation,
+        ) async {
+          capturedContent = invocation.positionalArguments[1] as String;
+          return mockFile;
+        });
 
         final viewModel = container.read(exportViewModelProvider.notifier);
         viewModel.setExportFormat(ExportFormat.csv);
@@ -519,11 +536,12 @@ void main() {
 
       test('VCF 格式應該符合 vCard 標準', () async {
         String? capturedContent;
-        when(() => mockFileSystemService.writeFile(any(), any()))
-            .thenAnswer((invocation) async {
-              capturedContent = invocation.positionalArguments[1] as String;
-              return mockFile;
-            });
+        when(() => mockFileSystemService.writeFile(any(), any())).thenAnswer((
+          invocation,
+        ) async {
+          capturedContent = invocation.positionalArguments[1] as String;
+          return mockFile;
+        });
 
         final viewModel = container.read(exportViewModelProvider.notifier);
 
@@ -543,11 +561,12 @@ void main() {
 
       test('JSON 格式應該包含完整名片資料', () async {
         String? capturedContent;
-        when(() => mockFileSystemService.writeFile(any(), any()))
-            .thenAnswer((invocation) async {
-              capturedContent = invocation.positionalArguments[1] as String;
-              return mockFile;
-            });
+        when(() => mockFileSystemService.writeFile(any(), any())).thenAnswer((
+          invocation,
+        ) async {
+          capturedContent = invocation.positionalArguments[1] as String;
+          return mockFile;
+        });
 
         final viewModel = container.read(exportViewModelProvider.notifier);
 
@@ -597,9 +616,7 @@ void main() {
         final viewModel = container.read(exportViewModelProvider.notifier);
 
         // 設定錯誤狀態
-        viewModel.state = viewModel.state.copyWith(
-          errorMessage: '測試錯誤',
-        );
+        viewModel.state = viewModel.state.copyWith(errorMessage: '測試錯誤');
 
         viewModel.clearError();
 
@@ -627,8 +644,9 @@ void main() {
 
     group('邊界條件', () {
       test('應該處理空名片列表', () async {
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => []);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => []);
         final viewModel = container.read(exportViewModelProvider.notifier);
 
         await viewModel.exportAllCards();
@@ -643,8 +661,9 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => [minimalCard]);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => [minimalCard]);
 
         final viewModel = container.read(exportViewModelProvider.notifier);
         await viewModel.exportAllCards();
@@ -662,8 +681,9 @@ void main() {
           createdAt: DateTime.now(),
         );
 
-        when(() => mockGetCardsUseCase.execute(any()))
-            .thenAnswer((_) async => [longTextCard]);
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => [longTextCard]);
 
         final viewModel = container.read(exportViewModelProvider.notifier);
         await viewModel.exportAllCards();
@@ -676,7 +696,7 @@ void main() {
     group('多執行緒安全', () {
       test('同時呼叫多個匯出方法應該正確處理', () async {
         final viewModel = container.read(exportViewModelProvider.notifier);
-        
+
         viewModel.selectCards(['1']);
 
         // 同時呼叫多個匯出方法
@@ -691,7 +711,10 @@ void main() {
         final state = viewModel.state;
         expect(state.isExporting, false);
         // 至少應該有一個成功的匯出
-        expect(state.exportedFilePath != null || state.errorMessage != null, true);
+        expect(
+          state.exportedFilePath != null || state.errorMessage != null,
+          true,
+        );
       });
     });
   });

@@ -17,10 +17,14 @@ class MockCardWriter implements CardWriter {
 
   void setMockSavedCard(BusinessCard card) => _mockSavedCard = card;
   void setMockBatchResult(BatchSaveResult result) => _mockBatchResult = result;
-  void setMockDeleteResult(BatchDeleteResult result) => _mockDeleteResult = result;
-  void setMockDeleteSuccess({required bool success}) => _mockDeleteSuccess = success;
-  void setMockSoftDeleteSuccess({required bool success}) => _mockSoftDeleteSuccess = success;
-  void setMockRestoreSuccess({required bool success}) => _mockRestoreSuccess = success;
+  void setMockDeleteResult(BatchDeleteResult result) =>
+      _mockDeleteResult = result;
+  void setMockDeleteSuccess({required bool success}) =>
+      _mockDeleteSuccess = success;
+  void setMockSoftDeleteSuccess({required bool success}) =>
+      _mockSoftDeleteSuccess = success;
+  void setMockRestoreSuccess({required bool success}) =>
+      _mockRestoreSuccess = success;
   void setMockPurgeCount(int count) => _mockPurgeCount = count;
   void setMockFailure(DomainFailure failure) => _mockFailure = failure;
 

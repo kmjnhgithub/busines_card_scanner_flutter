@@ -136,7 +136,11 @@ class ThemedButton extends StatelessWidget {
     final colorScheme = _getColorScheme(context, type);
 
     // 建立按鈕內容
-    final Widget buttonContent = _buildButtonContent(context, config, colorScheme);
+    final Widget buttonContent = _buildButtonContent(
+      context,
+      config,
+      colorScheme,
+    );
 
     // 建立按鈕
     Widget button = _buildButton(context, config, colorScheme, buttonContent);
@@ -273,9 +277,7 @@ class ThemedButton extends StatelessWidget {
           style: OutlinedButton.styleFrom(
             backgroundColor: backgroundColor ?? colorScheme.background,
             foregroundColor: foregroundColor ?? colorScheme.foreground,
-            side: BorderSide(
-              color: borderColor ?? colorScheme.border,
-            ),
+            side: BorderSide(color: borderColor ?? colorScheme.border),
             padding: actualPadding,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(actualBorderRadius),

@@ -60,11 +60,11 @@ class LoadingState {
 
   /// 建立基本載入狀態
   const LoadingState.loading([this.message])
-      : isLoading = true,
-        type = LoadingType.normal,
-        progress = null,
-        canCancel = false,
-        onCancel = null;
+    : isLoading = true,
+      type = LoadingType.normal,
+      progress = null,
+      canCancel = false,
+      onCancel = null;
 
   /// 建立帶進度的載入狀態
   const LoadingState.withProgress({
@@ -80,9 +80,9 @@ class LoadingState {
     required this.onCancel,
     this.message,
     this.type = LoadingType.normal,
-  })  : isLoading = true,
-        progress = null,
-        canCancel = true;
+  }) : isLoading = true,
+       progress = null,
+       canCancel = true;
 
   /// 複製並更新載入狀態
   LoadingState copyWith({

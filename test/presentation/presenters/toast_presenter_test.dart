@@ -134,10 +134,7 @@ void main() {
                   return Scaffold(
                     body: ElevatedButton(
                       onPressed: () {
-                        ToastHelper.showSnackBar(
-                          context,
-                          'Info message',
-                        );
+                        ToastHelper.showSnackBar(context, 'Info message');
                       },
                       child: const Text('Show Info'),
                     ),

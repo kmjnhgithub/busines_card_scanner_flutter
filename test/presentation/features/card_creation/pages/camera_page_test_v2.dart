@@ -45,7 +45,9 @@ void main() {
           cameraViewModelProvider.overrideWith((ref) => mockCameraViewModel),
           loadingPresenterProvider.overrideWith((ref) => mockLoadingPresenter),
           toastPresenterProvider.overrideWith((ref) => mockToastPresenter),
-          processImageUseCaseProvider.overrideWith((ref) => MockProcessImageUseCase()),
+          processImageUseCaseProvider.overrideWith(
+            (ref) => MockProcessImageUseCase(),
+          ),
         ],
       );
     });
@@ -63,7 +65,8 @@ void main() {
         container: container,
         child: const CameraPage(),
         routes: {
-          '/ocr-processing': (context) => const Scaffold(body: Text('OCR Page')),
+          '/ocr-processing': (context) =>
+              const Scaffold(body: Text('OCR Page')),
           '/card-edit': (context) => const Scaffold(body: Text('Edit Page')),
         },
       );
@@ -85,10 +88,7 @@ void main() {
 
       testWidgets('相機初始化後應該顯示相機控制按鈕', (WidgetTester tester) async {
         // Arrange - 模擬相機已初始化狀態
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -104,10 +104,7 @@ void main() {
       testWidgets('錯誤狀態應該顯示錯誤訊息和重試按鈕', (WidgetTester tester) async {
         // Arrange
         const errorMessage = '相機初始化失敗';
-        mockCameraViewModel.state = const CameraState(
-          error: errorMessage,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(error: errorMessage);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -121,10 +118,7 @@ void main() {
 
       testWidgets('應該顯示相機掃描框架和提示文字', (WidgetTester tester) async {
         // Arrange
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -137,12 +131,11 @@ void main() {
     });
 
     group('使用者互動測試', () {
-      testWidgets('點擊拍照按鈕應該調用 ViewModel takePicture', (WidgetTester tester) async {
+      testWidgets('點擊拍照按鈕應該調用 ViewModel takePicture', (
+        WidgetTester tester,
+      ) async {
         // Arrange
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -155,12 +148,11 @@ void main() {
         verify(() => mockCameraViewModel.takePicture()).called(1);
       });
 
-      testWidgets('點擊閃光燈按鈕應該調用 ViewModel toggleFlashMode', (WidgetTester tester) async {
+      testWidgets('點擊閃光燈按鈕應該調用 ViewModel toggleFlashMode', (
+        WidgetTester tester,
+      ) async {
         // Arrange
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -175,9 +167,7 @@ void main() {
 
       testWidgets('錯誤狀態下點擊重試按鈕應該重新初始化相機', (WidgetTester tester) async {
         // Arrange
-        mockCameraViewModel.state = const CameraState(
-          error: '相機錯誤',
-        );
+        mockCameraViewModel.state = const CameraState(error: '相機錯誤');
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -194,10 +184,7 @@ void main() {
     group('閃光燈狀態測試', () {
       testWidgets('閃光燈模式變化應該更新圖示', (WidgetTester tester) async {
         // Arrange - auto 模式
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          flashMode: FlashMode.auto,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -245,10 +232,7 @@ void main() {
         expect(find.byType(CircularProgressIndicator), findsAtLeastNWidgets(1));
 
         // Arrange - 更新為已初始化狀態
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act - 觸發重建
         await tester.pump();
@@ -279,10 +263,7 @@ void main() {
     group('無障礙測試', () {
       testWidgets('按鈕應該有正確的語義標籤', (WidgetTester tester) async {
         // Arrange
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -297,10 +278,7 @@ void main() {
 
       testWidgets('應該提供適當的語音提示', (WidgetTester tester) async {
         // Arrange
-        mockCameraViewModel.state = const CameraState(
-          isInitialized: true,
-          isLoading: false,
-        );
+        mockCameraViewModel.state = const CameraState(isInitialized: true);
 
         // Act
         await tester.pumpWidget(createTestWidget());
@@ -316,7 +294,6 @@ void main() {
         // Arrange
         const testState = CameraState(
           isInitialized: true,
-          isLoading: false,
           flashMode: FlashMode.torch,
         );
         mockCameraViewModel.state = testState;

@@ -397,28 +397,32 @@ $ocrText
       } else if (response.statusCode == 401) {
         return const Right(false);
       } else {
-        return Left(NetworkConnectionFailure(
-          endpoint: '$_baseUrl/models',
-          userMessage: 'API 驗證失敗: HTTP ${response.statusCode}',
-        ));
+        return Left(
+          NetworkConnectionFailure(
+            endpoint: '$_baseUrl/models',
+            userMessage: 'API 驗證失敗: HTTP ${response.statusCode}',
+          ),
+        );
       }
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
+      if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
-        return const Left(NetworkConnectionFailure(
-          userMessage: '網路連線逾時',
-        ));
+        return const Left(NetworkConnectionFailure(userMessage: '網路連線逾時'));
       }
-      
-      return Left(NetworkConnectionFailure(
-        endpoint: '$_baseUrl/models',
-        userMessage: '網路連線失敗: ${e.message ?? 'Unknown network error'}',
-      ));
-    } catch (e) {
-      return Left(DataSourceFailure(
-        userMessage: 'API Key 驗證時發生未預期錯誤',
-        internalMessage: e.toString(),
-      ));
+
+      return Left(
+        NetworkConnectionFailure(
+          endpoint: '$_baseUrl/models',
+          userMessage: '網路連線失敗: ${e.message ?? 'Unknown network error'}',
+        ),
+      );
+    } on Exception catch (e) {
+      return Left(
+        DataSourceFailure(
+          userMessage: 'API Key 驗證時發生未預期錯誤',
+          internalMessage: e.toString(),
+        ),
+      );
     }
   }
 
@@ -444,7 +448,7 @@ $ocrText
       if (response.statusCode == 200) {
         // 解析回應數據
         final data = response.data as Map<String, dynamic>;
-        
+
         // 由於 OpenAI API 格式可能變更，這裡提供基本的解析邏輯
         final usageStats = UsageStats(
           totalRequests: (data['total_requests'] as int?) ?? 0,
@@ -452,37 +456,43 @@ $ocrText
           currentMonth: DateTime.now(),
           dailyUsage: [], // 實際應該解析每日使用量
         );
-        
+
         return Right(usageStats);
       } else if (response.statusCode == 401) {
-        return const Left(InsufficientPermissionFailure(
-          permission: 'usage_access',
-          operation: 'get_usage_stats',
-          userMessage: 'API Key 沒有存取使用量統計的權限',
-        ));
+        return const Left(
+          InsufficientPermissionFailure(
+            permission: 'usage_access',
+            operation: 'get_usage_stats',
+            userMessage: 'API Key 沒有存取使用量統計的權限',
+          ),
+        );
       } else {
-        return Left(NetworkConnectionFailure(
-          endpoint: '$_baseUrl/usage',
-          userMessage: '載入使用量統計失敗: HTTP ${response.statusCode}',
-        ));
+        return Left(
+          NetworkConnectionFailure(
+            endpoint: '$_baseUrl/usage',
+            userMessage: '載入使用量統計失敗: HTTP ${response.statusCode}',
+          ),
+        );
       }
     } on DioException catch (e) {
-      if (e.type == DioExceptionType.connectionTimeout || 
+      if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
-        return const Left(NetworkConnectionFailure(
-          userMessage: '網路連線逾時',
-        ));
+        return const Left(NetworkConnectionFailure(userMessage: '網路連線逾時'));
       }
-      
-      return Left(NetworkConnectionFailure(
-        endpoint: '$_baseUrl/usage',
-        userMessage: '網路連線失敗: ${e.message ?? 'Unknown network error'}',
-      ));
-    } catch (e) {
-      return Left(DataSourceFailure(
-        userMessage: '載入使用量統計時發生未預期錯誤',
-        internalMessage: e.toString(),
-      ));
+
+      return Left(
+        NetworkConnectionFailure(
+          endpoint: '$_baseUrl/usage',
+          userMessage: '網路連線失敗: ${e.message ?? 'Unknown network error'}',
+        ),
+      );
+    } on Exception catch (e) {
+      return Left(
+        DataSourceFailure(
+          userMessage: '載入使用量統計時發生未預期錯誤',
+          internalMessage: e.toString(),
+        ),
+      );
     }
   }
 }

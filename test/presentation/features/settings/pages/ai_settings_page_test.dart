@@ -5,7 +5,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
-import 'package:busines_card_scanner_flutter/presentation/features/settings/providers/settings_providers.dart' hide aiSettingsViewModelProvider;
+import 'package:busines_card_scanner_flutter/presentation/features/settings/providers/settings_providers.dart'
+    hide aiSettingsViewModelProvider;
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_button.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_text_field.dart';
@@ -16,11 +17,14 @@ import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_serv
 import '../../../../helpers/test_helpers.dart';
 
 /// Mock 類別
-class MockAISettingsViewModel extends StateNotifier<AISettingsState> with Mock implements AISettingsViewModel {
+class MockAISettingsViewModel extends StateNotifier<AISettingsState>
+    with Mock
+    implements AISettingsViewModel {
   MockAISettingsViewModel() : super(const AISettingsState());
 }
 
 class MockEnhancedSecureStorage extends Mock implements EnhancedSecureStorage {}
+
 class MockOpenAIService extends Mock implements OpenAIService {}
 
 void main() {
@@ -90,11 +94,11 @@ void main() {
         // Assert - 檢查 API Key 管理區塊
         expect(find.text('API Key 管理'), findsOneWidget);
         expect(find.byType(ThemedTextField), findsOneWidget);
-        
+
         // 檢查儲存和刪除按鈕
         expect(find.text('儲存'), findsOneWidget);
         expect(find.text('刪除'), findsOneWidget);
-        
+
         // 檢查顯示/隱藏按鈕（眼睛圖示）
         expect(find.byIcon(Icons.visibility), findsAtLeastNWidgets(0));
       });
@@ -153,7 +157,7 @@ void main() {
       testWidgets('應該能夠輸入 API Key', (tester) async {
         // Arrange
         const testApiKey = 'sk-test123456789';
-        
+
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
             container: container,
@@ -175,7 +179,7 @@ void main() {
       testWidgets('應該在點擊儲存時呼叫 ViewModel', (tester) async {
         // Arrange
         const testApiKey = 'sk-test123456789';
-        
+
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
             container: container,
@@ -201,7 +205,7 @@ void main() {
       testWidgets('應該能夠切換 API Key 的顯示狀態', (tester) async {
         // Arrange
         const testApiKey = 'sk-test123456789';
-        
+
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
             container: container,
@@ -227,9 +231,9 @@ void main() {
 
       testWidgets('應該顯示 API Key 格式錯誤', (tester) async {
         // Arrange
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(error: 'API Key 格式無效：必須以 sk- 開頭'),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(error: 'API Key 格式無效：必須以 sk- 開頭'));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -248,9 +252,9 @@ void main() {
     group('API Key 刪除測試', () {
       testWidgets('應該在點擊刪除時顯示確認對話框', (tester) async {
         // Arrange
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(hasApiKey: true),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(hasApiKey: true));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -274,9 +278,9 @@ void main() {
 
       testWidgets('應該在確認刪除時呼叫 ViewModel', (tester) async {
         // Arrange
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(hasApiKey: true),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(hasApiKey: true));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -302,9 +306,9 @@ void main() {
 
       testWidgets('應該在取消刪除時關閉對話框', (tester) async {
         // Arrange
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(hasApiKey: true),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(hasApiKey: true));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -352,9 +356,9 @@ void main() {
 
       testWidgets('應該顯示載入狀態', (tester) async {
         // Arrange - 設定載入狀態
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(isLoading: true),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(isLoading: true));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -444,17 +448,13 @@ void main() {
           totalTokens: 50000,
           currentMonth: DateTime.now(),
           dailyUsage: [
-            DailyUsage(
-              date: DateTime.now(),
-              requests: 10,
-              tokens: 1000,
-            ),
+            DailyUsage(date: DateTime.now(), requests: 10, tokens: 1000),
           ],
         );
 
-        when(() => mockViewModel.state).thenReturn(
-          AISettingsState(usageStats: mockUsageStats),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(AISettingsState(usageStats: mockUsageStats));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -472,9 +472,9 @@ void main() {
 
       testWidgets('應該在沒有使用量統計時顯示空狀態', (tester) async {
         // Arrange - 無使用量統計
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(usageStats: null),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(usageStats: null));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -494,9 +494,9 @@ void main() {
       testWidgets('應該顯示一般錯誤訊息', (tester) async {
         // Arrange
         const errorMessage = '網路連線失敗，請檢查網路設定';
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(error: errorMessage),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(error: errorMessage));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -513,9 +513,9 @@ void main() {
 
       testWidgets('應該能夠清除錯誤狀態', (tester) async {
         // Arrange
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(error: '測試錯誤'),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(error: '測試錯誤'));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -567,7 +567,10 @@ void main() {
         await waitForPageLoad(tester);
 
         // Assert - 檢查連結存在
-        expect(find.textContaining('https://platform.openai.com'), findsOneWidget);
+        expect(
+          find.textContaining('https://platform.openai.com'),
+          findsOneWidget,
+        );
       });
 
       testWidgets('應該能夠點擊外部連結', (tester) async {
@@ -587,7 +590,7 @@ void main() {
           // 模擬點擊（實際測試中無法真正打開連結）
           await tester.tap(linkText.first);
           await tester.pump();
-          
+
           // Assert - 確保不會崩潰
           expect(tester.takeException(), isNull);
         }
@@ -597,9 +600,9 @@ void main() {
     group('API Key 遮罩顯示測試', () {
       testWidgets('應該在有 API Key 時顯示遮罩', (tester) async {
         // Arrange - 設定有 API Key 狀態
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(hasApiKey: true),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(hasApiKey: true));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -616,9 +619,9 @@ void main() {
 
       testWidgets('應該在沒有 API Key 時顯示空的輸入欄位', (tester) async {
         // Arrange - 設定無 API Key 狀態
-        when(() => mockViewModel.state).thenReturn(
-          const AISettingsState(hasApiKey: false),
-        );
+        when(
+          () => mockViewModel.state,
+        ).thenReturn(const AISettingsState(hasApiKey: false));
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -632,7 +635,7 @@ void main() {
         // Assert - 檢查輸入欄位為空
         final textField = find.byType(ThemedTextField);
         expect(textField, findsOneWidget);
-        
+
         // 檢查輸入欄位的提示文字
         expect(find.textContaining('請輸入 OpenAI API Key'), findsOneWidget);
       });
@@ -653,7 +656,7 @@ void main() {
         // Assert - 檢查基本語義標籤存在
         // 檢查是否有 Semantics widget
         expect(find.byType(Semantics), findsWidgets);
-        
+
         // 檢查頁面基本結構
         expect(find.byType(Scaffold), findsOneWidget);
         expect(find.byType(AppBar), findsOneWidget);

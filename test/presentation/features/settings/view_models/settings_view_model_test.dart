@@ -10,6 +10,7 @@ import 'package:busines_card_scanner_flutter/presentation/features/settings/prov
 
 // Mock classes
 class MockSharedPreferences extends Mock implements SharedPreferences {}
+
 class MockDeviceInfoPlugin extends Mock implements DeviceInfoPlugin {}
 
 void main() {
@@ -29,16 +30,16 @@ void main() {
       // 設定 Mock 的預設回傳值
       when(() => mockPrefs.getString(any())).thenReturn(null);
       when(() => mockPrefs.getBool(any())).thenReturn(null);
-      when(() => mockPrefs.setString(any(), any())).thenAnswer((_) async => true);
+      when(
+        () => mockPrefs.setString(any(), any()),
+      ).thenAnswer((_) async => true);
       when(() => mockPrefs.setBool(any(), any())).thenAnswer((_) async => true);
       when(() => mockPrefs.remove(any())).thenAnswer((_) async => true);
 
       container = ProviderContainer(
         overrides: [
           settingsViewModelProvider.overrideWith(
-            (ref) => SettingsViewModel(
-              preferences: mockPrefs,
-            ),
+            (ref) => SettingsViewModel(preferences: mockPrefs),
           ),
         ],
       );
@@ -63,21 +64,18 @@ void main() {
 
       test('應該載入儲存的設定值', () {
         // Arrange
-        when(() => mockPrefs.getString('app_language'))
-            .thenReturn('zh_TW');
-        when(() => mockPrefs.getString('app_theme'))
-            .thenReturn('dark');
-        when(() => mockPrefs.getBool('notifications_enabled'))
-            .thenReturn(false);
+        when(() => mockPrefs.getString('app_language')).thenReturn('zh_TW');
+        when(() => mockPrefs.getString('app_theme')).thenReturn('dark');
+        when(
+          () => mockPrefs.getBool('notifications_enabled'),
+        ).thenReturn(false);
 
         // 重新建立 container 以觸發初始化
         container.dispose();
         container = ProviderContainer(
           overrides: [
             settingsViewModelProvider.overrideWith(
-              (ref) => SettingsViewModel(
-                preferences: mockPrefs,
-              ),
+              (ref) => SettingsViewModel(preferences: mockPrefs),
             ),
           ],
         );
@@ -85,7 +83,7 @@ void main() {
         // Act & Assert
         final state = container.read(settingsViewModelProvider);
 
-        expect(state.language, SettingsLanguage.zh_TW);
+        expect(state.language, SettingsLanguage.zhTw);
         expect(state.theme, SettingsTheme.dark);
         expect(state.notificationsEnabled, false);
       });
@@ -97,11 +95,11 @@ void main() {
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
-        await viewModel.changeLanguage(SettingsLanguage.zh_TW);
+        await viewModel.changeLanguage(SettingsLanguage.zhTw);
 
         // Assert
         final state = viewModel.state;
-        expect(state.language, SettingsLanguage.zh_TW);
+        expect(state.language, SettingsLanguage.zhTw);
         expect(state.isLoading, false);
         expect(state.error, isNull);
 
@@ -113,12 +111,12 @@ void main() {
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
-        await viewModel.changeLanguage(SettingsLanguage.en_US);
+        await viewModel.changeLanguage(SettingsLanguage.enUs);
 
         // Assert
         final state = viewModel.state;
-        expect(state.language, SettingsLanguage.en_US);
-        
+        expect(state.language, SettingsLanguage.enUs);
+
         verify(() => mockPrefs.setString('app_language', 'en_US')).called(1);
       });
 
@@ -132,18 +130,19 @@ void main() {
         // Assert
         final state = viewModel.state;
         expect(state.language, SettingsLanguage.system);
-        
+
         verify(() => mockPrefs.setString('app_language', 'system')).called(1);
       });
 
       test('語言切換失敗時應該顯示錯誤', () async {
         // Arrange
-        when(() => mockPrefs.setString('app_language', any()))
-            .thenThrow(Exception('儲存失敗'));
+        when(
+          () => mockPrefs.setString('app_language', any()),
+        ).thenThrow(Exception('儲存失敗'));
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
-        await viewModel.changeLanguage(SettingsLanguage.zh_TW);
+        await viewModel.changeLanguage(SettingsLanguage.zhTw);
 
         // Assert
         final state = viewModel.state;
@@ -156,7 +155,7 @@ void main() {
         // Arrange
         final viewModel = container.read(settingsViewModelProvider.notifier);
         bool loadingStateObserved = false;
-        
+
         // 監聽狀態變化
         container.listen(settingsViewModelProvider, (previous, next) {
           if (next.isLoading) {
@@ -165,7 +164,7 @@ void main() {
         });
 
         // Act
-        await viewModel.changeLanguage(SettingsLanguage.zh_TW);
+        await viewModel.changeLanguage(SettingsLanguage.zhTw);
 
         // Assert
         expect(loadingStateObserved, true);
@@ -184,7 +183,7 @@ void main() {
         final state = viewModel.state;
         expect(state.theme, SettingsTheme.dark);
         expect(state.error, isNull);
-        
+
         verify(() => mockPrefs.setString('app_theme', 'dark')).called(1);
       });
 
@@ -198,7 +197,7 @@ void main() {
         // Assert
         final state = viewModel.state;
         expect(state.theme, SettingsTheme.light);
-        
+
         verify(() => mockPrefs.setString('app_theme', 'light')).called(1);
       });
 
@@ -212,14 +211,15 @@ void main() {
         // Assert
         final state = viewModel.state;
         expect(state.theme, SettingsTheme.system);
-        
+
         verify(() => mockPrefs.setString('app_theme', 'system')).called(1);
       });
 
       test('主題切換失敗時應該顯示錯誤', () async {
         // Arrange
-        when(() => mockPrefs.setString('app_theme', any()))
-            .thenThrow(Exception('儲存失敗'));
+        when(
+          () => mockPrefs.setString('app_theme', any()),
+        ).thenThrow(Exception('儲存失敗'));
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
@@ -244,8 +244,10 @@ void main() {
         final state = viewModel.state;
         expect(state.notificationsEnabled, true);
         expect(state.error, isNull);
-        
-        verify(() => mockPrefs.setBool('notifications_enabled', true)).called(1);
+
+        verify(
+          () => mockPrefs.setBool('notifications_enabled', true),
+        ).called(1);
       });
 
       test('應該成功關閉通知', () async {
@@ -258,14 +260,17 @@ void main() {
         // Assert
         final state = viewModel.state;
         expect(state.notificationsEnabled, false);
-        
-        verify(() => mockPrefs.setBool('notifications_enabled', false)).called(1);
+
+        verify(
+          () => mockPrefs.setBool('notifications_enabled', false),
+        ).called(1);
       });
 
       test('通知設定失敗時應該顯示錯誤', () async {
         // Arrange
-        when(() => mockPrefs.setBool('notifications_enabled', any()))
-            .thenThrow(Exception('儲存失敗'));
+        when(
+          () => mockPrefs.setBool('notifications_enabled', any()),
+        ).thenThrow(Exception('儲存失敗'));
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
@@ -292,7 +297,7 @@ void main() {
         // Arrange
         final viewModel = container.read(settingsViewModelProvider.notifier);
         bool loadingStateObserved = false;
-        
+
         container.listen(settingsViewModelProvider, (previous, next) {
           if (next.isLoading) {
             loadingStateObserved = true;
@@ -330,8 +335,7 @@ void main() {
 
       test('重置設定失敗時應該顯示錯誤', () async {
         // Arrange
-        when(() => mockPrefs.remove(any()))
-            .thenThrow(Exception('清除失敗'));
+        when(() => mockPrefs.remove(any())).thenThrow(Exception('清除失敗'));
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
@@ -347,12 +351,13 @@ void main() {
     group('錯誤處理', () {
       test('應該能清除錯誤狀態', () async {
         // Arrange
-        when(() => mockPrefs.setString('app_language', any()))
-            .thenThrow(Exception('測試錯誤'));
+        when(
+          () => mockPrefs.setString('app_language', any()),
+        ).thenThrow(Exception('測試錯誤'));
         final viewModel = container.read(settingsViewModelProvider.notifier);
-        
+
         // 產生錯誤
-        await viewModel.changeLanguage(SettingsLanguage.zh_TW);
+        await viewModel.changeLanguage(SettingsLanguage.zhTw);
         expect(viewModel.state.error, isNotNull);
 
         // Act
@@ -375,9 +380,7 @@ void main() {
         container = ProviderContainer(
           overrides: [
             settingsViewModelProvider.overrideWith(
-              (ref) => SettingsViewModel(
-                preferences: mockPrefs,
-              ),
+              (ref) => SettingsViewModel(preferences: mockPrefs),
             ),
           ],
         );
@@ -393,17 +396,19 @@ void main() {
 
       test('應該處理無效的設定值', () {
         // Arrange
-        when(() => mockPrefs.getString('app_language')).thenReturn('invalid_lang');
-        when(() => mockPrefs.getString('app_theme')).thenReturn('invalid_theme');
+        when(
+          () => mockPrefs.getString('app_language'),
+        ).thenReturn('invalid_lang');
+        when(
+          () => mockPrefs.getString('app_theme'),
+        ).thenReturn('invalid_theme');
 
         // 重新建立 container
         container.dispose();
         container = ProviderContainer(
           overrides: [
             settingsViewModelProvider.overrideWith(
-              (ref) => SettingsViewModel(
-                preferences: mockPrefs,
-              ),
+              (ref) => SettingsViewModel(preferences: mockPrefs),
             ),
           ],
         );
@@ -422,16 +427,16 @@ void main() {
 
         // Act - 同時變更多個設定
         final futures = [
-          viewModel.changeLanguage(SettingsLanguage.zh_TW),
+          viewModel.changeLanguage(SettingsLanguage.zhTw),
           viewModel.changeTheme(SettingsTheme.dark),
           viewModel.toggleNotifications(enabled: false),
         ];
-        
+
         await Future.wait(futures);
 
         // Assert
         final state = viewModel.state;
-        expect(state.language, SettingsLanguage.zh_TW);
+        expect(state.language, SettingsLanguage.zhTw);
         expect(state.theme, SettingsTheme.dark);
         expect(state.notificationsEnabled, false);
         expect(state.error, isNull);
@@ -444,22 +449,23 @@ void main() {
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
-        await viewModel.changeLanguage(SettingsLanguage.zh_TW);
+        await viewModel.changeLanguage(SettingsLanguage.zhTw);
         await viewModel.changeTheme(SettingsTheme.dark);
         await viewModel.toggleNotifications(enabled: false);
 
         // Assert - 檢查所有儲存呼叫是否正確
         verify(() => mockPrefs.setString('app_language', 'zh_TW')).called(1);
         verify(() => mockPrefs.setString('app_theme', 'dark')).called(1);
-        verify(() => mockPrefs.setBool('notifications_enabled', false)).called(1);
+        verify(
+          () => mockPrefs.setBool('notifications_enabled', false),
+        ).called(1);
 
         // 檢查狀態
         final state = viewModel.state;
-        expect(state.language, SettingsLanguage.zh_TW);
+        expect(state.language, SettingsLanguage.zhTw);
         expect(state.theme, SettingsTheme.dark);
         expect(state.notificationsEnabled, false);
       });
     });
   });
 }
-

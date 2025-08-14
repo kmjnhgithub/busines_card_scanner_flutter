@@ -1,17 +1,16 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:busines_card_scanner_flutter/core/constants/app_constants.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/providers/settings_providers.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/dialog_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 /// 設定頁面
 ///
 /// 提供應用程式的各種設定選項：
 /// - 語言設定
-/// - 主題設定  
+/// - 主題設定
 /// - 通知設定
 /// - AI 設定
 /// - 匯出資料
@@ -40,10 +39,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('設定'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('設定'), centerTitle: true),
       body: settingsState.isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -106,7 +102,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           }).toList(),
           onChanged: (language) {
             if (language != null) {
-              ref.read(settingsViewModelProvider.notifier).changeLanguage(language);
+              ref
+                  .read(settingsViewModelProvider.notifier)
+                  .changeLanguage(language);
             }
           },
         ),
@@ -137,7 +135,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               selected: {state.theme},
               onSelectionChanged: (Set<SettingsTheme> themes) {
                 if (themes.isNotEmpty) {
-                  ref.read(settingsViewModelProvider.notifier).changeTheme(themes.first);
+                  ref
+                      .read(settingsViewModelProvider.notifier)
+                      .changeTheme(themes.first);
                 }
               },
             ),
@@ -156,7 +156,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         subtitle: Text(state.notificationsEnabled ? '已開啟' : '已關閉'),
         value: state.notificationsEnabled,
         onChanged: (value) {
-          ref.read(settingsViewModelProvider.notifier).toggleNotifications(enabled: value);
+          ref
+              .read(settingsViewModelProvider.notifier)
+              .toggleNotifications(enabled: value);
         },
       ),
     );
@@ -218,9 +220,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     switch (language) {
       case SettingsLanguage.system:
         return '跟隨系統';
-      case SettingsLanguage.zh_TW:
+      case SettingsLanguage.zhTw:
         return '繁體中文';
-      case SettingsLanguage.en_US:
+      case SettingsLanguage.enUs:
         return 'English';
     }
   }
@@ -272,7 +274,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
     DialogPresenter.showInfo(
       context,
       title: '關於應用程式',
-      content: '''
+      content:
+          '''
 ${AppConstants.appName}
 
 版本：${state.appVersion.isEmpty ? '載入中...' : state.appVersion}

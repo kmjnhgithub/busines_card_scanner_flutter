@@ -138,9 +138,7 @@ void main() {
       });
 
       testWidgets('onMoreActions = null 時不應該顯示更多按鈕', (tester) async {
-        await tester.pumpWidget(
-          createTestWidget(card: testCard),
-        );
+        await tester.pumpWidget(createTestWidget(card: testCard));
 
         expect(find.byIcon(Icons.more_vert), findsNothing);
       });

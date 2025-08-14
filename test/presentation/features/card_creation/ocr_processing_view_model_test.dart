@@ -35,7 +35,7 @@ void main() {
     suppressDatabaseWarnings();
     registerCommonFallbackValues();
   });
-  
+
   group('OCRProcessingViewModel Tests', () {
     late MockProcessImageUseCase mockProcessImageUseCase;
     late MockCreateCardFromImageUseCase mockCreateCardFromImageUseCase;

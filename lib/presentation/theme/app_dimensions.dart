@@ -175,38 +175,22 @@ class AppDimensions {
 
   /// 小陰影 - 用於懸浮按鈕
   static const List<BoxShadow> shadowSmall = [
-    BoxShadow(
-      color: Color(0x0A000000),
-      offset: Offset(0, 1),
-      blurRadius: 2,
-    ),
+    BoxShadow(color: Color(0x0A000000), offset: Offset(0, 1), blurRadius: 2),
   ];
 
   /// 中陰影 - 用於卡片
   static const List<BoxShadow> shadowMedium = [
-    BoxShadow(
-      color: Color(0x14000000),
-      offset: Offset(0, 2),
-      blurRadius: 8,
-    ),
+    BoxShadow(color: Color(0x14000000), offset: Offset(0, 2), blurRadius: 8),
   ];
 
   /// 大陰影 - 用於對話框、底部選單
   static const List<BoxShadow> shadowLarge = [
-    BoxShadow(
-      color: Color(0x1F000000),
-      offset: Offset(0, 4),
-      blurRadius: 16,
-    ),
+    BoxShadow(color: Color(0x1F000000), offset: Offset(0, 4), blurRadius: 16),
   ];
 
   /// 超大陰影 - 用於模態對話框
   static const List<BoxShadow> shadowExtraLarge = [
-    BoxShadow(
-      color: Color(0x29000000),
-      offset: Offset(0, 8),
-      blurRadius: 24,
-    ),
+    BoxShadow(color: Color(0x29000000), offset: Offset(0, 8), blurRadius: 24),
   ];
 
   // ==================== 元件尺寸 ====================

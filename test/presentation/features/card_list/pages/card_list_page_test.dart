@@ -255,11 +255,11 @@ void main() {
       testWidgets('確認刪除應該呼叫刪除用例', (tester) async {
         // 直接測試 ViewModel 的刪除功能，避免對話框相關的測試環境問題
         final viewModel = container.read(cardListViewModelProvider.notifier);
-        
+
         // 先載入名片列表
         await tester.pumpWidget(createTestWidget());
         await TestHelpers.pumpAndSettleWithTimeout(tester);
-        
+
         // 驗證初始名片列表已載入
         expect(find.text('張三'), findsOneWidget);
         expect(find.text('李四'), findsOneWidget);
@@ -279,17 +279,21 @@ void main() {
 
         // 直接呼叫 ViewModel 的刪除方法（模擬用戶在對話框中確認刪除）
         final result = await viewModel.deleteCard('1');
-        
+
         // 等待 UI 更新
         await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 驗證刪除用例被正確呼叫
-        verify(() => mockDeleteCardUseCase.execute(
-          any(that: predicate<DeleteCardParams>(
-            (params) => params.cardId == '1',
-          )),
-        )).called(1);
-        
+        verify(
+          () => mockDeleteCardUseCase.execute(
+            any(
+              that: predicate<DeleteCardParams>(
+                (params) => params.cardId == '1',
+              ),
+            ),
+          ),
+        ).called(1);
+
         // 驗證返回結果
         expect(result, isTrue);
       });
@@ -401,7 +405,9 @@ void main() {
         await TestHelpers.testLoadingState(tester);
 
         // 檢查載入狀態（應該有載入指示器或載入中文字）
-        final hasLoadingIndicator = TestFinders.loadingIndicator().evaluate().isNotEmpty;
+        final hasLoadingIndicator = TestFinders.loadingIndicator()
+            .evaluate()
+            .isNotEmpty;
         final hasLoadingText = TestFinders.loadingText().evaluate().isNotEmpty;
 
         expect(
@@ -419,12 +425,12 @@ void main() {
 
       testWidgets('載入失敗時應該顯示錯誤訊息', (tester) async {
         // 設定失敗回應
-        when(() => mockGetCardsUseCase.execute(any())).thenThrow(
-          Exception('載入失敗'),
-        );
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenThrow(Exception('載入失敗'));
 
         await tester.pumpWidget(createTestWidget());
-        
+
         // 使用帶超時保護的等待
         await TestHelpers.pumpAndSettleWithTimeout(tester);
 

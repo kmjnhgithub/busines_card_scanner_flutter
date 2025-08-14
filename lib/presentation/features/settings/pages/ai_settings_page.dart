@@ -1,14 +1,13 @@
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
-
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_button.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_text_field.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// AI 設定頁面
 ///
@@ -97,15 +96,13 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
                 'API Key 管理',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.getTextColor(
-                    Theme.of(context).brightness,
-                  ),
+                  color: AppColors.getTextColor(Theme.of(context).brightness),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppDimensions.space4),
-          
+
           // API Key 輸入欄位
           ThemedTextField(
             controller: _apiKeyController,
@@ -116,7 +113,9 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             type: ThemedTextFieldType.password,
             obscureText: !_isApiKeyVisible,
             prefixIcon: Icons.vpn_key,
-            suffixIcon: _isApiKeyVisible ? Icons.visibility_off : Icons.visibility,
+            suffixIcon: _isApiKeyVisible
+                ? Icons.visibility_off
+                : Icons.visibility,
             onSuffixIconPressed: () {
               setState(() {
                 _isApiKeyVisible = !_isApiKeyVisible;
@@ -136,15 +135,16 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             },
           ),
           const SizedBox(height: AppDimensions.space4),
-          
+
           // 操作按鈕
           Row(
             children: [
               Expanded(
                 child: ThemedButton(
                   text: '儲存',
-                  type: ThemedButtonType.primary,
-                  onPressed: state.isLoading ? null : () => _saveApiKey(viewModel),
+                  onPressed: state.isLoading
+                      ? null
+                      : () => _saveApiKey(viewModel),
                   isLoading: state.isLoading,
                   semanticLabel: '儲存 API Key',
                 ),
@@ -161,7 +161,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
               ),
             ],
           ),
-          
+
           // API Key 狀態指示
           if (state.hasApiKey) ...[
             const SizedBox(height: AppDimensions.space3),
@@ -175,9 +175,9 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
                 const SizedBox(width: AppDimensions.space1),
                 Text(
                   'API Key 已設定',
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.success,
-                  ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: AppColors.success),
                 ),
               ],
             ),
@@ -209,15 +209,13 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
                 '連線測試',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.getTextColor(
-                    Theme.of(context).brightness,
-                  ),
+                  color: AppColors.getTextColor(Theme.of(context).brightness),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppDimensions.space4),
-          
+
           // 測試按鈕
           ThemedButton(
             text: '測試連線',
@@ -226,13 +224,14 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             onPressed: state.hasApiKey && !state.isLoading
                 ? () => viewModel.testConnection()
                 : null,
-            isLoading: state.isLoading && 
-                       state.connectionStatus == ConnectionStatus.connecting,
+            isLoading:
+                state.isLoading &&
+                state.connectionStatus == ConnectionStatus.connecting,
             expanded: true,
             semanticLabel: '測試連線',
           ),
           const SizedBox(height: AppDimensions.space3),
-          
+
           // 連線狀態顯示
           _buildConnectionStatusDisplay(context, state),
         ],
@@ -241,7 +240,10 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
   }
 
   /// 建立連線狀態顯示
-  Widget _buildConnectionStatusDisplay(BuildContext context, AISettingsState state) {
+  Widget _buildConnectionStatusDisplay(
+    BuildContext context,
+    AISettingsState state,
+  ) {
     IconData icon;
     Color color;
     String message;
@@ -291,12 +293,13 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                if (state.error != null && state.connectionStatus == ConnectionStatus.failed)
+                if (state.error != null &&
+                    state.connectionStatus == ConnectionStatus.failed)
                   Text(
                     state.error!,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.error,
-                    ),
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: AppColors.error),
                   ),
               ],
             ),
@@ -351,7 +354,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             ],
           ),
           const SizedBox(height: AppDimensions.space4),
-          
+
           // 使用量統計內容
           _buildUsageStatsContent(context, state),
         ],
@@ -374,16 +377,16 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             const SizedBox(height: AppDimensions.space2),
             Text(
               '暫無使用量統計',
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.placeholder,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.placeholder),
             ),
             if (!state.hasApiKey)
               Text(
                 '請先設定 API Key',
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.placeholder,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.placeholder),
               ),
           ],
         ),
@@ -469,15 +472,13 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
                 '如何取得 API Key',
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
-                  color: AppColors.getTextColor(
-                    Theme.of(context).brightness,
-                  ),
+                  color: AppColors.getTextColor(Theme.of(context).brightness),
                 ),
               ),
             ],
           ),
           const SizedBox(height: AppDimensions.space4),
-          
+
           Text(
             '1. 前往 OpenAI 官方網站\n'
             '2. 登入或註冊帳號\n'
@@ -485,26 +486,24 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             '4. 點擊「Create new secret key」\n'
             '5. 複製產生的 API Key 並貼上',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.getTextColor(
-                Theme.of(context).brightness,
-              ),
+              color: AppColors.getTextColor(Theme.of(context).brightness),
               height: 1.5,
             ),
           ),
           const SizedBox(height: AppDimensions.space4),
-          
+
           ThemedButton(
             text: '前往 OpenAI 平台',
             type: ThemedButtonType.outline,
             icon: Icons.open_in_new,
-            onPressed: () => _launchOpenAIWebsite(),
+            onPressed: _launchOpenAIWebsite,
             expanded: true,
           ),
           const SizedBox(height: AppDimensions.space2),
-          
+
           Center(
             child: InkWell(
-              onTap: () => _launchOpenAIWebsite(),
+              onTap: _launchOpenAIWebsite,
               child: Padding(
                 padding: AppDimensions.paddingSmall,
                 child: Text(
@@ -526,9 +525,9 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
   void _saveApiKey(AISettingsViewModel viewModel) {
     final apiKey = _apiKeyController.text.trim();
     if (apiKey.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('請輸入 API Key')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('請輸入 API Key')));
       return;
     }
 
@@ -569,19 +568,25 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
       if (await canLaunchUrl(uri)) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);
       } else {
-        if (!mounted) return;
+        if (!mounted) {
+          return;
+        }
         // 複製到剪貼簿
         await Clipboard.setData(const ClipboardData(text: url));
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('網址已複製到剪貼簿')),
-        );
+        if (!mounted) {
+          return;
+        }
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('網址已複製到剪貼簿')));
       }
     } on Exception catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('無法開啟網頁：$e')),
-      );
+      if (!mounted) {
+        return;
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('無法開啟網頁：$e')));
     }
   }
 

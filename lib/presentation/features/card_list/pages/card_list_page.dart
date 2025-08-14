@@ -618,17 +618,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       }
 
       if (success) {
-        ToastHelper.showSnackBar(
-          context,
-          '名片已刪除',
-          type: ToastType.success,
-        );
+        ToastHelper.showSnackBar(context, '名片已刪除', type: ToastType.success);
       } else {
-        ToastHelper.showSnackBar(
-          context,
-          '刪除名片失敗',
-          type: ToastType.error,
-        );
+        ToastHelper.showSnackBar(context, '刪除名片失敗', type: ToastType.error);
       }
     }
   }
