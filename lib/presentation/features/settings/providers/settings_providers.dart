@@ -19,11 +19,9 @@ final deviceInfoProvider = Provider<DeviceInfoPlugin>((ref) {
 /// SettingsViewModel Provider
 final settingsViewModelProvider = StateNotifierProvider<SettingsViewModel, SettingsState>((ref) {
   final preferences = ref.watch(sharedPreferencesProvider);
-  final deviceInfo = ref.watch(deviceInfoProvider);
   
   return SettingsViewModel(
     preferences: preferences,
-    deviceInfo: deviceInfo,
   );
 });
 

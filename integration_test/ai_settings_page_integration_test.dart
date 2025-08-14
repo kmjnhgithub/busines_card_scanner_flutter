@@ -4,10 +4,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
-import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
-import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 
 /// Mock 類別
 class MockEnhancedSecureStorage extends Mock implements EnhancedSecureStorage {}
@@ -38,8 +38,8 @@ void main() {
           overrides: [
             aiSettingsViewModelProvider.overrideWith((ref) => viewModel),
           ],
-          child: MaterialApp(
-            home: const AISettingsPage(),
+          child: const MaterialApp(
+            home: AISettingsPage(),
           ),
         ),
       );

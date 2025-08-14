@@ -13,11 +13,7 @@ import 'package:mocktail/mocktail.dart';
 import '../../../../helpers/test_helpers.dart';
 
 // Mock 類別
-class MockCameraViewModel extends StateNotifier<CameraState>
-    with Mock
-    implements CameraViewModel {
-  MockCameraViewModel() : super(const CameraState());
-}
+class MockCameraViewModel extends Mock implements CameraViewModel {}
 
 class MockLoadingPresenter extends Mock implements LoadingPresenter {}
 

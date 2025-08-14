@@ -38,7 +38,6 @@ void main() {
           settingsViewModelProvider.overrideWith(
             (ref) => SettingsViewModel(
               preferences: mockPrefs,
-              deviceInfo: mockDeviceInfo,
             ),
           ),
         ],
@@ -78,7 +77,6 @@ void main() {
             settingsViewModelProvider.overrideWith(
               (ref) => SettingsViewModel(
                 preferences: mockPrefs,
-                deviceInfo: mockDeviceInfo,
               ),
             ),
           ],
@@ -240,7 +238,7 @@ void main() {
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
-        await viewModel.toggleNotifications(true);
+        await viewModel.toggleNotifications(enabled: true);
 
         // Assert
         final state = viewModel.state;
@@ -255,7 +253,7 @@ void main() {
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
-        await viewModel.toggleNotifications(false);
+        await viewModel.toggleNotifications(enabled: false);
 
         // Assert
         final state = viewModel.state;
@@ -271,7 +269,7 @@ void main() {
         final viewModel = container.read(settingsViewModelProvider.notifier);
 
         // Act
-        await viewModel.toggleNotifications(true);
+        await viewModel.toggleNotifications(enabled: true);
 
         // Assert
         final state = viewModel.state;
@@ -379,7 +377,6 @@ void main() {
             settingsViewModelProvider.overrideWith(
               (ref) => SettingsViewModel(
                 preferences: mockPrefs,
-                deviceInfo: mockDeviceInfo,
               ),
             ),
           ],
@@ -406,7 +403,6 @@ void main() {
             settingsViewModelProvider.overrideWith(
               (ref) => SettingsViewModel(
                 preferences: mockPrefs,
-                deviceInfo: mockDeviceInfo,
               ),
             ),
           ],
@@ -428,7 +424,7 @@ void main() {
         final futures = [
           viewModel.changeLanguage(SettingsLanguage.zh_TW),
           viewModel.changeTheme(SettingsTheme.dark),
-          viewModel.toggleNotifications(false),
+          viewModel.toggleNotifications(enabled: false),
         ];
         
         await Future.wait(futures);
@@ -450,7 +446,7 @@ void main() {
         // Act
         await viewModel.changeLanguage(SettingsLanguage.zh_TW);
         await viewModel.changeTheme(SettingsTheme.dark);
-        await viewModel.toggleNotifications(false);
+        await viewModel.toggleNotifications(enabled: false);
 
         // Assert - 檢查所有儲存呼叫是否正確
         verify(() => mockPrefs.setString('app_language', 'zh_TW')).called(1);

@@ -82,7 +82,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
           state = state.copyWith(hasApiKey: true);
         },
       );
-    } catch (e) {
+    } on Exception {
       // 忽略初始化錯誤，保持初始狀態
     }
   }
@@ -121,7 +121,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
           );
         },
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '儲存 API Key 時發生未預期錯誤：$e',
@@ -154,7 +154,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
           );
         },
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '刪除 API Key 時發生未預期錯誤：$e',
@@ -213,7 +213,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
           }
         },
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: 'API Key 驗證時發生未預期錯誤：$e',
@@ -260,7 +260,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
           );
         },
       );
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '載入使用量統計時發生未預期錯誤：$e',
@@ -284,7 +284,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
       if (state.isApiKeyValid && state.connectionStatus == ConnectionStatus.connected) {
         await loadUsageStats();
       }
-    } catch (e) {
+    } on Exception catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: '連線測試時發生未預期錯誤：$e',

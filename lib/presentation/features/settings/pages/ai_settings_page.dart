@@ -3,12 +3,12 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_button.dart';
-import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_text_field.dart';
-import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
-import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
+import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_button.dart';
+import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
+import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_text_field.dart';
 
 /// AI 設定頁面
 ///
@@ -87,7 +87,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.key,
                 color: AppColors.primary,
                 size: AppDimensions.iconMedium,
@@ -167,7 +167,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             const SizedBox(height: AppDimensions.space3),
             Row(
               children: [
-                Icon(
+                const Icon(
                   Icons.check_circle,
                   color: AppColors.success,
                   size: AppDimensions.iconSmall,
@@ -199,7 +199,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.network_check,
                 color: AppColors.primary,
                 size: AppDimensions.iconMedium,
@@ -263,7 +263,6 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
         message = '連線中...';
         break;
       case ConnectionStatus.unknown:
-      default:
         icon = Icons.help_outline;
         color = AppColors.placeholder;
         message = '尚未測試';
@@ -322,7 +321,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
             children: [
               Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.bar_chart,
                     color: AppColors.primary,
                     size: AppDimensions.iconMedium,
@@ -367,7 +366,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
         padding: AppDimensions.paddingMedium,
         child: Column(
           children: [
-            Icon(
+            const Icon(
               Icons.analytics_outlined,
               size: AppDimensions.iconExtraLarge,
               color: AppColors.placeholder,
@@ -460,7 +459,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
         children: [
           Row(
             children: [
-              Icon(
+              const Icon(
                 Icons.help_outline,
                 color: AppColors.primary,
                 size: AppDimensions.iconMedium,
@@ -573,6 +572,7 @@ class _AISettingsPageState extends ConsumerState<AISettingsPage> {
         if (!mounted) return;
         // 複製到剪貼簿
         await Clipboard.setData(const ClipboardData(text: url));
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('網址已複製到剪貼簿')),
         );

@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
 import '../constants/settings_constants.dart';
@@ -70,13 +69,10 @@ class SettingsState with _$SettingsState {
 /// 設定頁面 ViewModel
 class SettingsViewModel extends StateNotifier<SettingsState> {
   final SharedPreferences _preferences;
-  final DeviceInfoPlugin _deviceInfo;
 
   SettingsViewModel({
     required SharedPreferences preferences,
-    required DeviceInfoPlugin deviceInfo,
   })  : _preferences = preferences,
-        _deviceInfo = deviceInfo,
         super(const SettingsState()) {
     _initializeSettings();
   }
@@ -145,7 +141,7 @@ class SettingsViewModel extends StateNotifier<SettingsState> {
   }
 
   /// 切換通知設定
-  Future<void> toggleNotifications(bool enabled) async {
+  Future<void> toggleNotifications({required bool enabled}) async {
     try {
       state = state.copyWith(isLoading: true, error: null);
 

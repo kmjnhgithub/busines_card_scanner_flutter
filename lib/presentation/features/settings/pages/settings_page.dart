@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 
-import '../providers/settings_providers.dart';
-import '../view_models/settings_view_model.dart';
-import '../constants/settings_constants.dart';
-import '../../../widgets/shared/themed_card.dart';
-import '../../../presenters/dialog_presenter.dart';
-import '../../../../core/constants/app_constants.dart';
+import 'package:busines_card_scanner_flutter/core/constants/app_constants.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/settings/providers/settings_providers.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/settings_view_model.dart';
+import 'package:busines_card_scanner_flutter/presentation/presenters/dialog_presenter.dart';
+import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
 
 /// 設定頁面
 ///
@@ -158,7 +156,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         subtitle: Text(state.notificationsEnabled ? '已開啟' : '已關閉'),
         value: state.notificationsEnabled,
         onChanged: (value) {
-          ref.read(settingsViewModelProvider.notifier).toggleNotifications(value);
+          ref.read(settingsViewModelProvider.notifier).toggleNotifications(enabled: value);
         },
       ),
     );
