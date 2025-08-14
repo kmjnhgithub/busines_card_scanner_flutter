@@ -28,6 +28,12 @@ class MockCameraController extends Mock implements CameraController {}
 class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 void main() {
+  setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    suppressDatabaseWarnings();
+    registerCommonFallbackValues();
+  });
+  
   group('CameraPage Widget Tests', () {
     late MockCameraViewModel mockCameraViewModel;
     late MockLoadingPresenter mockLoadingPresenter;

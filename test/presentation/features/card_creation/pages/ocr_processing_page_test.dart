@@ -28,8 +28,9 @@ class MockNavigatorObserver extends Mock implements NavigatorObserver {}
 
 void main() {
   setUpAll(() {
-    // 註冊 fallback values 給 Mocktail
-    registerFallbackValue(Uint8List(0));
+    TestWidgetsFlutterBinding.ensureInitialized();
+    suppressDatabaseWarnings();
+    registerCommonFallbackValues();
   });
   group('OCRProcessingPage Widget Tests', () {
     late MockOCRProcessingViewModel mockOCRProcessingViewModel;
@@ -554,7 +555,7 @@ void main() {
 
         // Act
         await tester.pumpWidget(createTestWidget(state: completedState));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // Assert
         

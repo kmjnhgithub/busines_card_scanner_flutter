@@ -1,6 +1,45 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart' hide isNotNull;
+import 'package:camera/camera.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
+
+// 防止資料庫多實例警告
+void suppressDatabaseWarnings() {
+  driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
+}
+
+/// 註冊所有測試需要的 fallback values
+/// 在 setUpAll() 中呼叫此函數
+void registerCommonFallbackValues() {
+  // Camera 相關
+  registerFallbackValue(FlashMode.auto);
+  registerFallbackValue(const Offset(0.0, 0.0));
+  registerFallbackValue(ExposureMode.auto);
+  registerFallbackValue(FocusMode.auto);
+  
+  // Process Image 相關
+  registerFallbackValue(
+    ProcessImageParams(imageData: Uint8List.fromList([1, 2, 3])),
+  );
+  
+  // Card UseCases 相關
+  registerFallbackValue(const GetCardsParams());
+  registerFallbackValue(const DeleteCardParams(
+    cardId: 'test',
+    deleteType: DeleteType.soft,
+  ));
+  
+  // 通用型別
+  registerFallbackValue(Uint8List(0));
+  registerFallbackValue(DateTime.now());
+}
 
 /// 測試輔助工具類
 ///
@@ -8,19 +47,26 @@ import 'package:flutter_test/flutter_test.dart';
 class TestHelpers {
   /// 建立測試用的 Widget，使用已覆寫的 ProviderContainer
   ///
+  /// 注意：此方法使用 UncontrolledProviderScope 確保 Provider 覆寫正確生效
   /// [container] 包含已覆寫的 providers
   /// [child] 要測試的 widget
   /// [routes] 路由配置（可選）
+  /// [navigatorObservers] 導航觀察者（可選）
   static Widget createTestWidget({
     required ProviderContainer container,
     required Widget child,
     Map<String, WidgetBuilder>? routes,
+    List<NavigatorObserver>? navigatorObservers,
   }) {
+    // 確保資料庫警告被抑制
+    suppressDatabaseWarnings();
+    
     return UncontrolledProviderScope(
       container: container,
       child: MaterialApp(
         home: child,
         routes: routes ?? {},
+        navigatorObservers: navigatorObservers ?? [],
       ),
     );
   }
@@ -76,11 +122,12 @@ class TestHelpers {
   static Future<void> testLoadingState(
     WidgetTester tester, {
     Duration loadingDuration = const Duration(milliseconds: 100),
+    int maxPumps = 3,
   }) async {
-    // 只 pump 一次以檢查載入狀態
-    await tester.pump();
-    // 等待載入狀態持續一段時間
-    await tester.pump(loadingDuration);
+    // 多次 pump 以確保狀態更新
+    for (int i = 0; i < maxPumps; i++) {
+      await tester.pump(loadingDuration);
+    }
   }
 
   /// 安全地等待非同步操作完成
@@ -187,5 +234,27 @@ class TestFinders {
   /// 找到圖標按鈕
   static Finder iconButton(IconData icon) {
     return find.byIcon(icon);
+  }
+  
+  /// 找到 Snackbar
+  static Finder snackbar([String? text]) {
+    if (text != null) {
+      return find.descendant(
+        of: find.byType(SnackBar),
+        matching: find.text(text),
+      );
+    }
+    return find.byType(SnackBar);
+  }
+  
+  /// 找到對話框
+  static Finder dialog([String? title]) {
+    if (title != null) {
+      return find.descendant(
+        of: find.byType(Dialog),
+        matching: find.text(title),
+      );
+    }
+    return find.byType(Dialog);
   }
 }

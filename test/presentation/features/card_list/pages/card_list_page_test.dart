@@ -21,6 +21,9 @@ class FakeDeleteCardParams extends Fake implements DeleteCardParams {}
 
 void main() {
   setUpAll(() {
+    TestWidgetsFlutterBinding.ensureInitialized();
+    suppressDatabaseWarnings();
+    registerCommonFallbackValues();
     registerFallbackValue(FakeGetCardsParams());
     registerFallbackValue(FakeDeleteCardParams());
   });
@@ -97,14 +100,14 @@ void main() {
     group('初始載入', () {
       testWidgets('應該顯示應用程式標題', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         expect(find.text('名片'), findsOneWidget);
       });
 
       testWidgets('應該顯示搜尋和排序按鈕', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         expect(find.byIcon(Icons.search), findsOneWidget);
         expect(find.byIcon(Icons.sort), findsOneWidget);
@@ -112,7 +115,7 @@ void main() {
 
       testWidgets('應該顯示新增名片的 FAB', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         expect(find.byType(FloatingActionButton), findsOneWidget);
         expect(find.byIcon(Icons.add), findsOneWidget);
@@ -120,7 +123,7 @@ void main() {
 
       testWidgets('應該載入並顯示名片列表', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 驗證名片顯示
         expect(find.text('張三'), findsOneWidget);
@@ -133,11 +136,11 @@ void main() {
     group('搜尋功能', () {
       testWidgets('點擊搜尋按鈕應該展開搜尋框', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 點擊搜尋按鈕
         await tester.tap(find.byIcon(Icons.search));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該顯示關閉按鈕和搜尋輸入框
         expect(find.byIcon(Icons.close), findsOneWidget);
@@ -146,15 +149,15 @@ void main() {
 
       testWidgets('輸入搜尋內容應該過濾名片', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 展開搜尋框
         await tester.tap(find.byIcon(Icons.search));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 輸入搜尋內容
         await tester.enterText(find.byType(TextField), '張');
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該只顯示包含「張」的名片
         expect(find.text('張三'), findsOneWidget);
@@ -163,17 +166,17 @@ void main() {
 
       testWidgets('點擊關閉按鈕應該清除搜尋並收合', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 展開搜尋框並輸入內容
         await tester.tap(find.byIcon(Icons.search));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
         await tester.enterText(find.byType(TextField), '張');
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 點擊關閉按鈕
         await tester.tap(find.byIcon(Icons.close));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該回到正常狀態，顯示所有名片
         expect(find.byIcon(Icons.search), findsOneWidget);
@@ -185,11 +188,11 @@ void main() {
     group('排序功能', () {
       testWidgets('點擊排序按鈕應該顯示排序選項', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 點擊排序按鈕
         await tester.tap(find.byIcon(Icons.sort));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該顯示排序選項
         expect(find.text('排序方式'), findsOneWidget);
@@ -200,15 +203,15 @@ void main() {
 
       testWidgets('選擇排序選項應該更新列表順序', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 點擊排序按鈕
         await tester.tap(find.byIcon(Icons.sort));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 選擇按姓名排序
         await tester.tap(find.text('按姓名排序'));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 驗證排序被觸發（不驗證具體排序結果，因為可能有其他文字干擾）
         expect(find.text('張三'), findsAtLeastNWidgets(1));
@@ -219,11 +222,11 @@ void main() {
     group('名片操作', () {
       testWidgets('點擊更多按鈕應該顯示操作選項', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 點擊第一張名片的更多按鈕
         await tester.tap(find.byIcon(Icons.more_vert).first);
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該顯示操作選項
         expect(find.text('編輯'), findsOneWidget);
@@ -233,15 +236,15 @@ void main() {
 
       testWidgets('選擇刪除應該顯示確認對話框', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 點擊更多按鈕
         await tester.tap(find.byIcon(Icons.more_vert).first);
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 點擊刪除
         await tester.tap(find.text('刪除'));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該顯示確認對話框
         expect(find.text('刪除名片'), findsOneWidget);
@@ -255,7 +258,7 @@ void main() {
         
         // 先載入名片列表
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
         
         // 驗證初始名片列表已載入
         expect(find.text('張三'), findsOneWidget);
@@ -278,7 +281,7 @@ void main() {
         final result = await viewModel.deleteCard('1');
         
         // 等待 UI 更新
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 驗證刪除用例被正確呼叫
         verify(() => mockDeleteCardUseCase.execute(
@@ -300,7 +303,7 @@ void main() {
         ).thenThrow(Exception('載入失敗'));
 
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該顯示錯誤狀態
         expect(find.byIcon(Icons.error_outline), findsOneWidget);
@@ -315,7 +318,7 @@ void main() {
         ).thenThrow(Exception('載入失敗'));
 
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 重設為成功
         when(
@@ -324,7 +327,7 @@ void main() {
 
         // 點擊重試
         await tester.tap(find.text('重試'));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該重新載入並顯示名片
         expect(find.text('張三'), findsOneWidget);
@@ -340,7 +343,7 @@ void main() {
         ).thenAnswer((_) async => <BusinessCard>[]);
 
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該顯示空狀態
         expect(find.byIcon(Icons.credit_card_outlined), findsOneWidget);
@@ -350,13 +353,13 @@ void main() {
 
       testWidgets('搜尋無結果時應該顯示搜尋空狀態', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 展開搜尋框並輸入不存在的內容
         await tester.tap(find.byIcon(Icons.search));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
         await tester.enterText(find.byType(TextField), 'xyz');
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 應該顯示搜尋無結果狀態
         expect(find.byIcon(Icons.search_off), findsOneWidget);
@@ -367,7 +370,7 @@ void main() {
     group('下拉刷新', () {
       testWidgets('下拉應該觸發刷新', (tester) async {
         await tester.pumpWidget(createTestWidget());
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 重設 mock 計數
         reset(mockGetCardsUseCase);
@@ -377,7 +380,7 @@ void main() {
 
         // 執行下拉刷新
         await tester.drag(find.byType(RefreshIndicator), const Offset(0, 300));
-        await tester.pumpAndSettle();
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
 
         // 驗證刷新被觸發
         verify(() => mockGetCardsUseCase.execute(any())).called(1);
