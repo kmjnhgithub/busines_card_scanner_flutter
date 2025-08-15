@@ -21,9 +21,10 @@ analyzer:
     # 測試文件的例外規則
     use_setters_to_change_properties: ignore  # Mocktail Mock 設定方法
     avoid_setters_without_getters: info
-    avoid_positional_boolean_parameters: warning  # 應該修復
+    avoid_positional_boolean_parameters: info  # 降級為info，不強制修復
     prefer_mixin: warning  # 應該修復
     avoid_catching_errors: warning  # 應該修復
+    prefer_final_locals: info  # 降級為info，不強制每個局部變數都用final
     
   exclude:
     - "**/*.g.dart"
@@ -121,7 +122,7 @@ linter:
     parameter_assignments: true
     prefer_adjacent_string_concatenation: true
     prefer_asserts_in_initializer_lists: true
-    prefer_asserts_with_message: false
+    prefer_asserts_with_message: true
     prefer_collection_literals: true
     prefer_conditional_assignment: true
     prefer_const_constructors: true
@@ -134,7 +135,7 @@ linter:
     prefer_expression_function_bodies: false
     prefer_final_fields: true
     prefer_final_in_for_each: true
-    prefer_final_locals: true
+    prefer_final_locals: false
     prefer_for_elements_to_map_fromIterable: true
     prefer_generic_function_type_aliases: true
     prefer_if_elements_to_conditional_expressions: true
