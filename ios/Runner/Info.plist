@@ -45,5 +45,11 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>此應用程式需要相機權限來拍攝名片照片進行掃描</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>此應用程式需要相簿權限來選擇名片照片進行掃描</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>此應用程式需要相簿權限來儲存掃描的名片照片</string>
 </dict>
 </plist>

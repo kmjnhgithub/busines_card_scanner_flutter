@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/ocr_processing_view_model.dart';
+import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
@@ -9,6 +10,7 @@ import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// OCR 處理頁面
 ///
@@ -51,7 +53,9 @@ class _OCRProcessingPageState extends ConsumerState<OCRProcessingPage> {
   /// 載入圖片資料
   Future<void> _loadImageData() async {
     try {
-      final imageFile = File(widget.imagePath);
+      // 解碼URL編碼的路徑
+      final decodedPath = Uri.decodeComponent(widget.imagePath);
+      final imageFile = File(decodedPath);
       final imageData = await imageFile.readAsBytes();
       await ref
           .read(ocrProcessingViewModelProvider.notifier)
@@ -90,10 +94,9 @@ class _OCRProcessingPageState extends ConsumerState<OCRProcessingPage> {
 
   /// 導航到編輯頁面
   void _navigateToEditPage(BusinessCard businessCard) {
-    // TODO: 實作導航到名片編輯頁面
-    // Navigator.push(context, MaterialPageRoute(
-    //   builder: (context) => CardEditPage(businessCard: businessCard),
-    // ));
+    // 名片保存成功，返回名片列表頁面
+    // 可以選擇導航到名片詳情頁面或直接返回列表
+    context.go(AppRoutes.cardList);
   }
 
   @override

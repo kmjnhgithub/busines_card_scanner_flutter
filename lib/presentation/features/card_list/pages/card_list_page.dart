@@ -2,6 +2,7 @@ import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart'
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/view_models/card_list_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/dialog_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
+import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
@@ -9,6 +10,7 @@ import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// 名片列表頁面
 ///
@@ -627,20 +629,20 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
   /// 導航到名片詳情頁面
   void _navigateToCardDetail(BuildContext context, BusinessCard card) {
-    // TODO: 實作導航到名片詳情頁面
-    // Navigator.pushNamed(context, '/card_detail', arguments: card);
+    // 導航到名片詳情頁面
+    context.push('${AppRoutes.cardDetail}/${card.id}');
   }
 
   /// 導航到名片建立頁面
   void _navigateToCardCreation(BuildContext context) {
-    // TODO: 實作導航到名片建立頁面
-    // Navigator.pushNamed(context, '/card_creation');
+    // 導航到相機頁面開始名片建立流程
+    context.push(AppRoutes.camera);
   }
 
   /// 導航到名片編輯頁面
   void _navigateToCardEdit(BuildContext context, BusinessCard card) {
-    // TODO: 實作導航到名片編輯頁面
-    // Navigator.pushNamed(context, '/card_edit', arguments: card);
+    // 導航到名片編輯頁面（暫時使用詳情頁）
+    context.push('${AppRoutes.cardDetail}/${card.id}');
   }
 
   /// 分享名片

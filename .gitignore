@@ -98,3 +98,14 @@ coverage/
 test_debug.dart
 *_debug.dart
 *.debug
+
+# Testing and debugging temporary files
+lib/main_test_*.dart
+lib/*_test_*.dart
+lib/simple_camera_test.dart
+lib/test_permissions_page.dart
+# iOS build cache
+ios/build/
+**/ios/build/
+**/XCBuildData/
+**/PIFCache/

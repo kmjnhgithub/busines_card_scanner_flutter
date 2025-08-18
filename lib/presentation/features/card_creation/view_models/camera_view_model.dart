@@ -55,6 +55,8 @@ class CameraViewModel extends StateNotifier<CameraState> {
 
   /// 初始化相機
   Future<void> initializeCamera(List<CameraDescription> cameras) async {
+    debugPrint('CameraViewModel: 開始初始化相機，相機數量: ${cameras.length}');
+
     if (cameras.isEmpty) {
       _updateError('沒有可用的相機');
       _toastPresenter.showError('沒有可用的相機');
@@ -62,28 +64,46 @@ class CameraViewModel extends StateNotifier<CameraState> {
     }
 
     try {
+      debugPrint('CameraViewModel: 設定載入狀態');
       state = state.copyWith(isLoading: true, error: null);
 
+      debugPrint('CameraViewModel: 創建 CameraController');
       final controller = CameraController(
         cameras.first,
         ResolutionPreset.high,
         enableAudio: false,
       );
 
+      debugPrint('CameraViewModel: 初始化 CameraController');
       await controller.initialize();
 
+      debugPrint(
+        'CameraViewModel: 控制器初始化狀態: ${controller.value.isInitialized}',
+      );
+
       if (controller.value.isInitialized) {
+        debugPrint('CameraViewModel: 更新狀態 - 相機已初始化');
         state = state.copyWith(
           cameraController: controller,
           isInitialized: true,
           isLoading: false,
         );
+        debugPrint(
+          'CameraViewModel: 狀態更新完成 - isInitialized: ${state.isInitialized}, hasController: ${state.cameraController != null}',
+        );
+      } else {
+        debugPrint('CameraViewModel: 控制器初始化失敗 - isInitialized 為 false');
+        _updateError('相機控制器初始化失敗');
       }
     } on CameraException catch (e) {
+      debugPrint(
+        'CameraViewModel: CameraException - ${e.code}: ${e.description}',
+      );
       _updateError('相機初始化失敗: ${e.description}');
       _toastPresenter.showError('相機初始化失敗');
       state = state.copyWith(isLoading: false);
     } on Exception catch (e) {
+      debugPrint('CameraViewModel: Exception - $e');
       _updateError('相機初始化失敗: $e');
       _toastPresenter.showError('相機初始化失敗');
       state = state.copyWith(isLoading: false);
@@ -203,15 +223,26 @@ class CameraViewModel extends StateNotifier<CameraState> {
 }
 
 /// Camera ViewModel Provider
+/// 使用 autoDispose 確保頁面離開時釋放資源
 final cameraViewModelProvider =
-    StateNotifierProvider<CameraViewModel, CameraState>((ref) {
+    StateNotifierProvider.autoDispose<CameraViewModel, CameraState>((ref) {
+      debugPrint('Creating new CameraViewModel instance');
+
       final processImageUseCase = ref.watch(processImageUseCaseProvider);
       final loadingPresenter = ref.watch(loadingPresenterProvider.notifier);
       final toastPresenter = ref.watch(toastPresenterProvider.notifier);
 
-      return CameraViewModel(
+      final viewModel = CameraViewModel(
         processImageUseCase,
         loadingPresenter,
         toastPresenter,
       );
+
+      // 確保在 dispose 時清理資源
+      ref.onDispose(() {
+        debugPrint('Disposing CameraViewModel');
+        viewModel.dispose();
+      });
+
+      return viewModel;
     });
