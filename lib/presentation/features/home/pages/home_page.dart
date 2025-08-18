@@ -1,4 +1,3 @@
-import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/camera_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/pages/card_list_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/settings_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
@@ -45,6 +44,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _onBottomNavTap(int index) {
+    // 特殊處理相機 tab（index 1）：使用 push 導航到全螢幕頁面
+    if (index == 1) {
+      context.push(AppRoutes.camera);
+      return;
+    }
+
+    // 其他 tab 使用原有的 go 導航邏輯
     final route = AppRoutes.getRouteByBottomNavIndex(index);
     if (route != null && index != widget.currentIndex) {
       context.go(route);
@@ -59,16 +65,6 @@ class CardListNavPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const CardListPage();
-  }
-}
-
-/// 相機掃描導航頁面
-class CameraNavPage extends StatelessWidget {
-  const CameraNavPage({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const CameraPage();
   }
 }
 

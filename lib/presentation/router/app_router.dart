@@ -1,3 +1,4 @@
+import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/camera_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/ocr_processing_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/home/pages/home_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
@@ -73,17 +74,6 @@ class AppRouter {
               ),
             ),
 
-            // 相機掃描頁面
-            GoRoute(
-              path: AppRoutes.camera,
-              name: 'camera',
-              pageBuilder: (context, state) => _buildPageWithTransition(
-                context,
-                state,
-                const CameraNavPage(),
-              ),
-            ),
-
             // 設定頁面
             GoRoute(
               path: AppRoutes.settings,
@@ -95,6 +85,17 @@ class AppRouter {
               ),
             ),
           ],
+        ),
+
+        // 全螢幕相機頁面（獨立路由）
+        GoRoute(
+          path: AppRoutes.camera,
+          name: 'camera-fullscreen',
+          pageBuilder: (context, state) => _buildFullscreenPageWithTransition(
+            context,
+            state,
+            const CameraPage(),
+          ),
         ),
 
         // OCR處理頁面（帶參數）
@@ -185,6 +186,35 @@ class AppRouter {
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
         // 使用滑動轉場動畫
         const begin = Offset(1, 0);
+        const end = Offset.zero;
+        const curve = Curves.easeInOut;
+
+        final tween = Tween(begin: begin, end: end);
+        final curvedAnimation = CurvedAnimation(
+          parent: animation,
+          curve: curve,
+        );
+
+        return SlideTransition(
+          position: tween.animate(curvedAnimation),
+          child: child,
+        );
+      },
+    );
+  }
+
+  /// 建立全螢幕頁面的轉場動畫（從下往上滑入）
+  Page<T> _buildFullscreenPageWithTransition<T extends Object?>(
+    BuildContext context,
+    GoRouterState state,
+    Widget child,
+  ) {
+    return CustomTransitionPage<T>(
+      key: state.pageKey,
+      child: child,
+      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+        // 使用從下往上的滑動轉場動畫（類似模態頁面）
+        const begin = Offset(0, 1);
         const end = Offset.zero;
         const curve = Curves.easeInOut;
 

@@ -339,17 +339,17 @@ class _CameraPageState extends ConsumerState<CameraPage>
       );
     }
 
-    // 使用 Container 確保相機預覽填滿整個屏幕
-    return SizedBox(
-      width: MediaQuery.of(context).size.width,
-      height: MediaQuery.of(context).size.height,
+    // 使用 SizedBox.expand 和 FittedBox 確保相機預覽填滿整個螢幕
+    return SizedBox.expand(
       child: GestureDetector(
         onTapUp: (TapUpDetails details) {
           _handleFocusTap(details, controller);
         },
-        child: Center(
-          child: AspectRatio(
-            aspectRatio: controller.value.aspectRatio,
+        child: FittedBox(
+          fit: BoxFit.cover,
+          child: SizedBox(
+            width: controller.value.previewSize?.height ?? 1,
+            height: controller.value.previewSize?.width ?? 1,
             child: CameraPreview(controller),
           ),
         ),
