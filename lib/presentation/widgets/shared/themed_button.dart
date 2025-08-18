@@ -387,9 +387,6 @@ class ThemedButton extends StatelessWidget {
     BuildContext context,
     ThemedButtonType type,
   ) {
-    final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-
     switch (type) {
       case ThemedButtonType.primary:
         return const _ButtonColorScheme(
@@ -400,12 +397,10 @@ class ThemedButton extends StatelessWidget {
         );
 
       case ThemedButtonType.secondary:
-        return _ButtonColorScheme(
-          background: isDark
-              ? AppColors.secondaryBackgroundDark
-              : AppColors.secondaryBackground,
-          foreground: AppColors.getTextColor(theme.brightness),
-          border: AppColors.getBorderColor(theme.brightness),
+        return const _ButtonColorScheme(
+          background: AppColors.secondaryBackground,
+          foreground: AppColors.primaryText,
+          border: AppColors.border,
           shadow: AppColors.shadow,
         );
 
@@ -426,9 +421,9 @@ class ThemedButton extends StatelessWidget {
         );
 
       case ThemedButtonType.icon:
-        return _ButtonColorScheme(
+        return const _ButtonColorScheme(
           background: Colors.transparent,
-          foreground: AppColors.getTextColor(theme.brightness),
+          foreground: AppColors.primaryText,
           border: Colors.transparent,
           shadow: Colors.transparent,
         );

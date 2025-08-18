@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 /// 應用程式顏色系統
 ///
-/// 提供一致的顏色定義，支援淺色和深色主題
+/// 提供一致的顏色定義，專注於淺色主題
 /// 遵循 Material Design 3 和 iOS 設計規範
 /// 適用於商務名片掃描應用的專業風格
 class AppColors {
@@ -53,66 +53,36 @@ class AppColors {
   /// 主背景色 - 淺灰色，營造乾淨的視覺效果
   static const Color background = Color(0xFFF2F2F7);
 
-  /// 深色主題背景色
-  static const Color backgroundDark = Color(0xFF000000);
-
   /// 卡片背景色 - 純白，突出內容
   static const Color cardBackground = Color(0xFFFFFFFF);
-
-  /// 深色主題卡片背景色
-  static const Color cardBackgroundDark = Color(0xFF1C1C1E);
 
   /// 次要背景色 - 用於分組和區域劃分
   static const Color secondaryBackground = Color(0xFFE5E5EA);
 
-  /// 深色主題次要背景色
-  static const Color secondaryBackgroundDark = Color(0xFF2C2C2E);
-
   /// 表面色 - 用於元件表面
   static const Color surface = Color(0xFFFFFFFF);
-
-  /// 深色主題表面色
-  static const Color surfaceDark = Color(0xFF1C1C1E);
 
   // ==================== 文字顏色 ====================
 
   /// 主要文字色 - 90% 黑色，確保良好的可讀性
   static const Color primaryText = Color(0xE6000000);
 
-  /// 深色主題主要文字色
-  static const Color primaryTextDark = Color(0xFFFFFFFF);
-
   /// 次要文字色 - 60% 黑色，用於輔助資訊
   static const Color secondaryText = Color(0x99000000);
-
-  /// 深色主題次要文字色
-  static const Color secondaryTextDark = Color(0x99FFFFFF);
 
   /// 預留位置文字色 - 用於 placeholder 和 hint
   static const Color placeholder = Color(0xFF8E8E93);
 
-  /// 深色主題預留位置文字色
-  static const Color placeholderDark = Color(0xFF8E8E93);
-
   /// 禁用文字色
   static const Color disabledText = Color(0x42000000);
-
-  /// 深色主題禁用文字色
-  static const Color disabledTextDark = Color(0x42FFFFFF);
 
   // ==================== 邊框與分隔線 ====================
 
   /// 分隔線色 - 用於分隔不同區域
   static const Color separator = Color(0xFFC6C6C8);
 
-  /// 深色主題分隔線色
-  static const Color separatorDark = Color(0xFF38383A);
-
   /// 邊框色 - 用於輸入框、按鈕等元件邊框
   static const Color border = Color(0xFFE5E5EA);
-
-  /// 深色主題邊框色
-  static const Color borderDark = Color(0xFF38383A);
 
   /// 焦點邊框色 - 當元件獲得焦點時使用
   static const Color focusBorder = primary;
@@ -128,14 +98,8 @@ class AppColors {
   /// 陰影色 - 用於卡片和元件陰影
   static const Color shadow = Color(0x1A000000);
 
-  /// 深色主題陰影色
-  static const Color shadowDark = Color(0x3D000000);
-
   /// 高光色 - 用於按鈕按下狀態
   static const Color highlight = Color(0x1F000000);
-
-  /// 深色主題高光色
-  static const Color highlightDark = Color(0x1FFFFFFF);
 
   /// 選中狀態色
   static const Color selection = Color(0x3D007AFF);
@@ -165,24 +129,24 @@ class AppColors {
 
   // ==================== 輔助方法 ====================
 
-  /// 根據亮度返回適當的文字顏色
+  /// 獲取文字顏色（淺色模式專用）
   static Color getTextColor(Brightness brightness) {
-    return brightness == Brightness.light ? primaryText : primaryTextDark;
+    return primaryText;
   }
 
-  /// 根據亮度返回適當的背景顏色
+  /// 獲取背景顏色（淺色模式專用）
   static Color getBackgroundColor(Brightness brightness) {
-    return brightness == Brightness.light ? background : backgroundDark;
+    return background;
   }
 
-  /// 根據亮度返回適當的卡片背景顏色
+  /// 獲取卡片背景顏色（淺色模式專用）
   static Color getCardBackgroundColor(Brightness brightness) {
-    return brightness == Brightness.light ? cardBackground : cardBackgroundDark;
+    return cardBackground;
   }
 
-  /// 根據亮度返回適當的邊框顏色
+  /// 獲取邊框顏色（淺色模式專用）
   static Color getBorderColor(Brightness brightness) {
-    return brightness == Brightness.light ? border : borderDark;
+    return border;
   }
 
   /// 獲取帶透明度的顏色

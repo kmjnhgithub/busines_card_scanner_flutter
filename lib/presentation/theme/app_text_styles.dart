@@ -284,22 +284,9 @@ class AppTextStyles {
 
   // ==================== 輔助方法 ====================
 
-  /// 根據主題亮度調整文字樣式
+  /// 根據主題亮度調整文字樣式（已簡化：只支援淺色主題）
   static TextStyle adaptToTheme(TextStyle style, Brightness brightness) {
-    if (brightness == Brightness.dark) {
-      // 深色主題調整
-      Color newColor;
-      if (style.color == AppColors.primaryText) {
-        newColor = AppColors.primaryTextDark;
-      } else if (style.color == AppColors.secondaryText) {
-        newColor = AppColors.secondaryTextDark;
-      } else if (style.color == AppColors.placeholder) {
-        newColor = AppColors.placeholderDark;
-      } else {
-        newColor = style.color ?? AppColors.primaryTextDark;
-      }
-      return style.copyWith(color: newColor);
-    }
+    // 由於只支援淺色主題，直接返回原樣式
     return style;
   }
 
@@ -330,11 +317,6 @@ class AppTextStyles {
   /// 建立禁用狀態的文字樣式
   static TextStyle disabled(TextStyle style) {
     return style.copyWith(color: AppColors.disabledText);
-  }
-
-  /// 建立深色主題的禁用文字樣式
-  static TextStyle disabledDark(TextStyle style) {
-    return style.copyWith(color: AppColors.disabledTextDark);
   }
 }
 

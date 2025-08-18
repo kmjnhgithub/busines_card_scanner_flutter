@@ -18,7 +18,7 @@ class BusinessCardScannerApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Business Card Scanner',
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.light, // 強制使用淺色模式
       routerConfig: appRouter.router,
       debugShowCheckedModeBanner: false,
     );

@@ -47,12 +47,12 @@ void main() {
     group('路由配置', () {
       testWidgets('應該建立 AppRouter 實例', (tester) async {
         // Red Phase: 測試 AppRouter 類別是否存在並可以正確建立
-        expect(() => AppRouter.create(), throwsA(isA<UnimplementedError>()));
+        expect(() => AppRouter(), returnsNormally);
       });
 
       testWidgets('應該建立 GoRouter 實例', (tester) async {
         // Red Phase: 測試是否能取得 GoRouter 實例
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
         final goRouter = appRouter.router;
 
         expect(goRouter, isA<GoRouter>());
@@ -61,7 +61,7 @@ void main() {
 
       testWidgets('應該有正確的初始路由', (tester) async {
         // Red Phase: 測試初始路由是否為啟動頁
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
         final goRouter = appRouter.router;
 
         expect(
@@ -74,7 +74,7 @@ void main() {
     group('基本路由導航', () {
       testWidgets('應該能導航到啟動頁 (/)', (tester) async {
         // Red Phase: 測試啟動頁路由
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -99,7 +99,7 @@ void main() {
 
       testWidgets('應該能導航到名片列表頁 (/card-list)', (tester) async {
         // Red Phase: 測試名片列表頁路由
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -126,7 +126,7 @@ void main() {
 
       testWidgets('應該能導航到相機頁 (/camera)', (tester) async {
         // Red Phase: 測試相機頁路由
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -153,7 +153,7 @@ void main() {
 
       testWidgets('應該能導航到設定頁 (/settings)', (tester) async {
         // Red Phase: 測試設定頁路由
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -180,7 +180,7 @@ void main() {
 
       testWidgets('應該能導航到AI設定頁 (/ai-settings)', (tester) async {
         // Red Phase: 測試AI設定頁路由
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -211,7 +211,7 @@ void main() {
         tester,
       ) async {
         // Red Phase: 測試帶參數的OCR處理頁路由
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
         final testImagePath = '/test/image/path.jpg';
 
         await tester.pumpWidget(
@@ -240,7 +240,7 @@ void main() {
 
       testWidgets('應該能導航到名片詳情頁並傳遞名片ID (/card-detail/:cardId)', (tester) async {
         // Red Phase: 測試帶參數的名片詳情頁路由
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
         const testCardId = 'test-card-123';
 
         await tester.pumpWidget(
@@ -271,7 +271,7 @@ void main() {
     group('導航流程測試', () {
       testWidgets('應該支援完整的名片掃描流程導航', (tester) async {
         // Red Phase: 測試完整的使用者流程導航
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -313,7 +313,7 @@ void main() {
 
       testWidgets('應該支援設定相關頁面的導航', (tester) async {
         // Red Phase: 測試設定相關頁面的導航流程
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -345,7 +345,7 @@ void main() {
     group('路由守衛與重定向', () {
       testWidgets('應該實作路由守衛邏輯', (tester) async {
         // Red Phase: 測試路由守衛功能
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -365,7 +365,7 @@ void main() {
 
       testWidgets('應該處理無效路由並重定向到預設頁面', (tester) async {
         // Red Phase: 測試無效路由的處理
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -398,7 +398,7 @@ void main() {
     group('底部導航列整合', () {
       testWidgets('應該與底部導航列正確整合', (tester) async {
         // Red Phase: 測試底部導航列與路由的整合
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -431,7 +431,7 @@ void main() {
 
       testWidgets('應該在底部導航項目之間正確切換', (tester) async {
         // Red Phase: 測試底部導航項目的切換功能
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -465,7 +465,7 @@ void main() {
     group('路由動畫與轉場', () {
       testWidgets('應該實作自定義的頁面轉場動畫', (tester) async {
         // Red Phase: 測試路由轉場動畫
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -490,7 +490,7 @@ void main() {
     group('錯誤處理', () {
       testWidgets('應該處理路由配置錯誤', (tester) async {
         // Red Phase: 測試路由錯誤處理
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -506,7 +506,7 @@ void main() {
 
       testWidgets('應該有404錯誤頁面', (tester) async {
         // Red Phase: 測試404錯誤頁面
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(
@@ -530,7 +530,7 @@ void main() {
     group('深度連結支援', () {
       testWidgets('應該支援深度連結導航', (tester) async {
         // Red Phase: 測試深度連結功能
-        final appRouter = AppRouter.create();
+        final appRouter = AppRouter();
 
         await tester.pumpWidget(
           TestHelpers.createTestWidget(

@@ -1,16 +1,6 @@
+import 'package:busines_card_scanner_flutter/presentation/router/app_router.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:test/test.dart';
-
-// 臨時的 AppRouter 介面，用於測試 Red Phase
-class AppRouter {
-  static AppRouter create() {
-    throw UnimplementedError('AppRouter.create() 尚未實作');
-  }
-
-  dynamic get router {
-    throw UnimplementedError('AppRouter.router 尚未實作');
-  }
-}
 
 /// 簡化版 AppRouter 測試
 ///
@@ -19,18 +9,14 @@ class AppRouter {
 void main() {
   group('AppRouter - Core Logic Tests', () {
     test('應該能建立 AppRouter 實例', () {
-      // Red Phase: 測試 AppRouter.create() 方法
-      // 預期：會拋出 UnimplementedError
-      expect(() => AppRouter.create(), throwsA(isA<UnimplementedError>()));
+      // Green Phase: 測試 AppRouter() 單例模式
+      expect(() => AppRouter(), returnsNormally);
     });
 
-    test('應該拋出錯誤當嘗試取得 router 實例', () {
-      // Red Phase: 測試未實作的 router getter
-      // 預期：會拋出 UnimplementedError
-      expect(() {
-        final appRouter = AppRouter.create();
-        appRouter.router; // 這應該拋出錯誤
-      }, throwsA(isA<UnimplementedError>()));
+    test('應該能取得 router 實例', () {
+      // Green Phase: 測試能取得 GoRouter 實例
+      final appRouter = AppRouter();
+      expect(appRouter.router, isNotNull);
     });
   });
 

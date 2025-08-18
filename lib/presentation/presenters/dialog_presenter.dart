@@ -408,7 +408,6 @@ class CustomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final accentColor = DialogStyleConfig.getAccentColor(config.type);
 
     return AlertDialog(
@@ -426,9 +425,7 @@ class CustomDialog extends StatelessWidget {
             child: Text(
               config.title,
               style: AppTextStyles.headline5.copyWith(
-                color: theme.brightness == Brightness.light
-                    ? AppColors.primaryText
-                    : AppColors.primaryTextDark,
+                color: AppColors.primaryText,
               ),
             ),
           ),
@@ -441,9 +438,7 @@ class CustomDialog extends StatelessWidget {
             child: Text(
               config.content,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: theme.brightness == Brightness.light
-                    ? AppColors.secondaryText
-                    : AppColors.secondaryTextDark,
+                color: AppColors.secondaryText,
               ),
             ),
           ),
@@ -499,8 +494,6 @@ class LoadingDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return AlertDialog(
       content: Padding(
         padding: const EdgeInsets.symmetric(vertical: AppDimensions.space4),
@@ -518,9 +511,7 @@ class LoadingDialog extends StatelessWidget {
                 child: Text(
                   message!,
                   style: AppTextStyles.bodyMedium.copyWith(
-                    color: theme.brightness == Brightness.light
-                        ? AppColors.primaryText
-                        : AppColors.primaryTextDark,
+                    color: AppColors.primaryText,
                   ),
                 ),
               ),

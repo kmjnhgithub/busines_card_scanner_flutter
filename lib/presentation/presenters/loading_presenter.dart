@@ -347,7 +347,6 @@ class LoadingCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final accentColor = LoadingStyleConfig.getAccentColor(loadingState.type);
     final message =
         loadingState.message ??
@@ -377,9 +376,7 @@ class LoadingCard extends StatelessWidget {
             Text(
               message,
               style: AppTextStyles.bodyMedium.copyWith(
-                color: theme.brightness == Brightness.light
-                    ? AppColors.primaryText
-                    : AppColors.primaryTextDark,
+                color: AppColors.primaryText,
               ),
               textAlign: TextAlign.center,
             ),
@@ -454,9 +451,7 @@ class InlineLoadingIndicator extends ConsumerWidget {
           Text(
             message!,
             style: AppTextStyles.bodySmall.copyWith(
-              color: Theme.of(context).brightness == Brightness.light
-                  ? AppColors.secondaryText
-                  : AppColors.secondaryTextDark,
+              color: AppColors.secondaryText,
             ),
           ),
         ],
