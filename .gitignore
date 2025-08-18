@@ -24,6 +24,11 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 
+# Editor configuration files
+# .editorconfig 通常會提交，因為它是跨團隊的標準配置
+# 如果您不想提交個人配置，請取消註解下面一行：
+#.editorconfig
+
 # Flutter/Dart/Pub related
 **/doc/api/
 **/ios/Flutter/.last_build_id
@@ -109,3 +114,4 @@ ios/build/
 **/ios/build/
 **/XCBuildData/
 **/PIFCache/
+/.editorconfig
