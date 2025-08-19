@@ -24,7 +24,7 @@ class CardDetailViewModelBasic extends _$CardDetailViewModelBasic {
     try {
       // 從模擬資料庫中尋找名片
       final mockCard = _findMockCardById(cardId);
-      
+
       if (mockCard != null) {
         state = CardDetailState.viewing(card: mockCard);
       } else {

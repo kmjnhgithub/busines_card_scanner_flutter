@@ -73,10 +73,9 @@ class CardListState with _$CardListState {
 class CardListViewModel extends StateNotifier<CardListState> {
   final DeleteCardUseCase _deleteCardUseCase;
 
-  CardListViewModel({
-    required DeleteCardUseCase deleteCardUseCase,
-  }) : _deleteCardUseCase = deleteCardUseCase,
-       super(const CardListState());
+  CardListViewModel({required DeleteCardUseCase deleteCardUseCase})
+    : _deleteCardUseCase = deleteCardUseCase,
+      super(const CardListState());
 
   /// 載入名片列表
   Future<void> loadCards() async {
@@ -110,6 +109,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         address: '台北市信義區松仁路100號',
         website: 'https://www.apple.com.tw',
         notes: '技術專精 Swift、SwiftUI，曾參與多個大型專案開發',
+        imagePath: 'assets/images/sample_card_1.png',
         createdAt: now.subtract(const Duration(days: 10)),
         updatedAt: now.subtract(const Duration(days: 2)),
       ),
@@ -123,6 +123,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         address: '台北市南港區經貿二路66號',
         website: 'https://design.google',
         notes: '專精於使用者體驗設計，擅長 Figma、Sketch 等設計工具',
+        imagePath: 'assets/images/sample_card_2.png',
         createdAt: now.subtract(const Duration(days: 15)),
         updatedAt: now.subtract(const Duration(days: 5)),
       ),
@@ -135,6 +136,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         phone: '0923-456-789',
         address: '台北市中山區民生東路三段156號',
         notes: '負責 Azure 雲端服務產品線，具備豐富的跨國團隊管理經驗',
+        imagePath: 'assets/images/sample_card_3.png',
         createdAt: now.subtract(const Duration(days: 8)),
         updatedAt: now.subtract(const Duration(days: 1)),
       ),
@@ -148,6 +150,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         address: '台北市松山區復興北路99號',
         website: 'https://www.91app.com',
         notes: '專精 Flutter 跨平台開發，熟悉 Clean Architecture 與 MVVM 模式',
+        imagePath: 'assets/images/sample_card_4.png',
         createdAt: now.subtract(const Duration(days: 3)),
         updatedAt: now.subtract(const Duration(hours: 12)),
       ),
@@ -161,6 +164,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
         address: '新北市汐止區中興路26號',
         website: 'https://www.synology.com',
         notes: '負責 DSM 系統架構設計，專精於分散式系統與雲端儲存技術',
+        imagePath: 'assets/images/sample_card_5.png',
         createdAt: now.subtract(const Duration(days: 20)),
         updatedAt: now.subtract(const Duration(days: 7)),
       ),

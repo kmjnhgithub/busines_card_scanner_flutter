@@ -180,10 +180,21 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
   /// 取得頁面標題
   String _getPageTitle() {
     final state = ref.watch(cardDetailViewModelBasicProvider);
-    
+
     return state.maybeWhen(
-      (mode, isLoading, isSaving, error, originalCard, currentCard, 
-       validationErrors, hasChanges, ocrParsedCard, confidence, fromAIParsing) {
+      (
+        mode,
+        isLoading,
+        isSaving,
+        error,
+        originalCard,
+        currentCard,
+        validationErrors,
+        hasChanges,
+        ocrParsedCard,
+        confidence,
+        fromAIParsing,
+      ) {
         switch (mode) {
           case CardDetailMode.viewing:
             return '名片詳情';
@@ -197,8 +208,10 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
       },
       initial: () => '初始化...',
       viewing: (card) => '名片詳情',
-      editing: (originalCard, currentCard, hasChanges, validationErrors) => '編輯名片',
-      creating: (parsedCard, confidence, fromAIParsing, validationErrors) => '新增名片',
+      editing: (originalCard, currentCard, hasChanges, validationErrors) =>
+          '編輯名片',
+      creating: (parsedCard, confidence, fromAIParsing, validationErrors) =>
+          '新增名片',
       manual: (emptyCard, validationErrors) => '手動建立',
       loading: () => '載入中...',
       error: (message) => '錯誤',
@@ -429,7 +442,7 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
   /// 處理欄位變更
   void _onFieldChanged(String fieldLabel, String value) {
     final viewModel = ref.read(cardDetailViewModelBasicProvider.notifier);
-    
+
     switch (fieldLabel) {
       case '姓名 *':
         viewModel.updateField(name: value);
