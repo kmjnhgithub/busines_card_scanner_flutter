@@ -127,6 +127,19 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
     _notesController.text = card.notes ?? '';
   }
 
+  /// 檢查是否需要更新控制器
+  bool _shouldUpdateControllers(BusinessCard card) {
+    // 當控制器的值與卡片資料不一致時才更新
+    return _nameController.text != card.name ||
+        _jobTitleController.text != (card.jobTitle ?? '') ||
+        _companyController.text != (card.company ?? '') ||
+        _emailController.text != (card.email ?? '') ||
+        _phoneController.text != (card.phone ?? '') ||
+        _addressController.text != (card.address ?? '') ||
+        _websiteController.text != (card.website ?? '') ||
+        _notesController.text != (card.notes ?? '');
+  }
+
   /// 儲存名片
   Future<void> _saveCard() async {
     if (!_formKey.currentState!.validate()) {
@@ -166,16 +179,31 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
 
   /// 取得頁面標題
   String _getPageTitle() {
-    switch (widget.mode) {
-      case CardDetailMode.viewing:
-        return '名片詳情';
-      case CardDetailMode.editing:
-        return '編輯名片';
-      case CardDetailMode.creating:
-        return '新增名片';
-      case CardDetailMode.manual:
-        return '手動建立';
-    }
+    final state = ref.watch(cardDetailViewModelBasicProvider);
+    
+    return state.maybeWhen(
+      (mode, isLoading, isSaving, error, originalCard, currentCard, 
+       validationErrors, hasChanges, ocrParsedCard, confidence, fromAIParsing) {
+        switch (mode) {
+          case CardDetailMode.viewing:
+            return '名片詳情';
+          case CardDetailMode.editing:
+            return '編輯名片';
+          case CardDetailMode.creating:
+            return '新增名片';
+          case CardDetailMode.manual:
+            return '手動建立';
+        }
+      },
+      initial: () => '初始化...',
+      viewing: (card) => '名片詳情',
+      editing: (originalCard, currentCard, hasChanges, validationErrors) => '編輯名片',
+      creating: (parsedCard, confidence, fromAIParsing, validationErrors) => '新增名片',
+      manual: (emptyCard, validationErrors) => '手動建立',
+      loading: () => '載入中...',
+      error: (message) => '錯誤',
+      orElse: () => '名片詳情',
+    );
   }
 
   /// 建立 AppBar 動作按鈕
@@ -243,10 +271,12 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
 
   /// 建立表單視圖
   Widget _buildFormView(BusinessCard card, bool canEdit) {
-    // 更新控制器內容
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateControllers(card);
-    });
+    // 只在需要時更新控制器內容（避免編輯時的無限循環）
+    if (_shouldUpdateControllers(card)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _updateControllers(card);
+      });
+    }
 
     return SafeArea(
       child: SingleChildScrollView(
@@ -371,6 +401,7 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
         enabled: enabled,
         keyboardType: keyboardType,
         maxLines: maxLines,
+        onChanged: enabled ? (value) => _onFieldChanged(label, value) : null,
         validator: required
             ? (value) {
                 if (value == null || value.trim().isEmpty) {
@@ -393,6 +424,38 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
             : AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText),
       ),
     );
+  }
+
+  /// 處理欄位變更
+  void _onFieldChanged(String fieldLabel, String value) {
+    final viewModel = ref.read(cardDetailViewModelBasicProvider.notifier);
+    
+    switch (fieldLabel) {
+      case '姓名 *':
+        viewModel.updateField(name: value);
+        break;
+      case '職稱':
+        viewModel.updateField(jobTitle: value);
+        break;
+      case '公司':
+        viewModel.updateField(company: value);
+        break;
+      case '電話':
+        viewModel.updateField(phone: value);
+        break;
+      case 'Email':
+        viewModel.updateField(email: value);
+        break;
+      case '地址':
+        viewModel.updateField(address: value);
+        break;
+      case '網站':
+        viewModel.updateField(website: value);
+        break;
+      case '備註':
+        viewModel.updateField(notes: value);
+        break;
+    }
   }
 
   /// 建立操作按鈕

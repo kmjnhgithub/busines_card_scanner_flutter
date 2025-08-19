@@ -641,8 +641,8 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
   /// 導航到名片編輯頁面
   void _navigateToCardEdit(BuildContext context, BusinessCard card) {
-    // 導航到名片編輯頁面（暫時使用詳情頁）
-    context.push('${AppRoutes.cardDetail}/${card.id}');
+    // 導航到名片編輯頁面
+    context.push('/card-detail/${card.id}/edit');
   }
 
   /// 分享名片
