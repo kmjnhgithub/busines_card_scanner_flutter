@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/ocr_processing_view_model.dart';
-import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
@@ -94,9 +93,8 @@ class _OCRProcessingPageState extends ConsumerState<OCRProcessingPage> {
 
   /// 導航到編輯頁面
   void _navigateToEditPage(BusinessCard businessCard) {
-    // 名片保存成功，返回名片列表頁面
-    // 可以選擇導航到名片詳情頁面或直接返回列表
-    context.go(AppRoutes.cardList);
+    // 導航到名片詳情頁面進行編輯
+    context.go('/card-detail/creating', extra: businessCard);
   }
 
   @override

@@ -17,10 +17,14 @@ class BusinessCard extends Equatable {
   final String? company;
   final String? email;
   final String? phone;
+  final String? mobile;
   final String? address;
   final String? website;
   final String? notes;
   final String? imageUrl;
+  final String? imagePath;
+  final List<String> tags;
+  final bool isFavorite;
   final DateTime createdAt;
   final DateTime? updatedAt;
 
@@ -44,19 +48,25 @@ class BusinessCard extends Equatable {
     String? company,
     String? email,
     String? phone,
+    String? mobile,
     String? address,
     String? website,
     String? notes,
     this.imageUrl,
+    this.imagePath,
+    List<String>? tags,
+    this.isFavorite = false,
     this.updatedAt,
   }) : name = _cleanString(name) ?? '',
        jobTitle = _cleanString(jobTitle),
        company = _cleanString(company),
        email = _cleanString(email),
        phone = _cleanString(phone),
+       mobile = _cleanString(mobile),
        address = _cleanString(address),
        website = _cleanString(website),
-       notes = _cleanString(notes) {
+       notes = _cleanString(notes),
+       tags = tags ?? const [] {
     _validateAndSanitize();
   }
 
@@ -65,14 +75,18 @@ class BusinessCard extends Equatable {
     required this.id,
     required this.name,
     required this.createdAt,
+    required this.tags,
+    required this.isFavorite,
     this.jobTitle,
     this.company,
     this.email,
     this.phone,
+    this.mobile,
     this.address,
     this.website,
     this.notes,
     this.imageUrl,
+    this.imagePath,
     this.updatedAt,
   });
 
@@ -192,10 +206,14 @@ class BusinessCard extends Equatable {
     String? company,
     String? email,
     String? phone,
+    String? mobile,
     String? address,
     String? website,
     String? notes,
     String? imageUrl,
+    String? imagePath,
+    List<String>? tags,
+    bool? isFavorite,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -206,10 +224,14 @@ class BusinessCard extends Equatable {
       company: company ?? this.company,
       email: _cleanString(email ?? this.email),
       phone: _cleanString(phone ?? this.phone),
+      mobile: _cleanString(mobile ?? this.mobile),
       address: address ?? this.address,
       website: website ?? this.website,
       notes: notes ?? this.notes,
       imageUrl: imageUrl ?? this.imageUrl,
+      imagePath: imagePath ?? this.imagePath,
+      tags: tags ?? this.tags,
+      isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -223,10 +245,14 @@ class BusinessCard extends Equatable {
     company,
     email,
     phone,
+    mobile,
     address,
     website,
     notes,
     imageUrl,
+    imagePath,
+    tags,
+    isFavorite,
     createdAt,
     updatedAt,
   ];

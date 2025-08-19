@@ -1,5 +1,8 @@
+import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/camera_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/ocr_processing_page.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_detail/pages/card_detail_page.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_detail/view_models/card_detail_state.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/home/pages/home_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
@@ -41,7 +44,31 @@ class AppRouter {
   GoRouter _createRouter() {
     return GoRouter(
       initialLocation: AppRoutes.splash,
-      errorBuilder: (context, state) => const NotFoundPage(),
+      // 移除 404 頁面，改為記錄錯誤並返回上一頁
+      errorBuilder: (context, state) {
+        debugPrint('路由錯誤: ${state.error}');
+        debugPrint('嘗試導航到: ${state.matchedLocation}');
+
+        // 在手機 APP 中，不顯示 404 頁面
+        // 而是顯示錯誤訊息並返回
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('頁面載入失敗'),
+                backgroundColor: Colors.red,
+              ),
+            );
+            // 如果可以返回，就返回上一頁
+            if (Navigator.of(context).canPop()) {
+              Navigator.of(context).pop();
+            }
+          }
+        });
+
+        // 返回一個空的容器，因為會立即返回上一頁
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      },
       routes: [
         // 啟動頁面路由
         GoRoute(
@@ -112,20 +139,76 @@ class AppRouter {
           },
         ),
 
-        // 名片詳情頁面（帶參數）
+        // 名片詳情頁面（檢視模式）
         GoRoute(
           path: '${AppRoutes.cardDetail}/:cardId',
           name: 'card-detail',
           pageBuilder: (context, state) {
             final cardId = state.pathParameters['cardId'] ?? '';
-            // TODO: 實作CardDetailPage
             return _buildPageWithTransition(
               context,
               state,
-              Scaffold(
-                appBar: AppBar(title: const Text('名片詳情')),
-                body: Center(child: Text('名片詳情頁面：$cardId')),
+              CardDetailPage(cardId: cardId),
+            );
+          },
+        ),
+
+        // 名片編輯頁面
+        GoRoute(
+          path: '/card-detail/:cardId/edit',
+          name: 'card-detail-edit',
+          pageBuilder: (context, state) {
+            final cardId = state.pathParameters['cardId'] ?? '';
+            return _buildPageWithTransition(
+              context,
+              state,
+              CardDetailPage(cardId: cardId, mode: CardDetailMode.editing),
+            );
+          },
+        ),
+
+        // 新增名片頁面（來自 OCR）
+        GoRoute(
+          path: '/card-detail/creating',
+          name: 'card-detail-creating',
+          pageBuilder: (context, state) {
+            // 支援多種參數格式
+            BusinessCard? parsedCard;
+
+            if (state.extra is BusinessCard) {
+              parsedCard = state.extra as BusinessCard;
+            } else if (state.extra is Map<String, dynamic>) {
+              final extraData = state.extra as Map<String, dynamic>;
+              parsedCard = extraData['card'] as BusinessCard?;
+
+              // 如果有圖片路徑，更新到名片資料
+              if (extraData['imagePath'] != null && parsedCard != null) {
+                parsedCard = parsedCard.copyWith(
+                  imagePath: extraData['imagePath'] as String,
+                );
+              }
+            }
+
+            return _buildPageWithTransition(
+              context,
+              state,
+              CardDetailPage(
+                mode: CardDetailMode.creating,
+                ocrParsedCard: parsedCard,
               ),
+            );
+          },
+        ),
+
+        // 手動建立名片頁面
+        GoRoute(
+          path: '/card-detail/manual',
+          name: 'card-detail-manual',
+          pageBuilder: (context, state) {
+            return _buildPageWithTransition(
+              context,
+              state,
+              const CardDetailPage(mode: CardDetailMode.manual),
             );
           },
         ),

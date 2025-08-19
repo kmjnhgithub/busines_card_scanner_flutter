@@ -1,14 +1,22 @@
+import 'dart:io';
+
+import 'package:busines_card_scanner_flutter/data/datasources/local/local_card_parser.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
-import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_image_usecase.dart';
-import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_from_ocr_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/loading_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
+import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart';
 import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:image/image.dart' as img;
+import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 part 'ocr_processing_view_model.freezed.dart';
 
@@ -60,6 +68,12 @@ class OCRProcessingState with _$OCRProcessingState {
 
     /// 警告訊息
     @Default([]) List<String> warnings,
+
+    /// 壓縮後的圖片路徑
+    String? compressedImagePath,
+
+    /// 解析來源（AI 或本地）
+    ParseSource? parseSource,
   }) = _OCRProcessingState;
 
   const OCRProcessingState._();
@@ -75,23 +89,27 @@ class OCRProcessingState with _$OCRProcessingState {
 /// 負責管理OCR處理流程，包括：
 /// - 圖片載入和驗證
 /// - OCR文字識別
-/// - AI解析和結構化
+/// - AI解析和結構化（含 fallback 機制）
+/// - 圖片壓縮和儲存
 /// - 編輯和重新解析功能
 /// - 完整的錯誤處理
 class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
   OCRProcessingViewModel(
     this._processImageUseCase,
-    this._createCardFromImageUseCase,
-    this._createCardFromOCRUseCase,
     this._loadingPresenter,
     this._toastPresenter,
-  ) : super(const OCRProcessingState());
+    this._openAIService,
+    this._secureStorage,
+  ) : super(const OCRProcessingState()) {
+    _localParser = LocalCardParser();
+  }
 
   final ProcessImageUseCase _processImageUseCase;
-  final CreateCardFromImageUseCase _createCardFromImageUseCase;
-  final CreateCardFromOCRUseCase _createCardFromOCRUseCase;
   final LoadingPresenter _loadingPresenter;
   final ToastPresenter _toastPresenter;
+  final OpenAIService _openAIService;
+  final EnhancedSecureStorage _secureStorage;
+  late final LocalCardParser _localParser;
 
   /// 載入圖片
   Future<void> loadImage(Uint8List imageData) async {
@@ -145,7 +163,7 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
     }
   }
 
-  /// AI 解析 OCR 文字
+  /// 智慧解析 OCR 文字（AI 優先，自動 fallback）
   Future<void> parseWithAI() async {
     if (state.ocrResult == null) {
       _updateError('請先完成 OCR 處理');
@@ -154,29 +172,89 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
     }
 
     try {
-      _loadingPresenter.show('AI 正在解析名片資訊...');
+      _loadingPresenter.show('正在解析名片資訊...');
       _updateProcessingStep(OCRProcessingStep.aiProcessing);
 
-      final params = CreateCardFromOCRParams(ocrResult: state.ocrResult!);
-      final result = await _createCardFromOCRUseCase.execute(params);
+      BusinessCard? parsedCard;
+      ParseSource source = ParseSource.local;
 
-      state = state.copyWith(
-        parsedCard: result.card,
-        processingStep: OCRProcessingStep.completed,
-        warnings: [...state.warnings, ...result.warnings],
-        error: null,
-      );
+      // 首先嘗試使用 AI 服務
+      bool aiAvailable = await _checkAIAvailability();
 
-      _loadingPresenter.hide();
+      if (aiAvailable) {
+        try {
+          _loadingPresenter.show('AI 正在解析名片資訊...');
+          final aiResult = await _openAIService.parseCardFromText(
+            state.ocrResult!.rawText,
+          );
+
+          // 將 ParsedCardData 轉換為 BusinessCard
+          parsedCard = _convertToBusinessCard(aiResult);
+          source = ParseSource.ai;
+
+          debugPrint('AI 解析成功，信心度: ${aiResult.confidence}');
+        } on Exception catch (aiError) {
+          debugPrint('AI 解析失敗，切換到本地解析: $aiError');
+          // AI 失敗，將使用本地解析（fallback）
+        }
+      }
+
+      // 如果 AI 不可用或失敗，使用本地正則表達式解析
+      if (parsedCard == null) {
+        _loadingPresenter.show('正在使用本地解析...');
+        final localResult = _localParser.parseCard(state.ocrResult!.rawText);
+
+        // 只有當解析結果有意義時才使用（至少有姓名或公司）
+        if (localResult.confidence > 0.3 &&
+            (localResult.name != null || localResult.company != null)) {
+          parsedCard = _convertToBusinessCard(localResult);
+          source = ParseSource.local;
+          debugPrint('本地解析完成，信心度: ${localResult.confidence}');
+        } else {
+          debugPrint('本地解析信心度過低或資料不足');
+          // 不設置 parsedCard，保持為 null
+        }
+
+        // 如果是因為 AI 不可用而使用本地解析，提示用戶
+        if (!aiAvailable && parsedCard != null) {
+          _toastPresenter.showInfo('使用本地解析模式（AI 服務未啟用）');
+        }
+      }
+
+      // 檢查是否成功解析
+      if (parsedCard != null) {
+        state = state.copyWith(
+          parsedCard: parsedCard,
+          processingStep: OCRProcessingStep.completed,
+          parseSource: source,
+          error: null,
+        );
+
+        _loadingPresenter.hide();
+
+        // 顯示解析來源
+        final sourceText = source == ParseSource.ai ? 'AI 智慧解析' : '本地解析';
+        _toastPresenter.showSuccess('名片解析完成（$sourceText）');
+      } else {
+        // 解析失敗
+        state = state.copyWith(
+          parsedCard: null,
+          processingStep: OCRProcessingStep.ocrCompleted,
+          error: '無法識別名片資訊，請確保圖片清晰並重新拍攝',
+        );
+
+        _loadingPresenter.hide();
+        _toastPresenter.showWarning('無法識別名片資訊，請重新拍攝');
+      }
     } on Exception catch (e) {
       _loadingPresenter.hide();
-      _updateError('AI 解析失敗: $e');
-      _toastPresenter.showError('AI 解析失敗: $e');
+      _updateError('名片解析失敗: $e');
+      _toastPresenter.showError('名片解析失敗: $e');
       state = state.copyWith(processingStep: OCRProcessingStep.ocrCompleted);
     }
   }
 
-  /// 完整的圖片到名片處理流程
+  /// 完整的圖片到名片處理流程（包含圖片壓縮）
   Future<void> processImageToCard(Uint8List imageData) async {
     try {
       _loadingPresenter.show('正在處理名片...');
@@ -186,20 +264,31 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
         error: null,
       );
 
-      final params = CreateCardFromImageParams(imageData: imageData);
-      final result = await _createCardFromImageUseCase.execute(params);
+      // 1. 壓縮並儲存圖片
+      final compressedPath = await _compressAndSaveImage(imageData);
+      state = state.copyWith(compressedImagePath: compressedPath);
+
+      // 2. 執行 OCR
+      _loadingPresenter.show('正在識別文字...');
+      final ocrParams = ProcessImageParams(imageData: imageData);
+      final ocrResult = await _processImageUseCase.execute(ocrParams);
 
       state = state.copyWith(
-        ocrResult: result.ocrResult,
-        parsedCard: result.card,
-        processingStep: OCRProcessingStep.completed,
-        confidence: result.ocrResult.confidence,
-        warnings: result.warnings,
-        error: null,
+        ocrResult: ocrResult.ocrResult,
+        confidence: ocrResult.ocrResult.confidence,
+        warnings: ocrResult.warnings,
       );
 
-      _loadingPresenter.hide();
-      _toastPresenter.showSuccess('名片處理完成！');
+      // 3. 智慧解析（AI + Fallback）
+      await parseWithAI();
+
+      // 4. 更新最終狀態，包含圖片路徑
+      if (state.parsedCard != null && compressedPath != null) {
+        final updatedCard = state.parsedCard!.copyWith(
+          imagePath: compressedPath,
+        );
+        state = state.copyWith(parsedCard: updatedCard);
+      }
     } on Exception catch (e) {
       _loadingPresenter.hide();
       _updateError('名片處理失敗: $e');
@@ -289,26 +378,126 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
           step == OCRProcessingStep.aiProcessing,
     );
   }
+
+  /// 檢查 AI 服務是否可用
+  Future<bool> _checkAIAvailability() async {
+    try {
+      // 檢查是否有 API Key
+      final apiKeyResult = await _secureStorage.getApiKey('openai_api_key');
+      final hasApiKey = apiKeyResult.fold(
+        (failure) => false,
+        (apiKey) => apiKey.isNotEmpty,
+      );
+
+      if (!hasApiKey) {
+        debugPrint('AI 服務未設定 API Key');
+        return false;
+      }
+
+      // 檢查服務狀態
+      final status = await _openAIService.getServiceStatus();
+      return status.isAvailable;
+    } on Exception catch (e) {
+      debugPrint('檢查 AI 服務狀態失敗: $e');
+      return false;
+    }
+  }
+
+  /// 將 ParsedCardData 轉換為 BusinessCard
+  BusinessCard _convertToBusinessCard(ParsedCardData parsedData) {
+    return BusinessCard(
+      id: const Uuid().v4(),
+      name: parsedData.name ?? '',
+      company: parsedData.company,
+      jobTitle: parsedData.jobTitle,
+      phone: parsedData.phone ?? parsedData.mobile,
+      mobile: parsedData.mobile,
+      email: parsedData.email,
+      address: parsedData.address,
+      website: parsedData.website,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      tags: const [],
+      imagePath: state.compressedImagePath,
+    );
+  }
+
+  /// 壓縮並儲存圖片
+  Future<String?> _compressAndSaveImage(Uint8List imageData) async {
+    try {
+      // 解碼圖片
+      final image = img.decodeImage(imageData);
+      if (image == null) {
+        debugPrint('無法解碼圖片');
+        return null;
+      }
+
+      // 計算新尺寸（最大 800x600）
+      const maxWidth = 800;
+      const maxHeight = 600;
+
+      int newWidth = image.width;
+      int newHeight = image.height;
+
+      if (image.width > maxWidth || image.height > maxHeight) {
+        final widthRatio = image.width / maxWidth;
+        final heightRatio = image.height / maxHeight;
+        final ratio = widthRatio > heightRatio ? widthRatio : heightRatio;
+
+        newWidth = (image.width / ratio).round();
+        newHeight = (image.height / ratio).round();
+      }
+
+      // 縮放圖片
+      final resized = img.copyResize(
+        image,
+        width: newWidth,
+        height: newHeight,
+        interpolation: img.Interpolation.linear,
+      );
+
+      // 壓縮為 JPEG（品質 85）
+      final compressed = img.encodeJpg(resized, quality: 85);
+
+      // 儲存到文件系統
+      final directory = await getApplicationDocumentsDirectory();
+      final fileName = '${const Uuid().v4()}.jpg';
+      final file = File('${directory.path}/card_images/$fileName');
+
+      // 確保目錄存在
+      await file.parent.create(recursive: true);
+
+      // 寫入文件
+      await file.writeAsBytes(compressed);
+
+      debugPrint('圖片已壓縮並儲存: ${file.path}');
+      debugPrint('原始大小: ${imageData.length} bytes');
+      debugPrint('壓縮後大小: ${compressed.length} bytes');
+
+      return file.path;
+    } on Exception catch (e) {
+      debugPrint('壓縮圖片失敗: $e');
+      return null;
+    }
+  }
 }
 
 /// OCR Processing ViewModel Provider
 final ocrProcessingViewModelProvider =
     StateNotifierProvider<OCRProcessingViewModel, OCRProcessingState>((ref) {
       final processImageUseCase = ref.watch(processImageUseCaseProvider);
-      final createCardFromImageUseCase = ref.watch(
-        createCardFromImageUseCaseProvider,
-      );
-      final createCardFromOCRUseCase = ref.watch(
-        createCardFromOCRUseCaseProvider,
-      );
       final loadingPresenter = ref.watch(loadingPresenterProvider.notifier);
       final toastPresenter = ref.watch(toastPresenterProvider.notifier);
 
+      // 需要從 data providers 獲取
+      final openAIService = ref.watch(openAIServiceProvider);
+      final secureStorage = ref.watch(enhancedSecureStorageProvider);
+
       return OCRProcessingViewModel(
         processImageUseCase,
-        createCardFromImageUseCase,
-        createCardFromOCRUseCase,
         loadingPresenter,
         toastPresenter,
+        openAIService,
+        secureStorage,
       );
     });

@@ -1,0 +1,134 @@
+import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/create_card_manually_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_params.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_detail/view_models/card_detail_state.dart';
+import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart';
+import 'package:flutter/foundation.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:uuid/uuid.dart';
+
+part 'card_detail_view_model_simplified.g.dart';
+
+/// 簡化版的名片詳情 ViewModel
+@riverpod
+class CardDetailViewModelSimplified extends _$CardDetailViewModelSimplified {
+  GetCardsUseCase get _getCardsUseCase => ref.read(getCardsUseCaseProvider);
+  CreateCardManuallyUseCase get _createCardUseCase => ref.read(createCardManuallyUseCaseProvider);
+
+  @override
+  CardDetailState build() {
+    return const CardDetailState.initial();
+  }
+
+  /// 初始化檢視模式
+  Future<void> initializeViewing(String cardId) async {
+    state = const CardDetailState.loading();
+
+    try {
+      final cards = await _getCardsUseCase.execute(const GetCardsParams());
+      final card = cards.where((c) => c.id == cardId).firstOrNull;
+      
+      if (card == null) {
+        state = const CardDetailState.error(message: '找不到指定的名片');
+        return;
+      }
+
+      state = CardDetailState.viewing(card: card);
+    } on Exception catch (e) {
+      state = CardDetailState.error(message: '載入名片失敗：${e.toString()}');
+    }
+  }
+
+  /// 初始化新增模式（來自 OCR）
+  void initializeCreating(BusinessCard parsedCard) {
+    state = CardDetailState.creating(
+      parsedCard: parsedCard,
+      confidence: 0.8,
+      fromAIParsing: true,
+    );
+  }
+
+  /// 初始化手動建立模式
+  void initializeManual() {
+    final emptyCard = BusinessCard(
+      id: const Uuid().v4(),
+      name: '',
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+    );
+
+    state = CardDetailState.manual(emptyCard: emptyCard);
+  }
+
+  /// 儲存名片
+  Future<bool> saveCard() async {
+    BusinessCard? cardToSave;
+    
+    // 使用 pattern matching 取得要儲存的名片
+    state.when(
+      initial: () => cardToSave = null,
+      loading: () => cardToSave = null,
+      error: (message) => cardToSave = null,
+      viewing: (card) => cardToSave = null,
+      editing: (originalCard, currentCard, hasChanges, validationErrors) {
+        cardToSave = currentCard;
+      },
+      creating: (parsedCard, confidence, fromAIParsing, validationErrors) {
+        cardToSave = parsedCard;
+      },
+      manual: (emptyCard, validationErrors) {
+        cardToSave = emptyCard;
+      },
+    );
+
+    if (cardToSave == null || cardToSave!.name.trim().isEmpty) {
+      debugPrint('沒有可儲存的名片資料或姓名為空');
+      return false;
+    }
+
+    try {
+      await _createCardUseCase.execute(cardToSave!);
+      debugPrint('名片已儲存');
+      return true;
+      
+    } on Exception catch (e) {
+      state = state.copyWith(error: '儲存失敗：${e.toString()}');
+      debugPrint('儲存失敗：${e.toString()}');
+      return false;
+    }
+  }
+
+  /// 取得當前的名片資料（用於表單顯示）
+  BusinessCard? get currentCard {
+    BusinessCard? result;
+    
+    state.when(
+      initial: () => result = null,
+      loading: () => result = null,
+      error: (message) => result = null,
+      viewing: (card) => result = card,
+      editing: (originalCard, currentCard, hasChanges, validationErrors) {
+        result = currentCard;
+      },
+      creating: (parsedCard, confidence, fromAIParsing, validationErrors) {
+        result = parsedCard;
+      },
+      manual: (emptyCard, validationErrors) {
+        result = emptyCard;
+      },
+    );
+    
+    return result;
+  }
+
+  /// 是否可以編輯
+  bool get canEdit {
+    return state.maybeWhen(
+      editing: (_, __, ___, ____) => true,
+      creating: (_, __, ___, ____) => true,
+      manual: (_, __) => true,
+      orElse: () => false,
+    );
+  }
+}

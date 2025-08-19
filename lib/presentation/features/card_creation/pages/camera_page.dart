@@ -1,8 +1,12 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/camera_view_model.dart';
-import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/ocr_processing_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
+import 'package:busines_card_scanner_flutter/presentation/widgets/processing_dialog.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -115,10 +119,10 @@ class _CameraPageState extends ConsumerState<CameraPage>
   Future<void> _handleTakePicture() async {
     await ref.read(cameraViewModelProvider.notifier).takePicture();
 
-    // 檢查是否拍照成功，如果成功則導航到下一頁
+    // 檢查是否拍照成功，如果成功則處理圖片
     final state = ref.read(cameraViewModelProvider);
     if (state.capturedImagePath != null) {
-      _navigateToOCRProcessing(state.capturedImagePath!);
+      await _processImage(state.capturedImagePath!);
     }
   }
 
@@ -133,19 +137,82 @@ class _CameraPageState extends ConsumerState<CameraPage>
       );
 
       if (image != null) {
-        _navigateToOCRProcessing(image.path);
+        await _processImage(image.path);
       }
     } on Exception catch (e) {
       debugPrint('選擇相簿圖片失敗: $e');
     }
   }
 
-  /// 導航到 OCR 處理頁面
-  void _navigateToOCRProcessing(String imagePath) {
-    // 導航到 OCR 處理頁面，傳遞圖片路徑參數
-    // 需要對路徑進行 URL 編碼以處理特殊字元
-    final encodedPath = Uri.encodeComponent(imagePath);
-    context.push('${AppRoutes.ocrProcessing}/$encodedPath');
+  /// 處理圖片（背景處理 + 導航到編輯頁面）
+  Future<void> _processImage(String imagePath) async {
+    try {
+      // 顯示處理對話框（不等待關閉）
+      unawaited(ProcessingDialog.show(context));
+
+      // 讀取圖片資料
+      final imageFile = File(imagePath);
+      final imageData = await imageFile.readAsBytes();
+
+      // 使用 ViewModel 處理圖片
+      final viewModel = ref.read(ocrProcessingViewModelProvider.notifier);
+      await viewModel.processImageToCard(imageData);
+
+      // 獲取處理結果
+      final state = ref.read(ocrProcessingViewModelProvider);
+
+      // 關閉對話框
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // 檢查處理結果
+      if (state.parsedCard != null) {
+        // 導航到編輯頁面（新增模式）
+        if (mounted) {
+          context.go(
+            '/card-detail/creating',
+            extra: {
+              'mode': 'creating',
+              'card': state.parsedCard,
+              'imagePath': state.compressedImagePath,
+            },
+          );
+        }
+      } else {
+        // 處理失敗或無法解析
+        if (mounted) {
+          final errorMessage = state.error ?? '無法解析名片資訊，請重試';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+              action: SnackBarAction(
+                label: '重試',
+                textColor: Colors.white,
+                onPressed: _handleTakePicture,
+              ),
+            ),
+          );
+        }
+      }
+    } on Exception catch (e) {
+      // 關閉對話框
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // 顯示錯誤
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('處理圖片失敗: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
   }
 
   /// 顯示權限被拒絕對話框
