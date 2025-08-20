@@ -1,7 +1,9 @@
 import 'package:busines_card_scanner_flutter/data/datasources/local/clean_app_database.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/local/ocr_cache_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/local/platform_ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/local/simple_ocr_cache_service.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/remote/ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/ai_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/card_repository_impl.dart';
@@ -11,6 +13,25 @@ import 'package:busines_card_scanner_flutter/domain/repositories/card_repository
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// =============================================================================
+// Service Providers - 符合 Clean Architecture 的依賴組裝層
+// =============================================================================
+// 這些 Providers 在 Data 層定義服務實例，避免循環依賴問題
+// Repository Providers 可以直接引用這些服務，實現依賴反轉
+// =============================================================================
+
+/// Provider for platform-specific OCR service
+/// 根據平台自動選擇最佳的 OCR 引擎（iOS Vision / Android ML Kit）
+final ocrServiceProvider = Provider<OCRService>((ref) {
+  return PlatformOCRService();
+});
+
+/// Provider for OCR cache service
+/// 提供 OCR 結果快取和歷史記錄管理
+final ocrCacheServiceProvider = Provider<OCRCacheService>((ref) {
+  return SimpleOCRCacheService();
+});
 
 // =============================================================================
 // Data Layer Repository Providers
@@ -54,20 +75,18 @@ final cardRepositoryProvider = Provider<CardRepository>((ref) {
 
 /// Provider for OCRRepository implementation
 /// Provides OCR functionality through platform-specific services
+///
+/// 此 Provider 遵循 Clean Architecture 原則：
+/// - 依賴抽象介面而非具體實作
+/// - 透過依賴注入取得服務實例
+/// - Data 層不負責依賴組裝，只專注於資料存取邏輯
 final ocrRepositoryProvider = Provider<OCRRepository>((ref) {
-  // 注意：這裡違反了 Clean Architecture 的分層原則
-  // 正確的做法是在更高層級的 container 中組裝依賴
-  // 但為了緊急修復相機功能，暫時採用這種方式
-  
-  // 從 presentation 層取得服務實例（透過檔案匯入的方式）
-  // 這是一個暫時的解決方案，未來應該重構為正確的依賴注入
-  final ocrService = PlatformOCRService();
-  final cacheService = SimpleOCRCacheService();
-  
-  return OCRRepositoryImpl(
-    ocrService: ocrService,
-    cacheService: cacheService,
-  );
+  // 透過 ref.watch 從外層取得服務實例
+  // 這符合依賴反轉原則：高層模組不依賴低層模組，都依賴抽象
+  final ocrService = ref.watch(ocrServiceProvider);
+  final cacheService = ref.watch(ocrCacheServiceProvider);
+
+  return OCRRepositoryImpl(ocrService: ocrService, cacheService: cacheService);
 });
 
 /// Provider for AIRepository implementation
