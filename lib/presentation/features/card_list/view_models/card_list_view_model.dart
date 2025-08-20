@@ -1,8 +1,11 @@
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/card_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
+import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart';
 import 'package:busines_card_scanner_flutter/presentation/providers/domain_providers.dart'
     as domain;
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -65,110 +68,40 @@ class CardListState with _$CardListState {
 /// 名片列表 ViewModel
 ///
 /// 負責管理名片列表的狀態和業務邏輯：
-/// - 載入名片列表
+/// - 載入名片列表（從真實資料庫）
 /// - 搜尋名片
 /// - 排序名片
 /// - 刪除名片
 /// - 錯誤處理
 class CardListViewModel extends StateNotifier<CardListState> {
   final DeleteCardUseCase _deleteCardUseCase;
+  final CardRepository _cardRepository;
 
-  CardListViewModel({required DeleteCardUseCase deleteCardUseCase})
-    : _deleteCardUseCase = deleteCardUseCase,
-      super(const CardListState());
+  CardListViewModel({
+    required DeleteCardUseCase deleteCardUseCase,
+    required CardRepository cardRepository,
+  }) : _deleteCardUseCase = deleteCardUseCase,
+       _cardRepository = cardRepository,
+       super(const CardListState());
 
-  /// 載入名片列表
+  /// 載入名片列表（從真實資料庫）
   Future<void> loadCards() async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      // 暫時使用假資料進行測試
-      await Future.delayed(const Duration(milliseconds: 800));
-      final cards = _generateMockCards();
+      debugPrint('開始從資料庫載入名片列表...');
+      final cards = await _cardRepository.getCards(limit: 100);
+      debugPrint('從資料庫載入了 ${cards.length} 張名片');
+
       state = state.copyWith(isLoading: false, cards: cards, error: null);
       _applyFiltersAndSort();
     } on Exception catch (error) {
       final errorMessage = error is DomainFailure
           ? error.userMessage
           : error.toString();
+      debugPrint('載入名片列表失敗: $errorMessage');
       state = state.copyWith(isLoading: false, error: errorMessage);
     }
-  }
-
-  /// 產生模擬名片資料（用於測試）
-  List<BusinessCard> _generateMockCards() {
-    final now = DateTime.now();
-    return [
-      BusinessCard(
-        id: 'card_001',
-        name: '王小明',
-        jobTitle: 'iOS 開發工程師',
-        company: 'Apple Taiwan',
-        email: 'xiaoming.wang@apple.com',
-        phone: '0912-345-678',
-        address: '台北市信義區松仁路100號',
-        website: 'https://www.apple.com.tw',
-        notes: '技術專精 Swift、SwiftUI，曾參與多個大型專案開發',
-        imagePath: 'assets/images/sample_card_1.png',
-        createdAt: now.subtract(const Duration(days: 10)),
-        updatedAt: now.subtract(const Duration(days: 2)),
-      ),
-      BusinessCard(
-        id: 'card_002',
-        name: '李美華',
-        jobTitle: 'UI/UX 設計師',
-        company: 'Google Taiwan',
-        email: 'meihua.li@google.com',
-        phone: '0987-654-321',
-        address: '台北市南港區經貿二路66號',
-        website: 'https://design.google',
-        notes: '專精於使用者體驗設計，擅長 Figma、Sketch 等設計工具',
-        imagePath: 'assets/images/sample_card_2.png',
-        createdAt: now.subtract(const Duration(days: 15)),
-        updatedAt: now.subtract(const Duration(days: 5)),
-      ),
-      BusinessCard(
-        id: 'card_003',
-        name: '張志強',
-        jobTitle: '產品經理',
-        company: 'Microsoft Taiwan',
-        email: 'zhiqiang.zhang@microsoft.com',
-        phone: '0923-456-789',
-        address: '台北市中山區民生東路三段156號',
-        notes: '負責 Azure 雲端服務產品線，具備豐富的跨國團隊管理經驗',
-        imagePath: 'assets/images/sample_card_3.png',
-        createdAt: now.subtract(const Duration(days: 8)),
-        updatedAt: now.subtract(const Duration(days: 1)),
-      ),
-      BusinessCard(
-        id: 'card_004',
-        name: '陳雅婷',
-        jobTitle: 'Flutter 開發工程師',
-        company: '91APP',
-        email: 'yating.chen@91app.com',
-        phone: '0956-789-123',
-        address: '台北市松山區復興北路99號',
-        website: 'https://www.91app.com',
-        notes: '專精 Flutter 跨平台開發，熟悉 Clean Architecture 與 MVVM 模式',
-        imagePath: 'assets/images/sample_card_4.png',
-        createdAt: now.subtract(const Duration(days: 3)),
-        updatedAt: now.subtract(const Duration(hours: 12)),
-      ),
-      BusinessCard(
-        id: 'card_005',
-        name: '林大為',
-        jobTitle: '資深軟體架構師',
-        company: 'Synology Inc.',
-        email: 'dawei.lin@synology.com',
-        phone: '0934-567-890',
-        address: '新北市汐止區中興路26號',
-        website: 'https://www.synology.com',
-        notes: '負責 DSM 系統架構設計，專精於分散式系統與雲端儲存技術',
-        imagePath: 'assets/images/sample_card_5.png',
-        createdAt: now.subtract(const Duration(days: 20)),
-        updatedAt: now.subtract(const Duration(days: 7)),
-      ),
-    ];
   }
 
   /// 搜尋名片
@@ -277,5 +210,6 @@ final cardListViewModelProvider =
     StateNotifierProvider<CardListViewModel, CardListState>((ref) {
       return CardListViewModel(
         deleteCardUseCase: ref.read(domain.deleteCardUseCaseProvider),
+        cardRepository: ref.read(cardRepositoryProvider),
       );
     });

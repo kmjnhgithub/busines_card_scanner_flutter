@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
-import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 
@@ -22,7 +21,8 @@ abstract class OpenAIService {
   Future<Either<DomainFailure, bool>> validateApiKey(String apiKey);
 
   /// 取得使用量統計
-  Future<Either<DomainFailure, UsageStats>> getUsageStats(String apiKey);
+  // TODO: 移動 UsageStats 到 Domain 層後重新啟用
+  // Future<Either<DomainFailure, UsageStats>> getUsageStats(String apiKey);
 }
 
 /// OpenAI Service 實作
@@ -426,7 +426,9 @@ $ocrText
     }
   }
 
-  @override
+  // @override
+  // TODO: 移動 UsageStats 到 Domain 層後重新啟用
+  /*
   Future<Either<DomainFailure, UsageStats>> getUsageStats(String apiKey) async {
     try {
       // 注意：OpenAI 的使用量 API 端點可能會變更，這裡使用模擬數據
@@ -495,4 +497,5 @@ $ocrText
       );
     }
   }
+  */
 }

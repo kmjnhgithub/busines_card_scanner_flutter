@@ -276,11 +276,13 @@ class GoogleMLKitOCRService implements OCRService {
       for (final line in block.lines) {
         final lineText = line.text.trim();
         if (lineText.isNotEmpty) {
-          detectedTexts.add(DetectedText(
-            text: lineText,
-            confidence: _estimateConfidence(lineText),
-            boundingBox: _convertBoundingBox(line.boundingBox as Rect?),
-          ));
+          detectedTexts.add(
+            DetectedText(
+              text: lineText,
+              confidence: _estimateConfidence(lineText),
+              boundingBox: _convertBoundingBox(line.boundingBox as Rect?),
+            ),
+          );
           rawTextBuffer.writeln(lineText);
         }
       }

@@ -45,12 +45,7 @@ class DetectedText extends Equatable {
   String get cleanedText => text.trim().replaceAll(RegExp(r'\s+'), ' ');
 
   @override
-  List<Object?> get props => [
-        text,
-        confidence,
-        boundingBox,
-        languageCode,
-      ];
+  List<Object?> get props => [text, confidence, boundingBox, languageCode];
 
   @override
   String toString() {
@@ -192,7 +187,9 @@ class BoundingBox extends Equatable {
 
   /// 限制邊界框在指定範圍內
   BoundingBox clamp({
-    required double maxX, required double maxY, double minX = 0,
+    required double maxX,
+    required double maxY,
+    double minX = 0,
     double minY = 0,
   }) {
     final clampedLeft = left.clamp(minX.toDouble(), (maxX - width).toDouble());

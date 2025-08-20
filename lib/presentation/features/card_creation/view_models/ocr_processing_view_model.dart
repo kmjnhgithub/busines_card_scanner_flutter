@@ -428,7 +428,9 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
         finalName = '${parsedData.company} 名片';
       } else {
         // 使用時間戳記作為預設名稱
-        final timestamp = DateTime.now().millisecondsSinceEpoch.toString().substring(7);
+        final timestamp = DateTime.now().millisecondsSinceEpoch
+            .toString()
+            .substring(7);
         finalName = '名片 #$timestamp';
       }
     }

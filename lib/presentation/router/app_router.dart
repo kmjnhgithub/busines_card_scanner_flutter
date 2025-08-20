@@ -3,9 +3,9 @@ import 'package:busines_card_scanner_flutter/presentation/features/card_creation
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/pages/ocr_processing_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_detail/pages/card_detail_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_detail/view_models/card_detail_state.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_list/pages/card_list_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/home/pages/home_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
-import 'package:busines_card_scanner_flutter/presentation/features/card_list/pages/card_list_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/settings_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:flutter/material.dart';

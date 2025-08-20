@@ -237,6 +237,8 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
       }
 
       // 載入使用量統計
+      // TODO: 重新啟用 getUsageStats 方法當 UsageStats 移至 Domain 層後
+      /*
       final statsResult = await _openAIService.getUsageStats(apiKey);
       statsResult.fold(
         (failure) {
@@ -253,6 +255,9 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
           );
         },
       );
+      */
+      // 暫時設為載入完成，不載入使用量統計
+      state = state.copyWith(isLoading: false, error: null);
     } on Exception catch (e) {
       state = state.copyWith(isLoading: false, error: '載入使用量統計時發生未預期錯誤：$e');
     }

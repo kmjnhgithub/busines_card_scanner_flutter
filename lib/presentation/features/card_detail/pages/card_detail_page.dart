@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_detail/view_models/card_detail_state.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_detail/view_models/card_detail_view_model_basic.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_list/view_models/card_list_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
@@ -87,7 +88,7 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
   /// 初始化 ViewModel
   void _initializeViewModel() {
     final viewModel = ref.read(cardDetailViewModelBasicProvider.notifier);
-    
+
     // 除錯資訊
     debugPrint('CardDetailPage 初始化:');
     debugPrint('  mode: ${widget.mode}');
@@ -160,8 +161,11 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
     final success = await viewModel.saveCard();
 
     if (success && mounted) {
-      // 儲存成功，返回列表頁面
-      context.go('/card-list');
+      // 儲存成功，重新載入名片列表並返回列表頁面
+      await ref.read(cardListViewModelProvider.notifier).loadCards();
+      if (mounted) {
+        context.go('/card-list');
+      }
     }
   }
 
