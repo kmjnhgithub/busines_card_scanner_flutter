@@ -1,16 +1,18 @@
 import 'package:busines_card_scanner_flutter/data/datasources/local/clean_app_database.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/local/ml_kit_ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/local/ocr_cache_service.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/local/platform_ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/local/simple_ocr_cache_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/remote/ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
-import 'package:busines_card_scanner_flutter/data/datasources/remote/simple_ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/ai_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/card_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/ocr_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
+import 'package:busines_card_scanner_flutter/platform/ios/vision_service_bridge.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -47,10 +49,29 @@ final openAIServiceProvider = Provider<OpenAIService>((ref) {
   return OpenAIServiceImpl(dio: dio, secureStorage: secureStorage);
 });
 
+/// Provider for MLKitOCRService instance
+/// Provides Google ML Kit OCR functionality
+final mlKitOCRServiceProvider = Provider<MLKitOCRService>((ref) {
+  return MLKitOCRService();
+});
+
+/// Provider for IOSVisionServiceBridge instance
+/// Provides iOS Vision Framework OCR functionality
+final iosVisionServiceProvider = Provider<IOSVisionServiceBridge>((ref) {
+  return IOSVisionServiceBridge();
+});
+
+/// Provider for PlatformOCRService instance
+/// Provides platform-specific OCR functionality (iOS Vision / Android ML Kit)
+final platformOCRServiceProvider = Provider<PlatformOCRService>((ref) {
+  return PlatformOCRService();
+});
+
 /// Provider for OCRService instance
-/// Provides OCR text recognition functionality using Simple OCR Service
+/// Provides OCR text recognition functionality using Platform-specific service
+/// 🚀 UPDATED: Now uses PlatformOCRService instead of SimpleOCRService
 final ocrServiceProvider = Provider<OCRService>((ref) {
-  return SimpleOCRService();
+  return ref.watch(platformOCRServiceProvider);
 });
 
 /// Provider for OCRCacheService instance

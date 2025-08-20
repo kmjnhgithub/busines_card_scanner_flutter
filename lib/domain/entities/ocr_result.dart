@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:busines_card_scanner_flutter/core/services/security_service.dart';
 import 'package:busines_card_scanner_flutter/core/utils/string_utils.dart';
+import 'package:busines_card_scanner_flutter/domain/entities/detected_text.dart';
 import 'package:equatable/equatable.dart';
 
 /// OCR 處理結果實體
@@ -15,7 +16,7 @@ import 'package:equatable/equatable.dart';
 class OCRResult extends Equatable {
   final String id;
   final String rawText;
-  final List<String>? detectedTexts;
+  final List<DetectedText>? detectedTexts;
   final double confidence;
   final Uint8List? imageData;
   final int? imageWidth;
@@ -120,8 +121,8 @@ class OCRResult extends Equatable {
 
     // 檢查 detectedTexts 中的安全性
     if (detectedTexts != null) {
-      for (final text in detectedTexts!) {
-        if (text.contains('<script')) {
+      for (final detectedText in detectedTexts!) {
+        if (detectedText.text.contains('<script')) {
           throw ArgumentError(
             'Detected text contains potentially malicious content',
           );
@@ -167,8 +168,8 @@ class OCRResult extends Equatable {
     }
 
     final allEmails = <String>[];
-    for (final text in detectedTexts!) {
-      final emails = StringUtils.extractEmails(text);
+    for (final detectedText in detectedTexts!) {
+      final emails = StringUtils.extractEmails(detectedText.text);
       allEmails.addAll(emails);
     }
 
@@ -188,8 +189,8 @@ class OCRResult extends Equatable {
     }
 
     final allPhones = <String>[];
-    for (final text in detectedTexts!) {
-      final phones = StringUtils.extractPhoneNumbers(text);
+    for (final detectedText in detectedTexts!) {
+      final phones = StringUtils.extractPhoneNumbers(detectedText.text);
       allPhones.addAll(phones);
     }
 
@@ -206,7 +207,7 @@ class OCRResult extends Equatable {
   OCRResult copyWith({
     String? id,
     String? rawText,
-    List<String>? detectedTexts,
+    List<DetectedText>? detectedTexts,
     double? confidence,
     Uint8List? imageData,
     int? imageWidth,

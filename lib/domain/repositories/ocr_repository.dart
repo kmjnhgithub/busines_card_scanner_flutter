@@ -141,6 +141,15 @@ class OCROptions {
   /// 是否儲存處理結果
   final bool saveResult;
 
+  /// 主要語言代碼（用於單一語言識別）
+  final String? language;
+
+  /// 識別精度等級（'fast', 'accurate'）
+  final String? recognitionLevel;
+
+  /// 是否使用語言修正
+  final bool? usesLanguageCorrection;
+
   const OCROptions({
     this.enableTextBlocks = true,
     this.preferredLanguages,
@@ -148,6 +157,9 @@ class OCROptions {
     this.enableRotationCorrection = true,
     this.maxProcessingTimeMs,
     this.saveResult = false,
+    this.language,
+    this.recognitionLevel,
+    this.usesLanguageCorrection,
   });
 }
 
@@ -186,6 +198,7 @@ class OCREngineInfo {
   final List<String> supportedLanguages;
   final bool isAvailable;
   final String platform; // 'ios', 'android', 'cross-platform'
+  final List<String> capabilities; // 引擎功能列表
 
   const OCREngineInfo({
     required this.id,
@@ -194,6 +207,7 @@ class OCREngineInfo {
     required this.supportedLanguages,
     required this.isAvailable,
     required this.platform,
+    required this.capabilities,
   });
 }
 
@@ -203,12 +217,12 @@ class OCREngineHealth {
   final bool isHealthy;
   final String? error;
   final double? responseTimeMs;
-  final DateTime checkedAt;
+  final DateTime lastChecked; // 更名為 lastChecked
 
   const OCREngineHealth({
     required this.engineId,
     required this.isHealthy,
-    required this.checkedAt,
+    required this.lastChecked,
     this.error,
     this.responseTimeMs,
   });
@@ -237,6 +251,15 @@ class ImagePreprocessOptions {
   /// 是否銳化
   final bool sharpen;
 
+  /// 是否增強對比度
+  final bool enhanceContrast;
+
+  /// 是否移除噪音
+  final bool removeNoise;
+
+  /// 是否標準化方向
+  final bool normalizeOrientation;
+
   const ImagePreprocessOptions({
     this.targetWidth,
     this.targetHeight,
@@ -245,6 +268,9 @@ class ImagePreprocessOptions {
     this.grayscale = false,
     this.denoise = false,
     this.sharpen = false,
+    this.enhanceContrast = false,
+    this.removeNoise = false,
+    this.normalizeOrientation = false,
   });
 }
 

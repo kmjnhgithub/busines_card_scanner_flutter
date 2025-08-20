@@ -217,7 +217,8 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
 
         // 如果是因為 AI 不可用而使用本地解析，提示用戶
         if (!aiAvailable && parsedCard != null) {
-          _toastPresenter.showInfo('使用本地解析模式（AI 服務未啟用）');
+          _toastPresenter.showInfo('已切換至本地解析模式（AI 服務未啟用）');
+          debugPrint('AI 服務不可用，建議在設定中配置 OpenAI API Key 以獲得更精確的解析結果');
         }
       }
 
@@ -236,15 +237,29 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
         final sourceText = source == ParseSource.ai ? 'AI 智慧解析' : '本地解析';
         _toastPresenter.showSuccess('名片解析完成（$sourceText）');
       } else {
-        // 解析失敗
-        state = state.copyWith(
-          parsedCard: null,
-          processingStep: OCRProcessingStep.ocrCompleted,
-          error: '無法識別名片資訊，請確保圖片清晰並重新拍攝',
+        // 解析失敗 - 設定狀態並提供手動輸入選項
+        _loadingPresenter.hide();
+
+        // 建立空白名片供手動輸入
+        final emptyCard = BusinessCard(
+          id: const Uuid().v4(),
+          name: '手動輸入名片',
+          createdAt: DateTime.now(),
+          updatedAt: DateTime.now(),
+          tags: const [],
+          imagePath: state.compressedImagePath,
         );
 
-        _loadingPresenter.hide();
-        _toastPresenter.showWarning('無法識別名片資訊，請重新拍攝');
+        state = state.copyWith(
+          parsedCard: emptyCard,
+          processingStep: OCRProcessingStep.completed,
+          parseSource: ParseSource.manual,
+          error: null,
+        );
+
+        // 提示用戶需要手動輸入
+        _toastPresenter.showWarning('無法自動解析名片，已切換至手動輸入模式');
+        debugPrint('OCR 解析失敗：可能是圖片不夠清晰或光線不足，已提供空白表單供手動輸入');
       }
     } on Exception catch (e) {
       _loadingPresenter.hide();
@@ -405,9 +420,22 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
 
   /// 將 ParsedCardData 轉換為 BusinessCard
   BusinessCard _convertToBusinessCard(ParsedCardData parsedData) {
+    // 為空白或無效的名稱提供預設值
+    String finalName = parsedData.name?.trim() ?? '';
+    if (finalName.isEmpty) {
+      // 嘗試使用公司名稱作為名稱
+      if (parsedData.company?.trim().isNotEmpty == true) {
+        finalName = '${parsedData.company} 名片';
+      } else {
+        // 使用時間戳記作為預設名稱
+        final timestamp = DateTime.now().millisecondsSinceEpoch.toString().substring(7);
+        finalName = '名片 #$timestamp';
+      }
+    }
+
     return BusinessCard(
       id: const Uuid().v4(),
-      name: parsedData.name ?? '',
+      name: finalName,
       company: parsedData.company,
       jobTitle: parsedData.jobTitle,
       phone: parsedData.phone ?? parsedData.mobile,

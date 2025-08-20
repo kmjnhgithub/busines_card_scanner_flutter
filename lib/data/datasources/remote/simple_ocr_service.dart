@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:busines_card_scanner_flutter/data/datasources/remote/ocr_service.dart';
+import 'package:busines_card_scanner_flutter/domain/entities/detected_text.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
@@ -40,11 +41,31 @@ class SimpleOCRService implements OCRService {
       id: 'simple_ocr_${DateTime.now().millisecondsSinceEpoch}',
       rawText: '張三\nABC科技公司\n產品經理\n02-1234-5678\nemail@example.com',
       detectedTexts: const [
-        '張三',
-        'ABC科技公司',
-        '產品經理',
-        '02-1234-5678',
-        'email@example.com',
+        DetectedText(
+          text: '張三',
+          confidence: 0.9,
+          boundingBox: BoundingBox(left: 10, top: 10, width: 100, height: 30),
+        ),
+        DetectedText(
+          text: 'ABC科技公司',
+          confidence: 0.85,
+          boundingBox: BoundingBox(left: 10, top: 50, width: 150, height: 25),
+        ),
+        DetectedText(
+          text: '產品經理',
+          confidence: 0.8,
+          boundingBox: BoundingBox(left: 10, top: 80, width: 80, height: 20),
+        ),
+        DetectedText(
+          text: '02-1234-5678',
+          confidence: 0.9,
+          boundingBox: BoundingBox(left: 10, top: 110, width: 120, height: 20),
+        ),
+        DetectedText(
+          text: 'email@example.com',
+          confidence: 0.85,
+          boundingBox: BoundingBox(left: 10, top: 140, width: 160, height: 20),
+        ),
       ],
       confidence: 0.85,
       imageData: imageData,
@@ -66,6 +87,7 @@ class SimpleOCRService implements OCRService {
         supportedLanguages: ['zh-Hant', 'en'],
         isAvailable: true,
         platform: 'cross-platform',
+        capabilities: ['basic_text_recognition'],
       ),
     ];
   }
@@ -84,6 +106,7 @@ class SimpleOCRService implements OCRService {
       supportedLanguages: ['zh-Hant', 'en'],
       isAvailable: true,
       platform: 'cross-platform',
+      capabilities: ['basic_text_recognition'],
     );
   }
 
@@ -93,7 +116,7 @@ class SimpleOCRService implements OCRService {
       engineId: engineId ?? _engineId,
       isHealthy: true,
       responseTimeMs: 100,
-      checkedAt: DateTime.now(),
+      lastChecked: DateTime.now(),
     );
   }
 

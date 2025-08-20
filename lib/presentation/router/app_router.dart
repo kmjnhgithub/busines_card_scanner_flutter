@@ -5,6 +5,8 @@ import 'package:busines_card_scanner_flutter/presentation/features/card_detail/p
 import 'package:busines_card_scanner_flutter/presentation/features/card_detail/view_models/card_detail_state.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/home/pages/home_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_list/pages/card_list_page.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/settings_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -97,7 +99,7 @@ class AppRouter {
               pageBuilder: (context, state) => _buildPageWithTransition(
                 context,
                 state,
-                const CardListNavPage(),
+                const CardListPage(),
               ),
             ),
 
@@ -108,7 +110,7 @@ class AppRouter {
               pageBuilder: (context, state) => _buildPageWithTransition(
                 context,
                 state,
-                const SettingsNavPage(),
+                const SettingsPage(),
               ),
             ),
           ],
@@ -139,35 +141,7 @@ class AppRouter {
           },
         ),
 
-        // 名片詳情頁面（檢視模式）
-        GoRoute(
-          path: '${AppRoutes.cardDetail}/:cardId',
-          name: 'card-detail',
-          pageBuilder: (context, state) {
-            final cardId = state.pathParameters['cardId'] ?? '';
-            return _buildPageWithTransition(
-              context,
-              state,
-              CardDetailPage(cardId: cardId),
-            );
-          },
-        ),
-
-        // 名片編輯頁面
-        GoRoute(
-          path: '/card-detail/:cardId/edit',
-          name: 'card-detail-edit',
-          pageBuilder: (context, state) {
-            final cardId = state.pathParameters['cardId'] ?? '';
-            return _buildPageWithTransition(
-              context,
-              state,
-              CardDetailPage(cardId: cardId, mode: CardDetailMode.editing),
-            );
-          },
-        ),
-
-        // 新增名片頁面（來自 OCR）
+        // 新增名片頁面（來自 OCR）- 必須放在參數路由前面
         GoRoute(
           path: '/card-detail/creating',
           name: 'card-detail-creating',
@@ -200,7 +174,7 @@ class AppRouter {
           },
         ),
 
-        // 手動建立名片頁面
+        // 手動建立名片頁面 - 必須放在參數路由前面
         GoRoute(
           path: '/card-detail/manual',
           name: 'card-detail-manual',
@@ -209,6 +183,34 @@ class AppRouter {
               context,
               state,
               const CardDetailPage(mode: CardDetailMode.manual),
+            );
+          },
+        ),
+
+        // 名片詳情頁面（檢視模式）- 參數路由必須放在具體路由後面
+        GoRoute(
+          path: '${AppRoutes.cardDetail}/:cardId',
+          name: 'card-detail',
+          pageBuilder: (context, state) {
+            final cardId = state.pathParameters['cardId'] ?? '';
+            return _buildPageWithTransition(
+              context,
+              state,
+              CardDetailPage(cardId: cardId),
+            );
+          },
+        ),
+
+        // 名片編輯頁面
+        GoRoute(
+          path: '/card-detail/:cardId/edit',
+          name: 'card-detail-edit',
+          pageBuilder: (context, state) {
+            final cardId = state.pathParameters['cardId'] ?? '';
+            return _buildPageWithTransition(
+              context,
+              state,
+              CardDetailPage(cardId: cardId, mode: CardDetailMode.editing),
             );
           },
         ),
@@ -235,13 +237,7 @@ class AppRouter {
           ),
         ),
 
-        // 404錯誤頁面
-        GoRoute(
-          path: AppRoutes.notFound,
-          name: '404',
-          pageBuilder: (context, state) =>
-              _buildPageWithTransition(context, state, const NotFoundPage()),
-        ),
+        // 移除 404 錯誤頁面（手機 APP 使用 errorBuilder 處理）
       ],
       // 路由重定向
       redirect: (context, state) {

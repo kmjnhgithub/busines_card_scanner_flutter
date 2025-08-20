@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 
 import 'package:busines_card_scanner_flutter/core/services/security_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/remote/ocr_service.dart';
+import 'package:busines_card_scanner_flutter/domain/entities/detected_text.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
 import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
@@ -142,6 +143,7 @@ class GoogleMLKitOCRService implements OCRService {
         supportedLanguages: _supportedLanguages,
         isAvailable: true,
         platform: _platformName,
+        capabilities: ['text_recognition', 'cross_platform'],
       ),
     ];
   }
@@ -171,7 +173,7 @@ class GoogleMLKitOCRService implements OCRService {
         engineId: testEngineId,
         isHealthy: false,
         error: '不支援的引擎 ID: $testEngineId',
-        checkedAt: DateTime.now(),
+        lastChecked: DateTime.now(),
       );
     }
 
@@ -190,7 +192,7 @@ class GoogleMLKitOCRService implements OCRService {
         engineId: testEngineId,
         isHealthy: true,
         responseTimeMs: stopwatch.elapsedMilliseconds.toDouble(),
-        checkedAt: DateTime.now(),
+        lastChecked: DateTime.now(),
       );
     } on Exception catch (e) {
       stopwatch.stop();
@@ -200,7 +202,7 @@ class GoogleMLKitOCRService implements OCRService {
         isHealthy: false,
         error: e.toString(),
         responseTimeMs: stopwatch.elapsedMilliseconds.toDouble(),
-        checkedAt: DateTime.now(),
+        lastChecked: DateTime.now(),
       );
     }
   }
@@ -267,14 +269,18 @@ class GoogleMLKitOCRService implements OCRService {
     OCROptions? options,
   }) async {
     // 提取所有文字區塊
-    final detectedTexts = <String>[];
+    final detectedTexts = <DetectedText>[];
     final rawTextBuffer = StringBuffer();
 
     for (final block in recognizedText.blocks) {
       for (final line in block.lines) {
         final lineText = line.text.trim();
         if (lineText.isNotEmpty) {
-          detectedTexts.add(lineText);
+          detectedTexts.add(DetectedText(
+            text: lineText,
+            confidence: _estimateConfidence(lineText),
+            boundingBox: _convertBoundingBox(line.boundingBox as Rect?),
+          ));
           rawTextBuffer.writeln(lineText);
         }
       }
@@ -603,6 +609,20 @@ class GoogleMLKitOCRService implements OCRService {
     throw OCRProcessingFailure(
       userMessage: 'OCR 處理發生未預期的錯誤',
       internalMessage: 'Unexpected error: $error',
+    );
+  }
+
+  /// 轉換邊界框
+  BoundingBox _convertBoundingBox(Rect? rect) {
+    if (rect == null) {
+      return const BoundingBox(left: 0, top: 0, width: 0, height: 0);
+    }
+
+    return BoundingBox(
+      left: rect.left,
+      top: rect.top,
+      width: rect.width,
+      height: rect.height,
     );
   }
 

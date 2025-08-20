@@ -34,8 +34,7 @@ class AppRoutes {
   /// 匯出資料頁
   static const String export = '/export';
 
-  /// 404 錯誤頁
-  static const String notFound = '/404';
+  /// 手機 APP 不使用 404 頁面，錯誤處理在 AppRouter errorBuilder 中
 
   /// 取得所有路由路徑列表
   static List<String> get allRoutes => [
@@ -47,7 +46,6 @@ class AppRoutes {
     settings,
     aiSettings,
     export,
-    notFound,
   ];
 
   /// 需要底部導航列的頁面

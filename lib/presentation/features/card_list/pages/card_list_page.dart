@@ -52,9 +52,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
           // 搜尋欄位
           _buildSearchBar(viewModel),
           // 名片列表
-          Expanded(
-            child: _buildBody(context, state, viewModel),
-          ),
+          Expanded(child: _buildBody(context, state, viewModel)),
         ],
       ),
     );
@@ -70,9 +68,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       elevation: 0,
       title: Text(
         '名片',
-        style: AppTextStyles.headline3.copyWith(
-          color: AppColors.primaryText,
-        ),
+        style: AppTextStyles.headline3.copyWith(color: AppColors.primaryText),
       ),
       centerTitle: true,
       actions: [
@@ -94,7 +90,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       builder: (context, constraints) {
         final screenWidth = MediaQuery.of(context).size.width;
         final isLargeScreen = screenWidth > 600;
-        
+
         return Container(
           margin: EdgeInsets.all(screenWidth * 0.04), // 4% 螢幕寬度邊距
           padding: EdgeInsets.symmetric(
@@ -110,26 +106,26 @@ class _CardListPageState extends ConsumerState<CardListPage> {
               Icon(
                 Icons.search,
                 color: AppColors.secondaryText,
-                size: isLargeScreen 
-                    ? AppDimensions.iconMedium 
+                size: isLargeScreen
+                    ? AppDimensions.iconMedium
                     : AppDimensions.iconSmall,
               ),
               SizedBox(width: screenWidth * 0.02), // 2% 間距
               Expanded(
                 child: TextField(
                   controller: _searchController,
-                  style: (isLargeScreen 
-                      ? AppTextStyles.bodyLarge 
-                      : AppTextStyles.bodyMedium
-                  ).copyWith(color: AppColors.primaryText),
+                  style:
+                      (isLargeScreen
+                              ? AppTextStyles.bodyLarge
+                              : AppTextStyles.bodyMedium)
+                          .copyWith(color: AppColors.primaryText),
                   decoration: InputDecoration(
                     hintText: '搜尋姓名、公司、電話、Email',
-                    hintStyle: (isLargeScreen 
-                        ? AppTextStyles.bodyLarge 
-                        : AppTextStyles.bodyMedium
-                    ).copyWith(
-                      color: AppColors.placeholder,
-                    ),
+                    hintStyle:
+                        (isLargeScreen
+                                ? AppTextStyles.bodyLarge
+                                : AppTextStyles.bodyMedium)
+                            .copyWith(color: AppColors.placeholder),
                     border: InputBorder.none,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -289,7 +285,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     CardListViewModel viewModel,
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
-    
+
     return Container(
       margin: EdgeInsets.only(
         bottom: screenWidth * 0.02, // 2% 螢幕寬度作為間距
@@ -319,9 +315,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
                 _buildCardImage(card),
                 SizedBox(width: screenWidth * 0.03), // 3% 間距
                 // 右側名片資訊
-                Expanded(
-                  child: _buildCardInfo(card),
-                ),
+                Expanded(child: _buildCardInfo(card)),
               ],
             ),
           ),
@@ -337,7 +331,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
         final screenWidth = MediaQuery.of(context).size.width;
         final imageWidth = screenWidth * 0.25; // 25% 螢幕寬度
         final imageHeight = imageWidth * 0.63; // 保持名片比例 (約 5:8)
-        
+
         return ClipRRect(
           borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
           child: Container(
@@ -373,11 +367,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
         ),
       ),
       child: const Center(
-        child: Icon(
-          Icons.credit_card,
-          color: Colors.white,
-          size: 40,
-        ),
+        child: Icon(Icons.credit_card, color: Colors.white, size: 40),
       ),
     );
   }
@@ -388,7 +378,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       builder: (context, constraints) {
         final screenWidth = MediaQuery.of(context).size.width;
         final isLargeScreen = screenWidth > 600; // 平板或大螢幕
-        
+
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -396,44 +386,42 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             // 姓名 - 大標題
             Text(
               card.name,
-              style: (isLargeScreen 
-                  ? AppTextStyles.headline5 
-                  : AppTextStyles.headline6
-              ).copyWith(
-                color: AppColors.primaryText,
-                fontWeight: FontWeight.bold,
-              ),
+              style:
+                  (isLargeScreen
+                          ? AppTextStyles.headline5
+                          : AppTextStyles.headline6)
+                      .copyWith(
+                        color: AppColors.primaryText,
+                        fontWeight: FontWeight.bold,
+                      ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             SizedBox(height: screenWidth * 0.01), // 1% 螢幕寬度間距
-            
             // 公司名稱 - 主要副標題
             if (card.company != null) ...[
               Text(
                 card.company!,
-                style: (isLargeScreen 
-                    ? AppTextStyles.bodyLarge 
-                    : AppTextStyles.bodyMedium
-                ).copyWith(
-                  color: AppColors.secondaryText,
-                ),
+                style:
+                    (isLargeScreen
+                            ? AppTextStyles.bodyLarge
+                            : AppTextStyles.bodyMedium)
+                        .copyWith(color: AppColors.secondaryText),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
               SizedBox(height: screenWidth * 0.005), // 0.5% 間距
             ],
-            
+
             // 職稱 - 次要副標題
             if (card.jobTitle != null) ...[
               Text(
                 card.jobTitle!,
-                style: (isLargeScreen 
-                    ? AppTextStyles.bodyMedium 
-                    : AppTextStyles.bodySmall
-                ).copyWith(
-                  color: AppColors.secondaryText,
-                ),
+                style:
+                    (isLargeScreen
+                            ? AppTextStyles.bodyMedium
+                            : AppTextStyles.bodySmall)
+                        .copyWith(color: AppColors.secondaryText),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -443,7 +431,6 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       },
     );
   }
-
 
   /// 顯示新增名片選項
   void _showCreateCardOptions(BuildContext context) {
@@ -506,7 +493,6 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       ),
     );
   }
-
 
   /// 顯示名片操作選項
   void _showCardOptions(
@@ -648,9 +634,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       ),
       subtitle: Text(
         subtitle,
-        style: AppTextStyles.bodySmall.copyWith(
-          color: AppColors.secondaryText,
-        ),
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
       ),
       onTap: () {
         Navigator.pop(context);
