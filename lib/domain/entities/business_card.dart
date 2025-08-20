@@ -1,6 +1,7 @@
 import 'package:busines_card_scanner_flutter/core/services/security_service.dart';
 import 'package:busines_card_scanner_flutter/core/services/validation_service.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/foundation.dart';
 
 /// 名片業務實體
 ///
@@ -64,7 +65,7 @@ class BusinessCard extends Equatable {
        phone = _cleanString(phone),
        mobile = _cleanString(mobile),
        address = _cleanString(address),
-       website = _cleanString(website),
+       website = _cleanAndValidateWebsite(website),
        notes = _cleanString(notes),
        tags = tags ?? const [] {
     _validateAndSanitize();
@@ -139,14 +140,8 @@ class BusinessCard extends Equatable {
       }
     }
 
-    // 網址格式驗證
-    if (website != null && website!.isNotEmpty) {
-      final urlResult = _validationService.validateUrl(website!);
-      urlResult.fold(
-        (failure) => throw ArgumentError('Invalid website URL format'),
-        (validUrl) {}, // URL is valid
-      );
-    }
+    // 網址驗證已在建構子階段透過 _cleanAndValidateWebsite 完成
+    // 這裡不需要額外的驗證邏輯
   }
 
   /// 清理字串欄位（移除多餘空白）
@@ -156,6 +151,25 @@ class BusinessCard extends Equatable {
     }
     final trimmed = value.trim();
     return trimmed.isEmpty ? null : trimmed.replaceAll(RegExp(r'\s+'), ' ');
+  }
+
+  /// 清理和驗證網址
+  static String? _cleanAndValidateWebsite(String? website) {
+    final cleaned = _cleanString(website);
+    if (cleaned == null || cleaned.isEmpty) {
+      return null;
+    }
+
+    // 使用驗證服務檢查網址格式
+    final urlResult = _validationService.validateUrl(cleaned);
+    return urlResult.fold(
+      (failure) {
+        // 如果驗證失敗，記錄警告並返回 null
+        debugPrint('警告：無效的網址格式被忽略: $cleaned');
+        return null;
+      },
+      (validUrl) => validUrl, // 返回有效的網址
+    );
   }
 
   /// 檢查名片資訊是否完整

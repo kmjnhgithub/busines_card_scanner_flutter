@@ -1,26 +1,17 @@
 // Re-export repository providers from data layer
-import 'package:busines_card_scanner_flutter/data/datasources/local/ml_kit_ocr_service.dart';
-import 'package:busines_card_scanner_flutter/platform/ios/vision_service_bridge.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 export 'package:busines_card_scanner_flutter/data/providers/repository_providers.dart';
 
 // =============================================================================
 // Presentation Layer Providers
 // =============================================================================
 // 這個檔案專門處理 Presentation 層的 Providers
-// Data 層的服務 Providers 已經移動到 data/providers/repository_providers.dart
-// 以避免循環依賴並遵循 Clean Architecture 分層原則
+//
+// 符合 Clean Architecture 原則：
+// - Presentation 層不直接引用 Data 層的具體實作
+// - 透過 export 的方式間接使用 Repository Providers
+// - 避免跨層直接依賴，維持架構邊界清晰
 // =============================================================================
 
-/// Provider for MLKitOCRService instance (僅供特殊用途)
-/// 一般情況下應該使用 ocrServiceProvider 來取得平台自動選擇的 OCR 服務
-final mlKitOCRServiceProvider = Provider<MLKitOCRService>((ref) {
-  return MLKitOCRService();
-});
-
-/// Provider for IOSVisionServiceBridge instance (僅供特殊用途)
-/// 一般情況下應該使用 ocrServiceProvider 來取得平台自動選擇的 OCR 服務
-final iosVisionServiceProvider = Provider<IOSVisionServiceBridge>((ref) {
-  return IOSVisionServiceBridge();
-});
+// 注意：原本的 MLKitOCRService 和 IOSVisionOCRService Providers 已移除
+// 這些服務現在透過 Data 層的 PlatformOCRService 自動選擇
+// 符合 Clean Architecture 的「依賴方向單一」原則

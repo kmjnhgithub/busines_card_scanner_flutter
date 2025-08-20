@@ -1,10 +1,10 @@
 import 'dart:io';
 
 import 'package:busines_card_scanner_flutter/data/datasources/local/ml_kit_ocr_service.dart';
+import 'package:busines_card_scanner_flutter/data/datasources/local/platform_specific/ios_vision_ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/remote/ocr_service.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
-import 'package:busines_card_scanner_flutter/platform/ios/vision_service_bridge.dart';
 import 'package:flutter/foundation.dart';
 
 /// 平台特定 OCR 服務選擇器
@@ -24,7 +24,7 @@ class PlatformOCRService implements OCRService {
   /// 初始化平台特定服務
   void _initializePlatformService() {
     if (Platform.isIOS) {
-      _activeService = IOSVisionServiceBridge();
+      _activeService = IOSVisionOCRService();
       _platformName = 'iOS Vision Framework';
       debugPrint('PlatformOCRService: 已選擇 iOS Vision Framework');
     } else {
@@ -73,7 +73,7 @@ class PlatformOCRService implements OCRService {
       debugPrint('PlatformOCRService: OCR 處理失敗 ($_platformName): $e');
 
       // 如果是 iOS 服務失敗，可以考慮 fallback 到 ML Kit
-      if (Platform.isIOS && _activeService is IOSVisionServiceBridge) {
+      if (Platform.isIOS && _activeService is IOSVisionOCRService) {
         debugPrint('PlatformOCRService: iOS Vision 失敗，嘗試 fallback 到 ML Kit');
         try {
           final fallbackService = MLKitOCRService();
@@ -133,7 +133,7 @@ class PlatformOCRService implements OCRService {
 
     // 如果在 iOS 上要切換回 Vision Framework
     if (Platform.isIOS && engineId == 'ios_vision') {
-      _activeService = IOSVisionServiceBridge();
+      _activeService = IOSVisionOCRService();
       _platformName = 'iOS Vision Framework';
       debugPrint('PlatformOCRService: 已切換到 iOS Vision Framework');
       return;
@@ -168,7 +168,7 @@ class PlatformOCRService implements OCRService {
     // 如果當前引擎不健康且在 iOS 上，測試 fallback 選項
     if (!health.isHealthy &&
         Platform.isIOS &&
-        _activeService is IOSVisionServiceBridge) {
+        _activeService is IOSVisionOCRService) {
       debugPrint('PlatformOCRService: 當前引擎不健康，測試 ML Kit fallback');
       try {
         final fallbackService = MLKitOCRService();
@@ -205,7 +205,7 @@ class PlatformOCRService implements OCRService {
 
   /// 取得當前使用的服務類型
   String get activeServiceType {
-    if (_activeService is IOSVisionServiceBridge) {
+    if (_activeService is IOSVisionOCRService) {
       return 'ios_vision';
     } else if (_activeService is MLKitOCRService) {
       return 'ml_kit';
@@ -223,7 +223,7 @@ class PlatformOCRService implements OCRService {
       throw UnsupportedError('Fallback only supported on iOS');
     }
 
-    if (_activeService is IOSVisionServiceBridge) {
+    if (_activeService is IOSVisionOCRService) {
       debugPrint('PlatformOCRService: 手動切換到 ML Kit fallback');
       _activeService = MLKitOCRService();
       _platformName = 'ML Kit (Manual Fallback)';

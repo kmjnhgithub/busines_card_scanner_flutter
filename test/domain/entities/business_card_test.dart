@@ -239,15 +239,16 @@ void main() {
       });
 
       test('should validate website URL format if provided', () {
-        expect(
-          () => BusinessCard(
-            id: 'card-123',
-            name: 'John Doe',
-            website: 'not-a-valid-url',
-            createdAt: testDateTime,
-          ),
-          throwsA(isA<ArgumentError>()),
+        // 無效網址應該被清除而不是拋出異常（容錯處理）
+        final card = BusinessCard(
+          id: 'card-123',
+          name: 'John Doe',
+          website: 'not-a-valid-url',
+          createdAt: testDateTime,
         );
+
+        // 無效網址應該被設為 null
+        expect(card.website, isNull);
       });
 
       test('should allow valid email, phone, and website formats', () {

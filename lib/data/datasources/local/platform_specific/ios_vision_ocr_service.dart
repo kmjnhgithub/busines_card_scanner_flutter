@@ -12,7 +12,7 @@ import 'package:uuid/uuid.dart';
 ///
 /// 透過 Platform Channel 呼叫 iOS 原生 Vision Framework
 /// 僅在 iOS 平台可用，提供高精度的文字識別
-/// 
+///
 /// 架構位置：Data 層 → Platform Specific DataSource
 /// 符合 Clean Architecture 原則：平台特定實作在 Data 層
 class IOSVisionOCRService implements OCRService {

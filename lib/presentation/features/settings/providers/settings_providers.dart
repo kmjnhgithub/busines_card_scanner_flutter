@@ -1,6 +1,7 @@
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/export_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/settings_view_model.dart';
+import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,10 +25,15 @@ final settingsViewModelProvider =
     });
 
 /// AISettingsViewModel Provider
+/// 符合 Clean Architecture：透過 Provider 取得依賴，而不是直接注入
 final aiSettingsViewModelProvider =
     StateNotifierProvider<AISettingsViewModel, AISettingsState>((ref) {
-      throw UnimplementedError(
-        'AISettingsViewModel provider must be overridden',
+      final secureStorage = ref.watch(enhancedSecureStorageProvider);
+      final openAIService = ref.watch(openAIServiceProvider);
+
+      return AISettingsViewModel(
+        secureStorage: secureStorage,
+        openAIService: openAIService,
       );
     });
 
