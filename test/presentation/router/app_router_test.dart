@@ -386,11 +386,7 @@ void main() {
             router.routerDelegate.currentConfiguration.uri.path;
         expect(
           currentRoute,
-          anyOf(
-            equals(AppRoutes.cardList),
-            equals(AppRoutes.notFound),
-            equals(AppRoutes.splash),
-          ),
+          anyOf(equals(AppRoutes.cardList), equals(AppRoutes.splash)),
         );
       });
     });

@@ -2,9 +2,11 @@ import 'package:busines_card_scanner_flutter/core/constants/app_constants.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/providers/settings_providers.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/dialog_presenter.dart';
+import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 /// 設定頁面
 ///
@@ -261,12 +263,12 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
 
   /// 導航到 AI 設定頁面
   void _navigateToAISettings(BuildContext context) {
-    Navigator.of(context).pushNamed('/ai_settings');
+    context.push(AppRoutes.aiSettings);
   }
 
   /// 導航到匯出頁面
   void _navigateToExport(BuildContext context) {
-    Navigator.of(context).pushNamed('/export');
+    context.push(AppRoutes.export);
   }
 
   /// 顯示關於對話框

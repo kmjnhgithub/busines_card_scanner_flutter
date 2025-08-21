@@ -7,8 +7,10 @@ import 'package:busines_card_scanner_flutter/presentation/features/card_list/pag
 import 'package:busines_card_scanner_flutter/presentation/features/home/pages/home_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/settings_page.dart';
+import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 /// 應用程式路由配置
@@ -20,7 +22,7 @@ import 'package:go_router/go_router.dart';
 /// - 路由配置與導航
 /// - 路由守衛與重定向
 /// - 底部導航列整合
-/// - 錯誤處理與404頁面
+/// - 錯誤處理與Toast提示
 /// - 深度連結支援
 /// - 頁面轉場動畫
 class AppRouter {
@@ -46,21 +48,18 @@ class AppRouter {
   GoRouter _createRouter() {
     return GoRouter(
       initialLocation: AppRoutes.splash,
-      // 移除 404 頁面，改為記錄錯誤並返回上一頁
+      // 手機 APP 不使用 404 頁面，使用 Toast 提示錯誤
       errorBuilder: (context, state) {
         debugPrint('路由錯誤: ${state.error}');
         debugPrint('嘗試導航到: ${state.matchedLocation}');
 
-        // 在手機 APP 中，不顯示 404 頁面
-        // 而是顯示錯誤訊息並返回
+        // 在手機 APP 中使用 Toast 提示錯誤
         WidgetsBinding.instance.addPostFrameCallback((_) {
           if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('頁面載入失敗'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            // 取得 ProviderContainer 來使用 ToastPresenter
+            final container = ProviderScope.containerOf(context);
+            container.read(toastPresenterProvider.notifier).showError('頁面載入失敗');
+
             // 如果可以返回，就返回上一頁
             if (Navigator.of(context).canPop()) {
               Navigator.of(context).pop();
@@ -237,7 +236,7 @@ class AppRouter {
           ),
         ),
 
-        // 移除 404 錯誤頁面（手機 APP 使用 errorBuilder 處理）
+        // 手機 APP 使用 errorBuilder 處理錯誤，不需要獨立的錯誤頁面
       ],
       // 路由重定向
       redirect: (context, state) {

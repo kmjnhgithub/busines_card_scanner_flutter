@@ -34,7 +34,7 @@ class AppRoutes {
   /// 匯出資料頁
   static const String export = '/export';
 
-  /// 手機 APP 不使用 404 頁面，錯誤處理在 AppRouter errorBuilder 中
+  /// 手機 APP 不使用錯誤頁面，錯誤處理透過 ToastPresenter 提示
 
   /// 取得所有路由路徑列表
   static List<String> get allRoutes => [

@@ -31,14 +31,13 @@ void main() {
       expect(AppRoutes.settings, equals('/settings'));
       expect(AppRoutes.aiSettings, equals('/ai-settings'));
       expect(AppRoutes.export, equals('/export'));
-      expect(AppRoutes.notFound, equals('/404'));
     });
 
     test('應該回傳所有路由列表', () {
       final allRoutes = AppRoutes.allRoutes;
 
       expect(allRoutes, isA<List<String>>());
-      expect(allRoutes.length, equals(9));
+      expect(allRoutes.length, equals(8)); // 移除 404 後剩下 8 個路由
       expect(allRoutes, contains('/'));
       expect(allRoutes, contains('/card-list'));
       expect(allRoutes, contains('/camera'));
