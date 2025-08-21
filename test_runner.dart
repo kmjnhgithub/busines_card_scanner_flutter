@@ -5,6 +5,7 @@ import 'package:mocktail/mocktail.dart';
 import 'lib/data/datasources/local/secure/enhanced_secure_storage.dart';
 import 'lib/data/datasources/remote/openai_service.dart';
 import 'lib/presentation/features/settings/pages/ai_settings_page.dart';
+import 'lib/presentation/features/settings/providers/settings_providers.dart';
 import 'lib/presentation/features/settings/view_models/ai_settings_view_model.dart';
 
 /// Mock 類別

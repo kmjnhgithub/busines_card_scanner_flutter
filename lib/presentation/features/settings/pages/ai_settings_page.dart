@@ -1,3 +1,4 @@
+import 'package:busines_card_scanner_flutter/presentation/features/settings/providers/settings_providers.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';

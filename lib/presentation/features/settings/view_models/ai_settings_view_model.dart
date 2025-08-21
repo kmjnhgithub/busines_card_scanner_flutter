@@ -317,11 +317,3 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
     return null;
   }
 }
-
-/// AISettingsViewModel Provider
-final aiSettingsViewModelProvider =
-    StateNotifierProvider<AISettingsViewModel, AISettingsState>(
-      (ref) => throw UnimplementedError(
-        'AISettingsViewModel provider must be overridden',
-      ),
-    );
