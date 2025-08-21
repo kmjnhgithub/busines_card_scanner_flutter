@@ -1,5 +1,8 @@
-import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
-import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
+import 'dart:async';
+
+import 'package:busines_card_scanner_flutter/domain/exceptions/repository_exceptions.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/ai/manage_api_key_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/ai/validate_ai_service_usecase.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
@@ -58,15 +61,17 @@ class AISettingsState with _$AISettingsState {
 }
 
 /// AI 設定頁面 ViewModel
+///
+/// 遵循 Clean Architecture 原則，只依賴 Domain 層的 UseCase
 class AISettingsViewModel extends StateNotifier<AISettingsState> {
-  final EnhancedSecureStorage _secureStorage;
-  final OpenAIService _openAIService;
+  final ManageApiKeyUseCase _manageApiKeyUseCase;
+  final ValidateAIServiceUseCase _validateAIServiceUseCase;
 
   AISettingsViewModel({
-    required EnhancedSecureStorage secureStorage,
-    required OpenAIService openAIService,
-  }) : _secureStorage = secureStorage,
-       _openAIService = openAIService,
+    required ManageApiKeyUseCase manageApiKeyUseCase,
+    required ValidateAIServiceUseCase validateAIServiceUseCase,
+  }) : _manageApiKeyUseCase = manageApiKeyUseCase,
+       _validateAIServiceUseCase = validateAIServiceUseCase,
        super(const AISettingsState()) {
     _initializeApiKeyStatus();
   }
@@ -74,15 +79,27 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
   /// 初始化 API Key 狀態
   Future<void> _initializeApiKeyStatus() async {
     try {
-      final result = await _secureStorage.getApiKey('openai');
+      final result = await _manageApiKeyUseCase.hasApiKey('openai');
       result.fold(
         (failure) {
-          // API Key 不存在，保持初始狀態
+          // API Key 不存在或檢查失敗，保持初始狀態
         },
-        (apiKey) {
-          state = state.copyWith(hasApiKey: true);
+        (hasKey) {
+          state = state.copyWith(hasApiKey: hasKey);
         },
       );
+
+      // 初始化 AI 服務狀態檢查（為未來功能預留）
+      unawaited(_validateAIServiceUseCase.getServiceStatus().then((statusResult) {
+        statusResult.fold(
+          (failure) {
+            // 服務狀態檢查失敗，記錄但不影響 UI
+          },
+          (status) {
+            // 未來可以根據服務狀態更新 UI
+          },
+        );
+      }));
     } on Exception {
       // 忽略初始化錯誤，保持初始狀態
     }
@@ -93,24 +110,13 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
     try {
       state = state.copyWith(isLoading: true, error: null);
 
-      // 驗證 API Key 格式
-      final validationError = _validateApiKeyFormat(apiKey);
-      if (validationError != null) {
-        state = state.copyWith(
-          isLoading: false,
-          error: validationError,
-          hasApiKey: false,
-        );
-        return;
-      }
-
-      // 儲存 API Key
-      final result = await _secureStorage.storeApiKey('openai', apiKey);
+      // 使用 UseCase 儲存 API Key（包含格式驗證）
+      final result = await _manageApiKeyUseCase.storeApiKey('openai', apiKey);
       result.fold(
         (failure) {
           state = state.copyWith(
             isLoading: false,
-            error: '儲存 API Key 失敗：${failure.userMessage}',
+            error: _getErrorMessage(failure),
             hasApiKey: false,
           );
         },
@@ -136,12 +142,12 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
     try {
       state = state.copyWith(isLoading: true, error: null);
 
-      final result = await _secureStorage.deleteApiKey('openai');
+      final result = await _manageApiKeyUseCase.deleteApiKey('openai');
       result.fold(
         (failure) {
           state = state.copyWith(
             isLoading: false,
-            error: '刪除 API Key 失敗：${failure.userMessage}',
+            error: _getErrorMessage(failure),
           );
         },
         (_) {
@@ -166,7 +172,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
       state = state.copyWith(isLoading: true, error: null);
 
       // 取得儲存的 API Key
-      final getKeyResult = await _secureStorage.getApiKey('openai');
+      final getKeyResult = await _manageApiKeyUseCase.getApiKey('openai');
       final apiKey = getKeyResult.fold((failure) {
         state = state.copyWith(
           isLoading: false,
@@ -181,8 +187,11 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
         return;
       }
 
-      // 驗證 API Key
-      final validationResult = await _openAIService.validateApiKey(apiKey);
+      // 驗證 API Key 格式
+      final validationResult = await _manageApiKeyUseCase.validateApiKeyFormat(
+        'openai',
+        apiKey,
+      );
       validationResult.fold(
         (failure) {
           state = state.copyWith(
@@ -226,7 +235,7 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
       state = state.copyWith(isLoading: true, error: null);
 
       // 取得儲存的 API Key
-      final getKeyResult = await _secureStorage.getApiKey('openai');
+      final getKeyResult = await _manageApiKeyUseCase.getApiKey('openai');
       final apiKey = getKeyResult.fold((failure) {
         state = state.copyWith(isLoading: false, error: '請先設定 API Key');
         return null;
@@ -294,26 +303,14 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
     state = state.copyWith(error: null);
   }
 
-  /// 驗證 API Key 格式
-  String? _validateApiKeyFormat(String apiKey) {
-    if (apiKey.isEmpty) {
-      return 'API Key 不能為空';
+  /// 取得錯誤訊息
+  String _getErrorMessage(DomainFailure failure) {
+    if (failure is DomainValidationFailure) {
+      return failure.userMessage;
+    } else if (failure is DataSourceFailure) {
+      return failure.userMessage;
+    } else {
+      return '操作失敗：${failure.userMessage}';
     }
-
-    if (apiKey.length < 20) {
-      return 'API Key 格式無效：長度太短';
-    }
-
-    // OpenAI API Key 格式檢查
-    if (!apiKey.startsWith('sk-')) {
-      return 'API Key 格式無效：必須以 sk- 開頭';
-    }
-
-    // 檢查是否只包含有效字符（字母、數字、連字號、底線）
-    if (!RegExp(r'^sk-[a-zA-Z0-9\-_]+$').hasMatch(apiKey)) {
-      return 'API Key 格式無效：包含無效字符';
-    }
-
-    return null;
   }
 }

@@ -6,9 +6,11 @@ import 'package:busines_card_scanner_flutter/data/datasources/local/simple_ocr_c
 import 'package:busines_card_scanner_flutter/data/datasources/remote/ocr_service.dart';
 import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/ai_repository_impl.dart';
+import 'package:busines_card_scanner_flutter/data/repositories/api_key_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/card_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/data/repositories/ocr_repository_impl.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ai_repository.dart';
+import 'package:busines_card_scanner_flutter/domain/repositories/api_key_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/card_repository.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
 import 'package:dio/dio.dart';
@@ -64,6 +66,13 @@ final openAIServiceProvider = Provider<OpenAIService>((ref) {
   final secureStorage = ref.watch(enhancedSecureStorageProvider);
   final dio = ref.watch(dioProvider);
   return OpenAIServiceImpl(dio: dio, secureStorage: secureStorage);
+});
+
+/// Provider for ApiKeyRepository implementation
+/// Provides secure API key management functionality
+final apiKeyRepositoryProvider = Provider<ApiKeyRepository>((ref) {
+  final secureStorage = ref.watch(enhancedSecureStorageProvider);
+  return ApiKeyRepositoryImpl(secureStorage: secureStorage);
 });
 
 /// Provider for CardRepository implementation

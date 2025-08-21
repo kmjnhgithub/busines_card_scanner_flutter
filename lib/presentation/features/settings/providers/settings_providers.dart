@@ -1,3 +1,5 @@
+import 'package:busines_card_scanner_flutter/domain/usecases/ai/manage_api_key_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/ai/validate_ai_service_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/export_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/settings_view_model.dart';
@@ -24,16 +26,32 @@ final settingsViewModelProvider =
       return SettingsViewModel(preferences: preferences);
     });
 
+/// ManageApiKeyUseCase Provider
+final manageApiKeyUseCaseProvider = Provider<ManageApiKeyUseCase>((ref) {
+  final repository = ref.watch(apiKeyRepositoryProvider);
+  return ManageApiKeyUseCaseImpl(repository: repository);
+});
+
+/// ValidateAIServiceUseCase Provider
+final validateAIServiceUseCaseProvider = Provider<ValidateAIServiceUseCase>((
+  ref,
+) {
+  final repository = ref.watch(aiRepositoryProvider);
+  return ValidateAIServiceUseCaseImpl(repository: repository);
+});
+
 /// AISettingsViewModel Provider
-/// 符合 Clean Architecture：透過 Provider 取得依賴，而不是直接注入
+/// 符合 Clean Architecture：只依賴 Domain 層的 UseCase
 final aiSettingsViewModelProvider =
     StateNotifierProvider<AISettingsViewModel, AISettingsState>((ref) {
-      final secureStorage = ref.watch(enhancedSecureStorageProvider);
-      final openAIService = ref.watch(openAIServiceProvider);
+      final manageApiKeyUseCase = ref.watch(manageApiKeyUseCaseProvider);
+      final validateAIServiceUseCase = ref.watch(
+        validateAIServiceUseCaseProvider,
+      );
 
       return AISettingsViewModel(
-        secureStorage: secureStorage,
-        openAIService: openAIService,
+        manageApiKeyUseCase: manageApiKeyUseCase,
+        validateAIServiceUseCase: validateAIServiceUseCase,
       );
     });
 

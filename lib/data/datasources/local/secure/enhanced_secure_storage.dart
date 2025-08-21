@@ -156,6 +156,39 @@ class EnhancedSecureStorage {
     }
   }
 
+  /// 檢查 API Key 是否存在
+  ///
+  /// [service] 服務名稱
+  ///
+  /// Returns: Right(bool) 是否存在，Left(Failure) 失敗
+  Future<Either<DomainFailure, bool>> hasApiKey(String service) async {
+    try {
+      // 驗證服務名稱
+      final serviceValidation = _validateServiceName(service);
+      if (serviceValidation != null) {
+        return Left(serviceValidation);
+      }
+
+      // 檢查是否存在
+      final encryptedApiKey = await _secureStorage.read(
+        key: '$_keyPrefix$service',
+        aOptions: const AndroidOptions(encryptedSharedPreferences: true),
+        iOptions: const IOSOptions(
+          accessibility: KeychainAccessibility.first_unlock_this_device,
+        ),
+      );
+
+      return Right(encryptedApiKey != null);
+    } on Exception catch (e) {
+      return Left(
+        DataSourceFailure(
+          userMessage: 'Failed to check API key existence',
+          internalMessage: 'Has API key error: $e',
+        ),
+      );
+    }
+  }
+
   /// 刪除 API Key
   ///
   /// [service] 服務名稱
@@ -186,6 +219,13 @@ class EnhancedSecureStorage {
         ),
       );
     }
+  }
+
+  /// 取得所有已儲存的服務列表
+  ///
+  /// Returns: Right(List&lt;String&gt;) 服務名稱列表，Left(Failure) 失敗
+  Future<Either<DomainFailure, List<String>>> getStoredServices() async {
+    return getStoredApiKeyServices();
   }
 
   /// 取得所有已儲存的 API Key 服務列表

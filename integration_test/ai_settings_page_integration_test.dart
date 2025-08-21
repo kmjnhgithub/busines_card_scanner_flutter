@@ -1,5 +1,5 @@
-import 'package:busines_card_scanner_flutter/data/datasources/local/secure/enhanced_secure_storage.dart';
-import 'package:busines_card_scanner_flutter/data/datasources/remote/openai_service.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/ai/manage_api_key_usecase.dart';
+import 'package:busines_card_scanner_flutter/domain/usecases/ai/validate_ai_service_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/pages/ai_settings_page.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/providers/settings_providers.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/settings/view_models/ai_settings_view_model.dart';
@@ -10,26 +10,26 @@ import 'package:integration_test/integration_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 /// Mock 類別
-class MockEnhancedSecureStorage extends Mock implements EnhancedSecureStorage {}
-class MockOpenAIService extends Mock implements OpenAIService {}
+class MockManageApiKeyUseCase extends Mock implements ManageApiKeyUseCase {}
+class MockValidateAIServiceUseCase extends Mock implements ValidateAIServiceUseCase {}
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   group('AISettingsPage Integration Tests', () {
-    late MockEnhancedSecureStorage mockStorage;
-    late MockOpenAIService mockOpenAIService;
+    late MockManageApiKeyUseCase mockManageApiKeyUseCase;
+    late MockValidateAIServiceUseCase mockValidateAIServiceUseCase;
 
     setUp(() {
-      mockStorage = MockEnhancedSecureStorage();
-      mockOpenAIService = MockOpenAIService();
+      mockManageApiKeyUseCase = MockManageApiKeyUseCase();
+      mockValidateAIServiceUseCase = MockValidateAIServiceUseCase();
     });
 
     testWidgets('AISettingsPage 應該能正常顯示和渲染', (WidgetTester tester) async {
       // 創建真實的 ViewModel 實例
       final viewModel = AISettingsViewModel(
-        secureStorage: mockStorage,
-        openAIService: mockOpenAIService,
+        manageApiKeyUseCase: mockManageApiKeyUseCase,
+        validateAIServiceUseCase: mockValidateAIServiceUseCase,
       );
 
       // 包裝在 MaterialApp 和 ProviderScope 中
