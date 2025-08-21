@@ -90,16 +90,18 @@ class AISettingsViewModel extends StateNotifier<AISettingsState> {
       );
 
       // 初始化 AI 服務狀態檢查（為未來功能預留）
-      unawaited(_validateAIServiceUseCase.getServiceStatus().then((statusResult) {
-        statusResult.fold(
-          (failure) {
-            // 服務狀態檢查失敗，記錄但不影響 UI
-          },
-          (status) {
-            // 未來可以根據服務狀態更新 UI
-          },
-        );
-      }));
+      unawaited(
+        _validateAIServiceUseCase.getServiceStatus().then((statusResult) {
+          statusResult.fold(
+            (failure) {
+              // 服務狀態檢查失敗，記錄但不影響 UI
+            },
+            (status) {
+              // 未來可以根據服務狀態更新 UI
+            },
+          );
+        }),
+      );
     } on Exception {
       // 忽略初始化錯誤，保持初始狀態
     }
