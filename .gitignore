@@ -115,3 +115,4 @@ ios/build/
 **/XCBuildData/
 **/PIFCache/
 /.editorconfig
+/CLAUDE.local.md
