@@ -83,6 +83,12 @@ class CameraViewModel extends StateNotifier<CameraState> {
 
       if (controller.value.isInitialized) {
         debugPrint('CameraViewModel: 更新狀態 - 相機已初始化');
+        
+        // 設定初始對焦模式為連續自動對焦
+        // iOS 原生相機預設就是連續自動對焦模式
+        await controller.setFocusMode(FocusMode.auto);
+        debugPrint('CameraViewModel: 設定對焦模式為自動（iOS 原生連續對焦）');
+        
         state = state.copyWith(
           cameraController: controller,
           isInitialized: true,
@@ -91,6 +97,8 @@ class CameraViewModel extends StateNotifier<CameraState> {
         debugPrint(
           'CameraViewModel: 狀態更新完成 - isInitialized: ${state.isInitialized}, hasController: ${state.cameraController != null}',
         );
+        
+        debugPrint('CameraViewModel: 使用原生連續自動對焦模式');
       } else {
         debugPrint('CameraViewModel: 控制器初始化失敗 - isInitialized 為 false');
         _updateError('相機控制器初始化失敗');
@@ -186,7 +194,7 @@ class CameraViewModel extends StateNotifier<CameraState> {
     }
   }
 
-  /// 設定焦點點
+  /// 設定焦點點（使用者手動點擊時）
   Future<void> setFocusPoint(Offset point) async {
     final controller = state.cameraController;
     if (controller == null || !controller.value.isInitialized) {
@@ -194,7 +202,20 @@ class CameraViewModel extends StateNotifier<CameraState> {
     }
 
     try {
+      // 設定焦點和曝光點
       await controller.setFocusPoint(point);
+      await controller.setExposurePoint(point);
+      
+      debugPrint('手動對焦點設定: $point');
+      
+      // iOS 會自動在幾秒後恢復連續自動對焦
+      // 不需要手動管理計時器
+    } on CameraException catch (e) {
+      debugPrint('相機對焦錯誤 - ${e.code}: ${e.description}');
+      // 如果 setFocusPoint 不支援，回退到原生自動對焦
+      if (e.code == 'setFocusPointFailed') {
+        debugPrint('此設備不支援手動對焦點設定，使用原生自動對焦');
+      }
     } on Exception catch (e) {
       debugPrint('設定焦點失敗: $e');
     }

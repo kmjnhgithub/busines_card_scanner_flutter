@@ -433,7 +433,29 @@ class _CameraPageState extends ConsumerState<CameraPage>
       localPoint.dy / renderBox.size.height,
     );
 
+    // 執行對焦
     ref.read(cameraViewModelProvider.notifier).setFocusPoint(focusPoint);
+    
+    // 顯示對焦動畫提示（可選）
+    _showFocusIndicator(localPoint);
+  }
+  
+  /// 顯示對焦指示器動畫
+  void _showFocusIndicator(Offset position) {
+    // 使用 Overlay 顯示短暫的對焦動畫
+    final overlay = Overlay.of(context);
+    final entry = OverlayEntry(
+      builder: (context) => Positioned(
+        left: position.dx - 40,
+        top: position.dy - 40,
+        child: _FocusIndicator(),
+      ),
+    );
+    
+    overlay.insert(entry);
+    
+    // 1秒後移除動畫
+    Future.delayed(const Duration(seconds: 1), entry.remove);
   }
 
   /// 建立相機覆蓋層（掃描框架）
@@ -621,6 +643,133 @@ class _CameraPageState extends ConsumerState<CameraPage>
         return Icons.flash_auto;
     }
   }
+}
+
+/// 對焦指示器動畫
+class _FocusIndicator extends StatefulWidget {
+  @override
+  State<_FocusIndicator> createState() => _FocusIndicatorState();
+}
+
+class _FocusIndicatorState extends State<_FocusIndicator>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    
+    _animation = Tween<double>(
+      begin: 1.5,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeOutBack,
+    ));
+    
+    _controller.forward();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _animation,
+      builder: (context, child) {
+        return Transform.scale(
+          scale: _animation.value,
+          child: Container(
+            width: 80,
+            height: 80,
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.yellow.withValues(alpha: 0.8),
+                width: 2,
+              ),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: CustomPaint(
+              painter: _FocusCornerPainter(),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// 對焦框角落繪製器
+class _FocusCornerPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.yellow
+      ..strokeWidth = 2.5
+      ..style = PaintingStyle.stroke;
+    
+    const cornerLength = 12.0;
+    
+    // 左上角
+    canvas.drawLine(
+      Offset.zero,
+      const Offset(cornerLength, 0),
+      paint,
+    );
+    canvas.drawLine(
+      Offset.zero,
+      const Offset(0, cornerLength),
+      paint,
+    );
+    
+    // 右上角
+    canvas.drawLine(
+      Offset(size.width, 0),
+      Offset(size.width - cornerLength, 0),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.width, 0),
+      Offset(size.width, cornerLength),
+      paint,
+    );
+    
+    // 左下角
+    canvas.drawLine(
+      Offset(0, size.height),
+      Offset(cornerLength, size.height),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(0, size.height),
+      Offset(0, size.height - cornerLength),
+      paint,
+    );
+    
+    // 右下角
+    canvas.drawLine(
+      Offset(size.width, size.height),
+      Offset(size.width - cornerLength, size.height),
+      paint,
+    );
+    canvas.drawLine(
+      Offset(size.width, size.height),
+      Offset(size.width, size.height - cornerLength),
+      paint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 /// 相機掃描框架覆蓋層繪製器
