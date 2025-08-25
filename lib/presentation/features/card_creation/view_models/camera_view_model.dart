@@ -233,8 +233,19 @@ class CameraViewModel extends StateNotifier<CameraState> {
   /// 清理資源
   @override
   void dispose() {
-    state.cameraController?.dispose();
+    // 先儲存相機控制器的參考
+    final controller = state.cameraController;
+    
+    // 先呼叫父類別的 dispose（這會讓 state 無法存取）
     super.dispose();
+    
+    // 然後安全地清理相機控制器
+    // 這時不會再存取 state，只使用之前儲存的參考
+    try {
+      controller?.dispose();
+    } on Exception catch (e) {
+      debugPrint('Camera controller dispose error: $e');
+    }
   }
 
   /// 更新錯誤狀態
@@ -259,10 +270,10 @@ final cameraViewModelProvider =
         toastPresenter,
       );
 
-      // 確保在 dispose 時清理資源
+      // Riverpod 會自動呼叫 StateNotifier 的 dispose
+      // 不需要手動呼叫
       ref.onDispose(() {
-        debugPrint('Disposing CameraViewModel');
-        viewModel.dispose();
+        debugPrint('CameraViewModel provider being disposed');
       });
 
       return viewModel;
