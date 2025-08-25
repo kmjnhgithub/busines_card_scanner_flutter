@@ -108,7 +108,10 @@ class AppResponsiveCardList {
   }
 
   /// 計算文字區域可用寬度
-  static double calculateTextAreaWidth({required double containerWidth, required double imageWidth}) {
+  static double calculateTextAreaWidth({
+    required double containerWidth,
+    required double imageWidth,
+  }) {
     return containerWidth - imageWidth - imageToTextSpacing;
   }
 
@@ -146,7 +149,12 @@ class AppResponsiveUtils {
   }
 
   /// 根據螢幕尺寸返回不同的數值
-  static T responsive<T>({required double screenWidth, required T small, required T medium, required T large}) {
+  static T responsive<T>({
+    required double screenWidth,
+    required T small,
+    required T medium,
+    required T large,
+  }) {
     final screenSize = getScreenSizeCategory(screenWidth);
     switch (screenSize) {
       case ScreenSize.small:
@@ -160,7 +168,11 @@ class AppResponsiveUtils {
 
   /// 基於螢幕寬度的比例縮放
   /// 基準螢幕寬度：375（iPhone 標準螢幕）
-  static double scale(double value, double screenWidth, {double baseWidth = 375}) {
+  static double scale(
+    double value,
+    double screenWidth, {
+    double baseWidth = 375,
+  }) {
     return value * (screenWidth / baseWidth);
   }
 
@@ -171,7 +183,8 @@ class AppResponsiveUtils {
     final padding = view.padding;
 
     final screenWidth = physicalSize.width / devicePixelRatio;
-    final screenHeight = (physicalSize.height - padding.top - padding.bottom) / devicePixelRatio;
+    final screenHeight =
+        (physicalSize.height - padding.top - padding.bottom) / devicePixelRatio;
 
     return Size(screenWidth, screenHeight);
   }

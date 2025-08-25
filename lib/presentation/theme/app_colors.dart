@@ -157,15 +157,23 @@ class AppColors {
 
   /// 獲取顏色的淺色變體
   static Color lighten(Color color, [double amount = 0.1]) {
-    assert(amount >= 0 && amount <= 1, 'Lighten amount must be between 0.0 and 1.0, got: $amount');
+    assert(
+      amount >= 0 && amount <= 1,
+      'Lighten amount must be between 0.0 and 1.0, got: $amount',
+    );
     final hsl = HSLColor.fromColor(color);
-    final hslLight = hsl.withLightness((hsl.lightness + amount).clamp(0.0, 1.0));
+    final hslLight = hsl.withLightness(
+      (hsl.lightness + amount).clamp(0.0, 1.0),
+    );
     return hslLight.toColor();
   }
 
   /// 獲取顏色的深色變體
   static Color darken(Color color, [double amount = 0.1]) {
-    assert(amount >= 0 && amount <= 1, 'Darken amount must be between 0.0 and 1.0, got: $amount');
+    assert(
+      amount >= 0 && amount <= 1,
+      'Darken amount must be between 0.0 and 1.0, got: $amount',
+    );
     final hsl = HSLColor.fromColor(color);
     final hslDark = hsl.withLightness((hsl.lightness - amount).clamp(0.0, 1.0));
     return hslDark.toColor();

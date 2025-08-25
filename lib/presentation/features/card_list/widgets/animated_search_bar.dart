@@ -42,7 +42,8 @@ class AnimatedSearchBar extends StatefulWidget {
   State<AnimatedSearchBar> createState() => _AnimatedSearchBarState();
 }
 
-class _AnimatedSearchBarState extends State<AnimatedSearchBar> with TickerProviderStateMixin {
+class _AnimatedSearchBarState extends State<AnimatedSearchBar>
+    with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _widthAnimation;
   late Animation<double> _fadeAnimation;
@@ -59,13 +60,15 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> with TickerProvid
     super.initState();
 
     // 初始化動畫控制器
-    _animationController = AnimationController(duration: widget.animationDuration, vsync: this);
+    _animationController = AnimationController(
+      duration: widget.animationDuration,
+      vsync: this,
+    );
 
     // 寬度動畫：從 0 到 1
-    _widthAnimation = Tween<double>(
-      begin: 0,
-      end: 1,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
+    _widthAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
+    );
 
     // 淡入動畫：延遲 150ms（模擬 iOS 行為）
     _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
@@ -191,11 +194,19 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> with TickerProvid
             animation: _widthAnimation,
             builder: (context, child) {
               return Container(
-                width: MediaQuery.of(context).size.width * 0.7 * _widthAnimation.value,
+                width:
+                    MediaQuery.of(context).size.width *
+                    0.7 *
+                    _widthAnimation.value,
                 height: _widthAnimation.value > 0 ? 40 : 0,
-                margin: EdgeInsets.only(right: AppDimensions.space2 * _widthAnimation.value),
+                margin: EdgeInsets.only(
+                  right: AppDimensions.space2 * _widthAnimation.value,
+                ),
                 child: _widthAnimation.value > 0.1
-                    ? FadeTransition(opacity: _fadeAnimation, child: _buildSearchField())
+                    ? FadeTransition(
+                        opacity: _fadeAnimation,
+                        child: _buildSearchField(),
+                      )
                     : const SizedBox.shrink(),
               );
             },
@@ -220,10 +231,14 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> with TickerProvid
             child: TextField(
               controller: _textController,
               focusNode: _focusNode,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.primaryText,
+              ),
               decoration: InputDecoration(
                 hintText: widget.hintText,
-                hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.placeholder),
+                hintStyle: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.placeholder,
+                ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppDimensions.space3,
@@ -242,10 +257,17 @@ class _AnimatedSearchBarState extends State<AnimatedSearchBar> with TickerProvid
             duration: const Duration(milliseconds: 200),
             child: _hasText
                 ? IconButton(
-                    icon: const Icon(Icons.clear, color: AppColors.secondaryText, size: AppDimensions.iconSmall),
+                    icon: const Icon(
+                      Icons.clear,
+                      color: AppColors.secondaryText,
+                      size: AppDimensions.iconSmall,
+                    ),
                     onPressed: _clearSearch,
                     padding: const EdgeInsets.all(AppDimensions.space1),
-                    constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                    constraints: const BoxConstraints(
+                      minWidth: 32,
+                      minHeight: 32,
+                    ),
                   )
                 : const SizedBox(width: 32, height: 32),
           ),
@@ -260,7 +282,12 @@ class SearchHighlighter {
   /// 建立高亮文字 Widget
   ///
   /// 將搜尋關鍵字在文字中高亮顯示（黃色背景）
-  static Widget highlightText(String text, String searchQuery, {TextStyle? style, TextStyle? highlightStyle}) {
+  static Widget highlightText(
+    String text,
+    String searchQuery, {
+    TextStyle? style,
+    TextStyle? highlightStyle,
+  }) {
     if (searchQuery.isEmpty) {
       return Text(text, style: style);
     }
@@ -268,7 +295,10 @@ class SearchHighlighter {
     final defaultStyle = style ?? AppTextStyles.bodyMedium;
     final defaultHighlightStyle =
         highlightStyle ??
-        defaultStyle.copyWith(backgroundColor: Colors.yellow.withValues(alpha: 0.3), fontWeight: FontWeight.w600);
+        defaultStyle.copyWith(
+          backgroundColor: Colors.yellow.withValues(alpha: 0.3),
+          fontWeight: FontWeight.w600,
+        );
 
     final List<TextSpan> spans = [];
     final String lowerText = text.toLowerCase();
@@ -286,11 +316,18 @@ class SearchHighlighter {
 
       // 添加匹配前的文字
       if (index > start) {
-        spans.add(TextSpan(text: text.substring(start, index), style: defaultStyle));
+        spans.add(
+          TextSpan(text: text.substring(start, index), style: defaultStyle),
+        );
       }
 
       // 添加高亮的匹配文字
-      spans.add(TextSpan(text: text.substring(index, index + searchQuery.length), style: defaultHighlightStyle));
+      spans.add(
+        TextSpan(
+          text: text.substring(index, index + searchQuery.length),
+          style: defaultHighlightStyle,
+        ),
+      );
 
       start = index + searchQuery.length;
     }
