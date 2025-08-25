@@ -235,10 +235,10 @@ class CameraViewModel extends StateNotifier<CameraState> {
   void dispose() {
     // 先儲存相機控制器的參考
     final controller = state.cameraController;
-    
+
     // 先呼叫父類別的 dispose（這會讓 state 無法存取）
     super.dispose();
-    
+
     // 然後安全地清理相機控制器
     // 這時不會再存取 state，只使用之前儲存的參考
     try {
