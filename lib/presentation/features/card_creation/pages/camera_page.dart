@@ -36,9 +36,9 @@ class _CameraPageState extends ConsumerState<CameraPage>
     with WidgetsBindingObserver {
   final ImagePicker _imagePicker = ImagePicker();
   List<CameraDescription> _cameras = [];
-  
+
   // 獲取 Toast Presenter 的快捷方式
-  ToastPresenter get _toastPresenter => 
+  ToastPresenter get _toastPresenter =>
       ref.read(toastPresenterProvider.notifier);
 
   @override
@@ -127,7 +127,7 @@ class _CameraPageState extends ConsumerState<CameraPage>
     // 使用新的智慧裁剪拍照功能
     final screenSize = MediaQuery.of(context).size;
     final cameraState = ref.read(cameraViewModelProvider);
-    
+
     if (cameraState.cameraController == null) {
       _toastPresenter.showError('相機尚未初始化');
       return;
@@ -144,14 +144,16 @@ class _CameraPageState extends ConsumerState<CameraPage>
         .read(cameraViewModelProvider.notifier)
         .takePictureWithCrop(
           screenSize: screenSize,
-          previewSize: Size(previewSize.height, previewSize.width), // 注意：相機預覽尺寸需要轉換
+          previewSize: Size(
+            previewSize.height,
+            previewSize.width,
+          ), // 注意：相機預覽尺寸需要轉換
         );
 
     if (croppedImageData != null) {
       await _processImageData(croppedImageData);
     }
   }
-
 
   /// 處理相簿選擇
   Future<void> _handlePhotoLibrary() async {

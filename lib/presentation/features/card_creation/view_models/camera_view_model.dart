@@ -166,7 +166,7 @@ class CameraViewModel extends StateNotifier<CameraState> {
       // 1. 拍攝照片
       final image = await controller.takePicture();
       final imageBytes = await image.readAsBytes();
-      
+
       // 2. 執行智慧裁剪
       final croppedImage = await _cropImageWithScanFrame(
         imageBytes,
@@ -322,8 +322,12 @@ class CameraViewModel extends StateNotifier<CameraState> {
         imageSize: Size(image.width.toDouble(), image.height.toDouble()),
       );
 
-      debugPrint('螢幕裁剪框: ${scanFrame.left.toInt()}, ${scanFrame.top.toInt()}, ${scanFrame.width.toInt()}, ${scanFrame.height.toInt()}');
-      debugPrint('圖片裁剪框: ${cropRect.left.toInt()}, ${cropRect.top.toInt()}, ${cropRect.width.toInt()}, ${cropRect.height.toInt()}');
+      debugPrint(
+        '螢幕裁剪框: ${scanFrame.left.toInt()}, ${scanFrame.top.toInt()}, ${scanFrame.width.toInt()}, ${scanFrame.height.toInt()}',
+      );
+      debugPrint(
+        '圖片裁剪框: ${cropRect.left.toInt()}, ${cropRect.top.toInt()}, ${cropRect.width.toInt()}, ${cropRect.height.toInt()}',
+      );
 
       // 4. 執行裁剪
       final cropped = img.copyCrop(
@@ -335,9 +339,13 @@ class CameraViewModel extends StateNotifier<CameraState> {
       );
 
       // 5. 編碼為 JPEG
-      final croppedBytes = Uint8List.fromList(img.encodeJpg(cropped, quality: 90));
-      
-      debugPrint('裁剪完成: 原圖 ${image.width}x${image.height} -> 裁剪後 ${cropped.width}x${cropped.height}');
+      final croppedBytes = Uint8List.fromList(
+        img.encodeJpg(cropped, quality: 90),
+      );
+
+      debugPrint(
+        '裁剪完成: 原圖 ${image.width}x${image.height} -> 裁剪後 ${cropped.width}x${cropped.height}',
+      );
       debugPrint('檔案大小: ${imageData.length} -> ${croppedBytes.length} bytes');
 
       return croppedBytes;
@@ -356,20 +364,25 @@ class CameraViewModel extends StateNotifier<CameraState> {
     // 計算縮放比例
     final scaleX = imageSize.width / screenSize.width;
     final scaleY = imageSize.height / screenSize.height;
-    
+
     // 直接按比例映射
     final imageLeft = screenFrame.left * scaleX;
     final imageTop = screenFrame.top * scaleY;
     final imageWidth = screenFrame.width * scaleX;
     final imageHeight = screenFrame.height * scaleY;
-    
-    debugPrint('直接映射 - 縮放比例: X=${scaleX.toStringAsFixed(2)}, Y=${scaleY.toStringAsFixed(2)}');
-    debugPrint('螢幕框: ${screenFrame.left.toInt()}, ${screenFrame.top.toInt()}, ${screenFrame.width.toInt()}, ${screenFrame.height.toInt()}');
-    debugPrint('圖片框: ${imageLeft.toInt()}, ${imageTop.toInt()}, ${imageWidth.toInt()}, ${imageHeight.toInt()}');
-    
+
+    debugPrint(
+      '直接映射 - 縮放比例: X=${scaleX.toStringAsFixed(2)}, Y=${scaleY.toStringAsFixed(2)}',
+    );
+    debugPrint(
+      '螢幕框: ${screenFrame.left.toInt()}, ${screenFrame.top.toInt()}, ${screenFrame.width.toInt()}, ${screenFrame.height.toInt()}',
+    );
+    debugPrint(
+      '圖片框: ${imageLeft.toInt()}, ${imageTop.toInt()}, ${imageWidth.toInt()}, ${imageHeight.toInt()}',
+    );
+
     return Rect.fromLTWH(imageLeft, imageTop, imageWidth, imageHeight);
   }
-
 }
 
 /// Camera ViewModel Provider
