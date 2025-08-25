@@ -435,11 +435,11 @@ class _CameraPageState extends ConsumerState<CameraPage>
 
     // 執行對焦
     ref.read(cameraViewModelProvider.notifier).setFocusPoint(focusPoint);
-    
+
     // 顯示對焦動畫提示（可選）
     _showFocusIndicator(localPoint);
   }
-  
+
   /// 顯示對焦指示器動畫
   void _showFocusIndicator(Offset position) {
     // 使用 Overlay 顯示短暫的對焦動畫
@@ -451,9 +451,9 @@ class _CameraPageState extends ConsumerState<CameraPage>
         child: _FocusIndicator(),
       ),
     );
-    
+
     overlay.insert(entry);
-    
+
     // 1秒後移除動畫
     Future.delayed(const Duration(seconds: 1), entry.remove);
   }
@@ -663,15 +663,12 @@ class _FocusIndicatorState extends State<_FocusIndicator>
       duration: const Duration(milliseconds: 600),
       vsync: this,
     );
-    
+
     _animation = Tween<double>(
       begin: 1.5,
       end: 1,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeOutBack,
-    ));
-    
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutBack));
+
     _controller.forward();
   }
 
@@ -698,9 +695,7 @@ class _FocusIndicatorState extends State<_FocusIndicator>
               ),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: CustomPaint(
-              painter: _FocusCornerPainter(),
-            ),
+            child: CustomPaint(painter: _FocusCornerPainter()),
           ),
         );
       },
@@ -716,21 +711,13 @@ class _FocusCornerPainter extends CustomPainter {
       ..color = Colors.yellow
       ..strokeWidth = 2.5
       ..style = PaintingStyle.stroke;
-    
+
     const cornerLength = 12.0;
-    
+
     // 左上角
-    canvas.drawLine(
-      Offset.zero,
-      const Offset(cornerLength, 0),
-      paint,
-    );
-    canvas.drawLine(
-      Offset.zero,
-      const Offset(0, cornerLength),
-      paint,
-    );
-    
+    canvas.drawLine(Offset.zero, const Offset(cornerLength, 0), paint);
+    canvas.drawLine(Offset.zero, const Offset(0, cornerLength), paint);
+
     // 右上角
     canvas.drawLine(
       Offset(size.width, 0),
@@ -742,7 +729,7 @@ class _FocusCornerPainter extends CustomPainter {
       Offset(size.width, cornerLength),
       paint,
     );
-    
+
     // 左下角
     canvas.drawLine(
       Offset(0, size.height),
@@ -754,7 +741,7 @@ class _FocusCornerPainter extends CustomPainter {
       Offset(0, size.height - cornerLength),
       paint,
     );
-    
+
     // 右下角
     canvas.drawLine(
       Offset(size.width, size.height),
