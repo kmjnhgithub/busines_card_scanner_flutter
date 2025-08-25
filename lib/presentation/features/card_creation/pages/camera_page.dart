@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:busines_card_scanner_flutter/core/utils/scan_frame_utils.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/camera_view_model.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_creation/view_models/ocr_processing_view_model.dart';
+import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
@@ -33,6 +36,10 @@ class _CameraPageState extends ConsumerState<CameraPage>
     with WidgetsBindingObserver {
   final ImagePicker _imagePicker = ImagePicker();
   List<CameraDescription> _cameras = [];
+  
+  // 獲取 Toast Presenter 的快捷方式
+  ToastPresenter get _toastPresenter => 
+      ref.read(toastPresenterProvider.notifier);
 
   @override
   void initState() {
@@ -117,14 +124,34 @@ class _CameraPageState extends ConsumerState<CameraPage>
 
   /// 處理拍照
   Future<void> _handleTakePicture() async {
-    await ref.read(cameraViewModelProvider.notifier).takePicture();
+    // 使用新的智慧裁剪拍照功能
+    final screenSize = MediaQuery.of(context).size;
+    final cameraState = ref.read(cameraViewModelProvider);
+    
+    if (cameraState.cameraController == null) {
+      _toastPresenter.showError('相機尚未初始化');
+      return;
+    }
 
-    // 檢查是否拍照成功，如果成功則處理圖片
-    final state = ref.read(cameraViewModelProvider);
-    if (state.capturedImagePath != null) {
-      await _processImage(state.capturedImagePath!);
+    final previewSize = cameraState.cameraController!.value.previewSize;
+    if (previewSize == null) {
+      _toastPresenter.showError('無法獲取相機預覽尺寸');
+      return;
+    }
+
+    // 執行智慧裁剪拍照
+    final croppedImageData = await ref
+        .read(cameraViewModelProvider.notifier)
+        .takePictureWithCrop(
+          screenSize: screenSize,
+          previewSize: Size(previewSize.height, previewSize.width), // 注意：相機預覽尺寸需要轉換
+        );
+
+    if (croppedImageData != null) {
+      await _processImageData(croppedImageData);
     }
   }
+
 
   /// 處理相簿選擇
   Future<void> _handlePhotoLibrary() async {
@@ -144,7 +171,74 @@ class _CameraPageState extends ConsumerState<CameraPage>
     }
   }
 
-  /// 處理圖片（背景處理 + 導航到編輯頁面）
+  /// 處理圖片數據（新版，直接處理裁剪後的數據）
+  Future<void> _processImageData(Uint8List imageData) async {
+    try {
+      // 顯示處理對話框（不等待關閉）
+      unawaited(ProcessingDialog.show(context));
+
+      // 使用 ViewModel 處理圖片
+      final viewModel = ref.read(ocrProcessingViewModelProvider.notifier);
+      await viewModel.processImageToCard(imageData);
+
+      // 獲取處理結果
+      final state = ref.read(ocrProcessingViewModelProvider);
+
+      // 關閉對話框
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // 檢查處理結果
+      if (state.parsedCard != null) {
+        // 導航到編輯頁面（新增模式）
+        if (mounted) {
+          context.go(
+            '/card-detail/creating',
+            extra: {
+              'mode': 'creating',
+              'card': state.parsedCard,
+              'imagePath': state.compressedImagePath,
+            },
+          );
+        }
+      } else {
+        // 處理失敗或無法解析
+        if (mounted) {
+          final errorMessage = state.error ?? '無法解析名片資訊，請重試';
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: AppColors.error,
+              duration: const Duration(seconds: 3),
+              action: SnackBarAction(
+                label: '重試',
+                textColor: Colors.white,
+                onPressed: _handleTakePicture,
+              ),
+            ),
+          );
+        }
+      }
+    } on Exception catch (e) {
+      // 關閉對話框
+      if (mounted) {
+        Navigator.of(context).pop();
+      }
+
+      // 顯示錯誤
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('處理圖片失敗: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
+  /// 處理圖片（舊版，保留作為備用）
   Future<void> _processImage(String imagePath) async {
     try {
       // 顯示處理對話框（不等待關閉）
@@ -767,20 +861,8 @@ class _CameraScannerOverlayPainter extends CustomPainter {
       ..color = Colors.black.withValues(alpha: 0.5)
       ..style = PaintingStyle.fill;
 
-    // 計算掃描框架尺寸和位置（黃金比例）
-    const aspectRatio = 1.618; // 名片的寬高比
-    final frameWidth = size.width * 0.8;
-    final frameHeight = frameWidth / aspectRatio;
-
-    final frameLeft = (size.width - frameWidth) / 2;
-    final frameTop = (size.height - frameHeight) / 2 - 50; // 稍微上移
-
-    final frameRect = Rect.fromLTWH(
-      frameLeft,
-      frameTop,
-      frameWidth,
-      frameHeight,
-    );
+    // 使用統一的掃描框計算（與 ViewModel 保持一致）
+    final frameRect = ScanFrameUtils.calculateScanFrame(size);
 
     // 繪製遮罩（除了掃描框架區域）
     final path = Path()
@@ -801,49 +883,49 @@ class _CameraScannerOverlayPainter extends CustomPainter {
 
     // 左上角
     canvas.drawLine(
-      Offset(frameLeft, frameTop),
-      Offset(frameLeft + cornerLength, frameTop),
+      Offset(frameRect.left, frameRect.top),
+      Offset(frameRect.left + cornerLength, frameRect.top),
       cornerPaint,
     );
     canvas.drawLine(
-      Offset(frameLeft, frameTop),
-      Offset(frameLeft, frameTop + cornerLength),
+      Offset(frameRect.left, frameRect.top),
+      Offset(frameRect.left, frameRect.top + cornerLength),
       cornerPaint,
     );
 
     // 右上角
     canvas.drawLine(
-      Offset(frameLeft + frameWidth, frameTop),
-      Offset(frameLeft + frameWidth - cornerLength, frameTop),
+      Offset(frameRect.right, frameRect.top),
+      Offset(frameRect.right - cornerLength, frameRect.top),
       cornerPaint,
     );
     canvas.drawLine(
-      Offset(frameLeft + frameWidth, frameTop),
-      Offset(frameLeft + frameWidth, frameTop + cornerLength),
+      Offset(frameRect.right, frameRect.top),
+      Offset(frameRect.right, frameRect.top + cornerLength),
       cornerPaint,
     );
 
     // 左下角
     canvas.drawLine(
-      Offset(frameLeft, frameTop + frameHeight),
-      Offset(frameLeft + cornerLength, frameTop + frameHeight),
+      Offset(frameRect.left, frameRect.bottom),
+      Offset(frameRect.left + cornerLength, frameRect.bottom),
       cornerPaint,
     );
     canvas.drawLine(
-      Offset(frameLeft, frameTop + frameHeight),
-      Offset(frameLeft, frameTop + frameHeight - cornerLength),
+      Offset(frameRect.left, frameRect.bottom),
+      Offset(frameRect.left, frameRect.bottom - cornerLength),
       cornerPaint,
     );
 
     // 右下角
     canvas.drawLine(
-      Offset(frameLeft + frameWidth, frameTop + frameHeight),
-      Offset(frameLeft + frameWidth - cornerLength, frameTop + frameHeight),
+      Offset(frameRect.right, frameRect.bottom),
+      Offset(frameRect.right - cornerLength, frameRect.bottom),
       cornerPaint,
     );
     canvas.drawLine(
-      Offset(frameLeft + frameWidth, frameTop + frameHeight),
-      Offset(frameLeft + frameWidth, frameTop + frameHeight - cornerLength),
+      Offset(frameRect.right, frameRect.bottom),
+      Offset(frameRect.right, frameRect.bottom - cornerLength),
       cornerPaint,
     );
   }

@@ -1,3 +1,4 @@
+import 'package:busines_card_scanner_flutter/core/utils/scan_frame_utils.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/loading_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:image/image.dart' as img;
 
 part 'camera_view_model.freezed.dart';
 
@@ -146,6 +148,49 @@ class CameraViewModel extends StateNotifier<CameraState> {
     }
   }
 
+  /// 拍照並自動裁剪（基於掃描框架位置）
+  Future<Uint8List?> takePictureWithCrop({
+    required Size screenSize,
+    required Size previewSize,
+  }) async {
+    final controller = state.cameraController;
+    if (controller == null || !controller.value.isInitialized) {
+      _updateError('相機尚未初始化，無法拍照');
+      _toastPresenter.showError('相機尚未初始化，無法拍照');
+      return null;
+    }
+
+    try {
+      _loadingPresenter.show('拍攝並處理中...');
+
+      // 1. 拍攝照片
+      final image = await controller.takePicture();
+      final imageBytes = await image.readAsBytes();
+      
+      // 2. 執行智慧裁剪
+      final croppedImage = await _cropImageWithScanFrame(
+        imageBytes,
+        screenSize,
+        previewSize,
+      );
+
+      state = state.copyWith(capturedImagePath: image.path, error: null);
+      _loadingPresenter.hide();
+
+      return croppedImage;
+    } on CameraException catch (e) {
+      _loadingPresenter.hide();
+      _updateError('拍照失敗: ${e.description}');
+      _toastPresenter.showError('拍照失敗: ${e.description}');
+      return null;
+    } on Exception catch (e) {
+      _loadingPresenter.hide();
+      _updateError('拍照失敗: $e');
+      _toastPresenter.showError('拍照失敗: $e');
+      return null;
+    }
+  }
+
   /// 處理圖片
   Future<ProcessImageResult> processImage(Uint8List imageData) async {
     try {
@@ -252,6 +297,79 @@ class CameraViewModel extends StateNotifier<CameraState> {
   void _updateError(String error) {
     state = state.copyWith(error: error);
   }
+
+  /// 根據掃描框架自動裁剪圖片
+  Future<Uint8List> _cropImageWithScanFrame(
+    Uint8List imageData,
+    Size screenSize,
+    Size previewSize,
+  ) async {
+    try {
+      // 1. 解碼圖片
+      final image = img.decodeImage(imageData);
+      if (image == null) {
+        debugPrint('無法解碼圖片');
+        return imageData; // 返回原圖
+      }
+
+      // 2. 使用統一的掃描框計算邏輯
+      final scanFrame = ScanFrameUtils.calculateScanFrame(screenSize);
+
+      // 3. 將螢幕座標轉換為圖片座標
+      final cropRect = _convertScreenCropToImageCrop(
+        screenFrame: scanFrame,
+        screenSize: screenSize,
+        imageSize: Size(image.width.toDouble(), image.height.toDouble()),
+      );
+
+      debugPrint('螢幕裁剪框: ${scanFrame.left.toInt()}, ${scanFrame.top.toInt()}, ${scanFrame.width.toInt()}, ${scanFrame.height.toInt()}');
+      debugPrint('圖片裁剪框: ${cropRect.left.toInt()}, ${cropRect.top.toInt()}, ${cropRect.width.toInt()}, ${cropRect.height.toInt()}');
+
+      // 4. 執行裁剪
+      final cropped = img.copyCrop(
+        image,
+        x: cropRect.left.toInt(),
+        y: cropRect.top.toInt(),
+        width: cropRect.width.toInt(),
+        height: cropRect.height.toInt(),
+      );
+
+      // 5. 編碼為 JPEG
+      final croppedBytes = Uint8List.fromList(img.encodeJpg(cropped, quality: 90));
+      
+      debugPrint('裁剪完成: 原圖 ${image.width}x${image.height} -> 裁剪後 ${cropped.width}x${cropped.height}');
+      debugPrint('檔案大小: ${imageData.length} -> ${croppedBytes.length} bytes');
+
+      return croppedBytes;
+    } on Exception catch (e) {
+      debugPrint('裁剪圖片失敗: $e');
+      return imageData; // 裁剪失敗時返回原圖
+    }
+  }
+
+  /// 直接映射：螢幕掃描框位置 → 照片裁剪位置
+  Rect _convertScreenCropToImageCrop({
+    required Rect screenFrame,
+    required Size screenSize,
+    required Size imageSize,
+  }) {
+    // 計算縮放比例
+    final scaleX = imageSize.width / screenSize.width;
+    final scaleY = imageSize.height / screenSize.height;
+    
+    // 直接按比例映射
+    final imageLeft = screenFrame.left * scaleX;
+    final imageTop = screenFrame.top * scaleY;
+    final imageWidth = screenFrame.width * scaleX;
+    final imageHeight = screenFrame.height * scaleY;
+    
+    debugPrint('直接映射 - 縮放比例: X=${scaleX.toStringAsFixed(2)}, Y=${scaleY.toStringAsFixed(2)}');
+    debugPrint('螢幕框: ${screenFrame.left.toInt()}, ${screenFrame.top.toInt()}, ${screenFrame.width.toInt()}, ${screenFrame.height.toInt()}');
+    debugPrint('圖片框: ${imageLeft.toInt()}, ${imageTop.toInt()}, ${imageWidth.toInt()}, ${imageHeight.toInt()}');
+    
+    return Rect.fromLTWH(imageLeft, imageTop, imageWidth, imageHeight);
+  }
+
 }
 
 /// Camera ViewModel Provider
