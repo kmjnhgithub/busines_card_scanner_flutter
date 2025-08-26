@@ -71,7 +71,10 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立應用程式列
-  PreferredSizeWidget _buildAppBar(BuildContext context, CardListViewModel viewModel) {
+  PreferredSizeWidget _buildAppBar(
+    BuildContext context,
+    CardListViewModel viewModel,
+  ) {
     return AppBar(
       backgroundColor: AppColors.background,
       elevation: 0,
@@ -94,10 +97,13 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             return FadeTransition(
               opacity: animation,
               child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(-0.3, 0), // 稍微從左側滑入
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(-0.3, 0), // 稍微從左側滑入
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                    ),
                 child: child,
               ),
             );
@@ -112,7 +118,10 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             : Text(
                 '名片',
                 key: const ValueKey('title'),
-                style: AppTextStyles.headline3.copyWith(color: AppColors.primaryText, fontWeight: FontWeight.w600),
+                style: AppTextStyles.headline3.copyWith(
+                  color: AppColors.primaryText,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
       ),
       actions: [
@@ -124,15 +133,24 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             layoutBuilder: (currentChild, previousChildren) {
               return Stack(
                 alignment: Alignment.centerRight,
-                children: <Widget>[...previousChildren, if (currentChild != null) currentChild],
+                children: <Widget>[
+                  ...previousChildren,
+                  if (currentChild != null) currentChild,
+                ],
               );
             },
             transitionBuilder: (child, animation) {
               return SlideTransition(
-                position: Tween<Offset>(
-                  begin: const Offset(1, 0),
-                  end: Offset.zero,
-                ).animate(CurvedAnimation(parent: animation, curve: Curves.easeInOut)),
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeInOut,
+                      ),
+                    ),
                 child: FadeTransition(opacity: animation, child: child),
               );
             },
@@ -155,7 +173,12 @@ class _CardListPageState extends ConsumerState<CardListPage> {
                           vertical: AppDimensions.space2,
                         ),
                       ),
-                      child: Text('Cancel', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primary)),
+                      child: Text(
+                        'Cancel',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
                     ),
                   )
                 : Row(
@@ -164,7 +187,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.search, color: AppColors.primary, size: AppDimensions.iconMedium),
+                        icon: const Icon(
+                          Icons.search,
+                          color: AppColors.primary,
+                          size: AppDimensions.iconMedium,
+                        ),
                         onPressed: () {
                           setState(() {
                             _isSearchExpanded = true;
@@ -172,7 +199,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
                         },
                       ),
                       IconButton(
-                        icon: const Icon(Icons.add, color: AppColors.primary, size: AppDimensions.iconMedium),
+                        icon: const Icon(
+                          Icons.add,
+                          color: AppColors.primary,
+                          size: AppDimensions.iconMedium,
+                        ),
                         onPressed: () => _showCreateCardOptions(context),
                       ),
                     ],
@@ -184,7 +215,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立主體內容
-  Widget _buildBody(BuildContext context, CardListState state, CardListViewModel viewModel) {
+  Widget _buildBody(
+    BuildContext context,
+    CardListState state,
+    CardListViewModel viewModel,
+  ) {
     // 移除搜尋欄區域，直接返回主要內容
     return _buildMainContent(context, state, viewModel);
   }
@@ -203,10 +238,19 @@ class _CardListPageState extends ConsumerState<CardListPage> {
         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
         decoration: InputDecoration(
           hintText: '搜尋姓名、公司、電話、Email',
-          hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.placeholder),
-          prefixIcon: const Icon(Icons.search, color: AppColors.secondaryText, size: AppDimensions.iconSmall),
+          hintStyle: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.placeholder,
+          ),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: AppColors.secondaryText,
+            size: AppDimensions.iconSmall,
+          ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: AppDimensions.space3, vertical: AppDimensions.space2),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.space3,
+            vertical: AppDimensions.space2,
+          ),
           isDense: true,
         ),
         onChanged: (query) {
@@ -224,7 +268,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立主要內容
-  Widget _buildMainContent(BuildContext context, CardListState state, CardListViewModel viewModel) {
+  Widget _buildMainContent(
+    BuildContext context,
+    CardListState state,
+    CardListViewModel viewModel,
+  ) {
     if (state.isLoading && state.cards.isEmpty) {
       return _buildLoadingState();
     }
@@ -250,9 +298,16 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary)),
+          const CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+          ),
           const SizedBox(height: AppDimensions.space4),
-          Text('載入中...', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText)),
+          Text(
+            '載入中...',
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: AppColors.secondaryText,
+            ),
+          ),
         ],
       ),
     );
@@ -266,13 +321,24 @@ class _CardListPageState extends ConsumerState<CardListPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.error_outline, size: AppDimensions.iconExtraLarge, color: AppColors.error),
+            const Icon(
+              Icons.error_outline,
+              size: AppDimensions.iconExtraLarge,
+              color: AppColors.error,
+            ),
             const SizedBox(height: AppDimensions.space4),
-            Text('發生錯誤', style: AppTextStyles.headline3.copyWith(color: AppColors.primaryText)),
+            Text(
+              '發生錯誤',
+              style: AppTextStyles.headline3.copyWith(
+                color: AppColors.primaryText,
+              ),
+            ),
             const SizedBox(height: AppDimensions.space2),
             Text(
               error,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.secondaryText,
+              ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppDimensions.space6),
@@ -315,14 +381,18 @@ class _CardListPageState extends ConsumerState<CardListPage> {
               child: Text(
                 isSearchResult ? '找不到「${state.searchQuery}」的相關名片' : '還沒有名片',
                 key: ValueKey(isSearchResult),
-                style: AppTextStyles.headline3.copyWith(color: AppColors.primaryText),
+                style: AppTextStyles.headline3.copyWith(
+                  color: AppColors.primaryText,
+                ),
                 textAlign: TextAlign.center,
               ),
             ),
             const SizedBox(height: AppDimensions.space2),
             Text(
               isSearchResult ? '試著搜尋其他關鍵字，或使用不同的搜尋條件' : '點擊右上角的 + 新增第一張名片',
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.secondaryText),
+              style: AppTextStyles.bodyMedium.copyWith(
+                color: AppColors.secondaryText,
+              ),
               textAlign: TextAlign.center,
             ),
 
@@ -353,15 +423,24 @@ class _CardListPageState extends ConsumerState<CardListPage> {
         // 如果正在搜尋且有查詢條件，顯示搜尋結果統計
         if (state.searchQuery.isNotEmpty) ...[
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppDimensions.space4, vertical: AppDimensions.space2),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppDimensions.space4,
+              vertical: AppDimensions.space2,
+            ),
             child: Row(
               children: [
-                const Icon(Icons.search, size: AppDimensions.iconSmall, color: AppColors.secondaryText),
+                const Icon(
+                  Icons.search,
+                  size: AppDimensions.iconSmall,
+                  color: AppColors.secondaryText,
+                ),
                 const SizedBox(width: AppDimensions.space2),
                 Expanded(
                   child: Text(
                     '找到 ${cards.length} 個結果',
-                    style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.secondaryText,
+                    ),
                   ),
                 ),
                 // 清除搜尋按鈕
@@ -369,7 +448,12 @@ class _CardListPageState extends ConsumerState<CardListPage> {
                   onPressed: () {
                     viewModel.searchCards('');
                   },
-                  child: Text('清除', style: AppTextStyles.bodySmall.copyWith(color: AppColors.primary)),
+                  child: Text(
+                    '清除',
+                    style: AppTextStyles.bodySmall.copyWith(
+                      color: AppColors.primary,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -406,7 +490,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立名片項目
-  Widget _buildCardItem(BuildContext context, BusinessCard card, CardListViewModel viewModel) {
+  Widget _buildCardItem(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) {
     final screenWidth = MediaQuery.of(context).size.width;
     final state = ref.watch(cardListViewModelProvider);
 
@@ -417,7 +505,13 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 8, offset: const Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -478,10 +572,15 @@ class _CardListPageState extends ConsumerState<CardListPage> {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [AppColors.primary.withValues(alpha: 0.8), AppColors.primary.withValues(alpha: 0.6)],
+          colors: [
+            AppColors.primary.withValues(alpha: 0.8),
+            AppColors.primary.withValues(alpha: 0.6),
+          ],
         ),
       ),
-      child: const Center(child: Icon(Icons.credit_card, color: Colors.white, size: 40)),
+      child: const Center(
+        child: Icon(Icons.credit_card, color: Colors.white, size: 40),
+      ),
     );
   }
 
@@ -499,19 +598,25 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             // 姓名 - 大標題（支援高亮顯示）
             Text(
               card.name,
-              style: (isLargeScreen ? AppTextStyles.headline5 : AppTextStyles.headline6).copyWith(
-                color: AppColors.primaryText,
-                fontWeight: FontWeight.bold,
-              ),
+              style:
+                  (isLargeScreen
+                          ? AppTextStyles.headline5
+                          : AppTextStyles.headline6)
+                      .copyWith(
+                        color: AppColors.primaryText,
+                        fontWeight: FontWeight.bold,
+                      ),
             ),
             SizedBox(height: screenWidth * 0.01), // 1% 螢幕寬度間距
             // 公司名稱 - 主要副標題（支援高亮顯示）
             if (card.company != null) ...[
               Text(
                 card.company!,
-                style: (isLargeScreen ? AppTextStyles.bodyLarge : AppTextStyles.bodyMedium).copyWith(
-                  color: AppColors.secondaryText,
-                ),
+                style:
+                    (isLargeScreen
+                            ? AppTextStyles.bodyLarge
+                            : AppTextStyles.bodyMedium)
+                        .copyWith(color: AppColors.secondaryText),
               ),
               SizedBox(height: screenWidth * 0.005), // 0.5% 間距
             ],
@@ -520,9 +625,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             if (card.jobTitle != null) ...[
               Text(
                 card.jobTitle!,
-                style: (isLargeScreen ? AppTextStyles.bodyMedium : AppTextStyles.bodySmall).copyWith(
-                  color: AppColors.secondaryText,
-                ),
+                style:
+                    (isLargeScreen
+                            ? AppTextStyles.bodyMedium
+                            : AppTextStyles.bodySmall)
+                        .copyWith(color: AppColors.secondaryText),
               ),
             ],
           ],
@@ -536,7 +643,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusLarge)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusLarge),
+        ),
       ),
       builder: (context) => SafeArea(
         child: Column(
@@ -546,14 +655,30 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.symmetric(vertical: AppDimensions.space2),
-              decoration: BoxDecoration(color: AppColors.separator, borderRadius: BorderRadius.circular(2)),
+              margin: const EdgeInsets.symmetric(
+                vertical: AppDimensions.space2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.separator,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
             Padding(
               padding: const EdgeInsets.all(AppDimensions.space4),
-              child: Text('新增名片', style: AppTextStyles.headline3.copyWith(color: AppColors.primaryText)),
+              child: Text(
+                '新增名片',
+                style: AppTextStyles.headline3.copyWith(
+                  color: AppColors.primaryText,
+                ),
+              ),
             ),
-            _buildCreateOption(context, Icons.camera_alt, '拍照', '使用相機拍攝名片', () => _navigateToCamera(context)),
+            _buildCreateOption(
+              context,
+              Icons.camera_alt,
+              '拍照',
+              '使用相機拍攝名片',
+              () => _navigateToCamera(context),
+            ),
             _buildCreateOption(
               context,
               Icons.photo_library,
@@ -561,7 +686,13 @@ class _CardListPageState extends ConsumerState<CardListPage> {
               '選擇已存在的名片圖片',
               () async => _navigateToPhotoLibrary(context),
             ),
-            _buildCreateOption(context, Icons.edit, '手動輸入', '手動建立名片資料', () => _navigateToManualCreate(context)),
+            _buildCreateOption(
+              context,
+              Icons.edit,
+              '手動輸入',
+              '手動建立名片資料',
+              () => _navigateToManualCreate(context),
+            ),
             const SizedBox(height: AppDimensions.space2),
           ],
         ),
@@ -570,11 +701,17 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 顯示名片操作選項
-  void _showCardOptions(BuildContext context, BusinessCard card, CardListViewModel viewModel) {
+  void _showCardOptions(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusLarge)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppDimensions.radiusLarge),
+        ),
       ),
       builder: (context) => SafeArea(
         child: Column(
@@ -584,12 +721,22 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.symmetric(vertical: AppDimensions.space2),
-              decoration: BoxDecoration(color: AppColors.separator, borderRadius: BorderRadius.circular(2)),
+              margin: const EdgeInsets.symmetric(
+                vertical: AppDimensions.space2,
+              ),
+              decoration: BoxDecoration(
+                color: AppColors.separator,
+                borderRadius: BorderRadius.circular(2),
+              ),
             ),
             ListTile(
               leading: const Icon(Icons.edit, color: AppColors.primaryText),
-              title: Text('編輯', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText)),
+              title: Text(
+                '編輯',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primaryText,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _navigateToCardEdit(context, card);
@@ -597,7 +744,12 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             ),
             ListTile(
               leading: const Icon(Icons.share, color: AppColors.primaryText),
-              title: Text('分享', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText)),
+              title: Text(
+                '分享',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.primaryText,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _shareCard(context, card);
@@ -605,7 +757,12 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             ),
             ListTile(
               leading: const Icon(Icons.delete, color: AppColors.error),
-              title: Text('刪除', style: AppTextStyles.bodyMedium.copyWith(color: AppColors.error)),
+              title: Text(
+                '刪除',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.error,
+                ),
+              ),
               onTap: () {
                 Navigator.pop(context);
                 _confirmDeleteCard(context, card, viewModel);
@@ -619,7 +776,11 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 確認刪除名片
-  Future<void> _confirmDeleteCard(BuildContext context, BusinessCard card, CardListViewModel viewModel) async {
+  Future<void> _confirmDeleteCard(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) async {
     final confirmed = await DialogPresenter.showDeleteConfirmation(
       context,
       title: '刪除名片',
@@ -649,7 +810,13 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   }
 
   /// 建立選項項目
-  Widget _buildCreateOption(BuildContext context, IconData icon, String title, String subtitle, VoidCallback onTap) {
+  Widget _buildCreateOption(
+    BuildContext context,
+    IconData icon,
+    String title,
+    String subtitle,
+    VoidCallback onTap,
+  ) {
     return ListTile(
       leading: Container(
         width: 40,
@@ -658,13 +825,23 @@ class _CardListPageState extends ConsumerState<CardListPage> {
           color: AppColors.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
         ),
-        child: Icon(icon, color: AppColors.primary, size: AppDimensions.iconSmall),
+        child: Icon(
+          icon,
+          color: AppColors.primary,
+          size: AppDimensions.iconSmall,
+        ),
       ),
       title: Text(
         title,
-        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText, fontWeight: FontWeight.w600),
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: AppColors.primaryText,
+          fontWeight: FontWeight.w600,
+        ),
       ),
-      subtitle: Text(subtitle, style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText)),
+      subtitle: Text(
+        subtitle,
+        style: AppTextStyles.bodySmall.copyWith(color: AppColors.secondaryText),
+      ),
       onTap: () {
         Navigator.pop(context);
         onTap();
@@ -690,7 +867,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
       if (image != null && context.mounted) {
         // 導航到 OCR 處理頁面，使用路徑參數
-        await context.push('${AppRoutes.ocrProcessing}/${Uri.encodeComponent(image.path)}');
+        await context.push(
+          '${AppRoutes.ocrProcessing}/${Uri.encodeComponent(image.path)}',
+        );
       }
     } on Exception catch (e) {
       debugPrint('選擇相簿圖片失敗: $e');
