@@ -1,6 +1,7 @@
 import 'package:busines_card_scanner_flutter/domain/usecases/card/delete_card_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/get_cards_usecase.dart';
 import 'package:busines_card_scanner_flutter/domain/usecases/card/process_image_usecase.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_list/view_models/card_list_view_model.dart';
 import 'package:camera/camera.dart';
 import 'package:drift/drift.dart' hide isNotNull;
 import 'package:flutter/material.dart';
@@ -244,4 +245,35 @@ class TestFinders {
     }
     return find.byType(Dialog);
   }
+}
+
+// ==================== Mock 類別 ====================
+
+/// Mock CardListViewModel
+class MockCardListViewModel extends Mock implements CardListViewModel {
+  @override
+  CardListState get state => const CardListState();
+}
+
+// ==================== 測試輔助函數 ====================
+
+/// 建立測試應用程式包裝器
+///
+/// 提供完整的 Material 環境，包含主題、路由等
+/// [child] 要測試的 widget
+/// [theme] 自訂主題（可選）
+/// [home] 主頁 widget（可選）
+/// [routes] 路由配置（可選）
+Widget createTestApp({
+  Widget? child,
+  Widget? home,
+  ThemeData? theme,
+  Map<String, WidgetBuilder>? routes,
+}) {
+  return MaterialApp(
+    theme: theme,
+    home: home ?? child,
+    routes: routes ?? {},
+    debugShowCheckedModeBanner: false,
+  );
 }

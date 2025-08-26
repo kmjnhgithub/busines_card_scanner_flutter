@@ -1,6 +1,6 @@
+import 'package:busines_card_scanner_flutter/core/utils/debouncer.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/view_models/card_list_view_model.dart';
-import 'package:busines_card_scanner_flutter/presentation/features/card_list/widgets/animated_search_bar.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/dialog_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
@@ -23,9 +23,22 @@ class CardListPage extends ConsumerStatefulWidget {
 }
 
 class _CardListPageState extends ConsumerState<CardListPage> {
+  bool _isSearchExpanded = false;
+
+  /// 搜尋防抖器，避免頻繁觸發搜尋操作
+  late final Debouncer _searchDebouncer;
+
+  /// 搜尋文字控制器，管理搜尋輸入
+  late final TextEditingController _searchController;
+
   @override
   void initState() {
     super.initState();
+    // 初始化搜尋防抖器
+    _searchDebouncer = Debouncer();
+    // 初始化搜尋控制器
+    _searchController = TextEditingController();
+
     // 初始載入名片列表
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(cardListViewModelProvider.notifier).loadCards();
@@ -34,6 +47,10 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
   @override
   void dispose() {
+    // 清理搜尋防抖器
+    _searchDebouncer.dispose();
+    // 清理搜尋控制器
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -57,22 +74,136 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     return AppBar(
       backgroundColor: AppColors.background,
       elevation: 0,
-      title: AnimatedSearchBar(
-        onChanged: (query) {
-          viewModel.searchCards(query);
+      centerTitle: true, // 強制標題置中
+      title: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 300),
+        switchInCurve: Curves.easeInOut,
+        switchOutCurve: Curves.easeInOut,
+        // 使用簡單的 layoutBuilder，避免 Stack 導致的位置問題
+        layoutBuilder: (Widget? currentChild, List<Widget> previousChildren) {
+          return currentChild ?? const SizedBox.shrink();
         },
-        onSubmitted: (query) {
-          viewModel.searchCards(query);
+        transitionBuilder: (Widget child, Animation<double> animation) {
+          // 判斷是搜尋欄還是標題
+          final isSearchBar = child.key == const ValueKey('searchBar');
+
+          // 搜尋欄：從左側滑入 + 淡入
+          if (isSearchBar) {
+            return FadeTransition(
+              opacity: animation,
+              child: SlideTransition(
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(-0.3, 0), // 稍微從左側滑入
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(parent: animation, curve: Curves.easeOut),
+                    ),
+                child: child,
+              ),
+            );
+          }
+          // 標題：只有淡入淡出，沒有任何位移
+          else {
+            return FadeTransition(opacity: animation, child: child);
+          }
         },
+        child: _isSearchExpanded
+            ? _buildSearchBar(viewModel)
+            : Text(
+                '名片',
+                key: const ValueKey('title'),
+                style: AppTextStyles.headline3.copyWith(
+                  color: AppColors.primaryText,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
       ),
       actions: [
-        IconButton(
-          icon: const Icon(
-            Icons.add,
-            color: AppColors.primary,
-            size: AppDimensions.iconMedium,
+        // 固定寬度容器避免按鈕切換時的位置跳動
+        SizedBox(
+          width: AppDimensions.appBarActionsWidth,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            layoutBuilder: (currentChild, previousChildren) {
+              return Stack(
+                alignment: Alignment.centerRight,
+                children: <Widget>[
+                  ...previousChildren,
+                  if (currentChild != null) currentChild,
+                ],
+              );
+            },
+            transitionBuilder: (child, animation) {
+              return SlideTransition(
+                position:
+                    Tween<Offset>(
+                      begin: const Offset(1, 0),
+                      end: Offset.zero,
+                    ).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeInOut,
+                      ),
+                    ),
+                child: FadeTransition(opacity: animation, child: child),
+              );
+            },
+            child: _isSearchExpanded
+                ? Container(
+                    key: const ValueKey('cancel'),
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _isSearchExpanded = false;
+                        });
+                        // 清空搜尋控制器和搜尋結果
+                        _searchController.clear();
+                        viewModel.searchCards('');
+                      },
+                      style: TextButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: AppDimensions.space3,
+                          vertical: AppDimensions.space2,
+                        ),
+                      ),
+                      child: Text(
+                        'Cancel',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                  )
+                : Row(
+                    key: const ValueKey('actions'),
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      IconButton(
+                        icon: const Icon(
+                          Icons.search,
+                          color: AppColors.primary,
+                          size: AppDimensions.iconMedium,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _isSearchExpanded = true;
+                          });
+                        },
+                      ),
+                      IconButton(
+                        icon: const Icon(
+                          Icons.add,
+                          color: AppColors.primary,
+                          size: AppDimensions.iconMedium,
+                        ),
+                        onPressed: () => _showCreateCardOptions(context),
+                      ),
+                    ],
+                  ),
           ),
-          onPressed: () => _showCreateCardOptions(context),
         ),
       ],
     );
@@ -80,6 +211,59 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
   /// 建立主體內容
   Widget _buildBody(
+    BuildContext context,
+    CardListState state,
+    CardListViewModel viewModel,
+  ) {
+    // 移除搜尋欄區域，直接返回主要內容
+    return _buildMainContent(context, state, viewModel);
+  }
+
+  /// 建立搜尋欄 Widget（在 AppBar title 位置）
+  Widget _buildSearchBar(CardListViewModel viewModel) {
+    return Container(
+      key: const ValueKey('searchBar'),
+      height: AppDimensions.searchBarHeight,
+      decoration: BoxDecoration(
+        color: AppColors.secondaryBackground,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+      ),
+      child: TextField(
+        autofocus: true,
+        style: AppTextStyles.bodyMedium.copyWith(color: AppColors.primaryText),
+        decoration: InputDecoration(
+          hintText: '搜尋姓名、公司、電話、Email',
+          hintStyle: AppTextStyles.bodyMedium.copyWith(
+            color: AppColors.placeholder,
+          ),
+          prefixIcon: const Icon(
+            Icons.search,
+            color: AppColors.secondaryText,
+            size: AppDimensions.iconSmall,
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.space3,
+            vertical: AppDimensions.space2,
+          ),
+          isDense: true,
+        ),
+        onChanged: (query) {
+          // 使用 debouncer 防止頻繁觸發搜尋
+          _searchDebouncer.run(() {
+            viewModel.searchCards(query);
+          });
+        },
+        onSubmitted: (query) {
+          viewModel.searchCards(query);
+        },
+        textInputAction: TextInputAction.search,
+      ),
+    );
+  }
+
+  /// 建立主要內容
+  Widget _buildMainContent(
     BuildContext context,
     CardListState state,
     CardListViewModel viewModel,
@@ -406,9 +590,8 @@ class _CardListPageState extends ConsumerState<CardListPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // 姓名 - 大標題（支援高亮顯示）
-            SearchHighlighter.highlightText(
+            Text(
               card.name,
-              searchQuery,
               style:
                   (isLargeScreen
                           ? AppTextStyles.headline5
@@ -421,9 +604,8 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             SizedBox(height: screenWidth * 0.01), // 1% 螢幕寬度間距
             // 公司名稱 - 主要副標題（支援高亮顯示）
             if (card.company != null) ...[
-              SearchHighlighter.highlightText(
+              Text(
                 card.company!,
-                searchQuery,
                 style:
                     (isLargeScreen
                             ? AppTextStyles.bodyLarge
@@ -435,9 +617,8 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
             // 職稱 - 次要副標題（支援高亮顯示）
             if (card.jobTitle != null) ...[
-              SearchHighlighter.highlightText(
+              Text(
                 card.jobTitle!,
-                searchQuery,
                 style:
                     (isLargeScreen
                             ? AppTextStyles.bodyMedium

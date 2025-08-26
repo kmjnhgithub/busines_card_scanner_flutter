@@ -286,6 +286,12 @@ class AppDimensions {
   static const double loadingIndicatorSize = 24;
   static const double loadingIndicatorSizeLarge = 48;
 
+  /// AppBar 動作按鈕區域寬度 (兩個 IconButton 的固定寬度)
+  static const double appBarActionsWidth = 96;
+
+  /// 搜尋欄高度
+  static const double searchBarHeight = 40;
+
   // ==================== 輔助方法 ====================
 
   /// 根據螢幕寬度決定是否為手機版面
