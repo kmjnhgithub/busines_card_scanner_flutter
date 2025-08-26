@@ -11,6 +11,7 @@ import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 
 /// 名片列表頁面
 ///
@@ -30,6 +31,9 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
   /// 搜尋文字控制器，管理搜尋輸入
   late final TextEditingController _searchController;
+  
+  /// 圖片選擇器，用於從相簿選擇圖片
+  final ImagePicker _imagePicker = ImagePicker();
 
   @override
   void initState() {
@@ -678,7 +682,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
               Icons.photo_library,
               '從相簿選擇',
               '選擇已存在的名片圖片',
-              () => _navigateToPhotoLibrary(context),
+              () async => _navigateToPhotoLibrary(context),
             ),
             _buildCreateOption(
               context,
@@ -848,10 +852,31 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     context.push(AppRoutes.camera);
   }
 
-  /// 導航到相簿選擇（暫時跳轉到相機）
-  void _navigateToPhotoLibrary(BuildContext context) {
-    // TODO: 實作相簿選擇功能，暫時跳轉到相機
-    context.push(AppRoutes.camera);
+  /// 導航到相簿選擇
+  Future<void> _navigateToPhotoLibrary(BuildContext context) async {
+    try {
+      // 從相簿選擇圖片
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 2048,
+        maxHeight: 2048,
+        imageQuality: 90,
+      );
+
+      if (image != null && context.mounted) {
+        // 導航到 OCR 處理頁面，使用路徑參數
+        await context.push('${AppRoutes.ocrProcessing}/${Uri.encodeComponent(image.path)}');
+      }
+    } on Exception catch (e) {
+      debugPrint('選擇相簿圖片失敗: $e');
+      if (context.mounted) {
+        ToastHelper.showSnackBar(
+          context, 
+          '選擇圖片失敗，請重試', 
+          type: ToastType.error
+        );
+      }
+    }
   }
 
   /// 導航到手動建立頁面
