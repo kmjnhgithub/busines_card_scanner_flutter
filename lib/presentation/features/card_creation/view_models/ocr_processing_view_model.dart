@@ -191,10 +191,7 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
           // 將 ParsedCardData 轉換為 BusinessCard
           parsedCard = _convertToBusinessCard(aiResult);
           source = ParseSource.ai;
-
-          debugPrint('AI 解析成功，信心度: ${aiResult.confidence}');
-        } on Exception catch (aiError) {
-          debugPrint('AI 解析失敗，切換到本地解析: $aiError');
+        } on Exception {
           // AI 失敗，將使用本地解析（fallback）
         }
       }
@@ -209,16 +206,13 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
             (localResult.name != null || localResult.company != null)) {
           parsedCard = _convertToBusinessCard(localResult);
           source = ParseSource.local;
-          debugPrint('本地解析完成，信心度: ${localResult.confidence}');
         } else {
-          debugPrint('本地解析信心度過低或資料不足');
           // 不設置 parsedCard，保持為 null
         }
 
         // 如果是因為 AI 不可用而使用本地解析，提示用戶
         if (!aiAvailable && parsedCard != null) {
           _toastPresenter.showInfo('已切換至本地解析模式（AI 服務未啟用）');
-          debugPrint('AI 服務不可用，建議在設定中配置 OpenAI API Key 以獲得更精確的解析結果');
         }
       }
 
@@ -259,7 +253,6 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
 
         // 提示用戶需要手動輸入
         _toastPresenter.showWarning('無法自動解析名片，已切換至手動輸入模式');
-        debugPrint('OCR 解析失敗：可能是圖片不夠清晰或光線不足，已提供空白表單供手動輸入');
       }
     } on Exception catch (e) {
       _loadingPresenter.hide();
@@ -405,15 +398,13 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
       );
 
       if (!hasApiKey) {
-        debugPrint('AI 服務未設定 API Key');
         return false;
       }
 
       // 檢查服務狀態
       final status = await _openAIService.getServiceStatus();
       return status.isAvailable;
-    } on Exception catch (e) {
-      debugPrint('檢查 AI 服務狀態失敗: $e');
+    } on Exception {
       return false;
     }
   }
@@ -458,7 +449,6 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
       // 解碼圖片
       final image = img.decodeImage(imageData);
       if (image == null) {
-        debugPrint('無法解碼圖片');
         return null;
       }
 
@@ -500,13 +490,8 @@ class OCRProcessingViewModel extends StateNotifier<OCRProcessingState> {
       // 寫入文件
       await file.writeAsBytes(compressed);
 
-      debugPrint('圖片已壓縮並儲存: ${file.path}');
-      debugPrint('原始大小: ${imageData.length} bytes');
-      debugPrint('壓縮後大小: ${compressed.length} bytes');
-
       return file.path;
-    } on Exception catch (e) {
-      debugPrint('壓縮圖片失敗: $e');
+    } on Exception {
       return null;
     }
   }

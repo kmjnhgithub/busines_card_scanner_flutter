@@ -4,7 +4,6 @@ import 'package:busines_card_scanner_flutter/data/datasources/remote/ocr_service
 import 'package:busines_card_scanner_flutter/domain/entities/detected_text.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/ocr_result.dart';
 import 'package:busines_card_scanner_flutter/domain/repositories/ocr_repository.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
@@ -33,8 +32,6 @@ class IOSVisionOCRService implements OCRService {
     final stopwatch = Stopwatch()..start();
 
     try {
-      debugPrint('IOSVisionOCRService: 開始 iOS Vision OCR 處理');
-
       // 呼叫 iOS 原生方法
       final result = await _channel.invokeMethod('recognizeText', {
         'imageData': imageData,
@@ -52,13 +49,9 @@ class IOSVisionOCRService implements OCRService {
         stopwatch.elapsedMilliseconds,
       );
 
-      debugPrint('IOSVisionOCRService: OCR 完成，信心度: ${ocrResult.confidence}');
-      debugPrint('IOSVisionOCRService: 識別文字: ${ocrResult.rawText}');
-
       return ocrResult;
     } on PlatformException catch (e) {
       stopwatch.stop();
-      debugPrint('IOSVisionOCRService: Platform Exception: ${e.message}');
 
       // 返回失敗結果
       return _createFailedResult(
@@ -68,7 +61,6 @@ class IOSVisionOCRService implements OCRService {
       );
     } on Exception catch (e) {
       stopwatch.stop();
-      debugPrint('IOSVisionOCRService: Exception: $e');
 
       // 返回失敗結果
       return _createFailedResult(
@@ -103,8 +95,7 @@ class IOSVisionOCRService implements OCRService {
           ),
         ),
       ];
-    } on Exception catch (e) {
-      debugPrint('IOSVisionOCRService: 取得引擎資訊失敗: $e');
+    } on Exception {
       return [];
     }
   }
@@ -117,9 +108,8 @@ class IOSVisionOCRService implements OCRService {
 
     try {
       await _channel.invokeMethod('setPreferredEngine', {'engineId': engineId});
-      debugPrint('IOSVisionOCRService: 引擎設定為 $engineId');
-    } on Exception catch (e) {
-      debugPrint('IOSVisionOCRService: 設定引擎失敗: $e');
+    } on Exception {
+      // Engine setting failed - continue silently
     }
   }
 
@@ -191,8 +181,6 @@ class IOSVisionOCRService implements OCRService {
     }
 
     try {
-      debugPrint('IOSVisionOCRService: 預處理圖片');
-
       final result = await _channel.invokeMethod('preprocessImage', {
         'imageData': imageData,
         'enhanceContrast': options?.enhanceContrast ?? true,
@@ -201,8 +189,7 @@ class IOSVisionOCRService implements OCRService {
       });
 
       return Uint8List.fromList(List<int>.from(result['processedImageData']));
-    } on Exception catch (e) {
-      debugPrint('IOSVisionOCRService: 圖片預處理失敗: $e');
+    } on Exception {
       return imageData; // 返回原圖
     }
   }

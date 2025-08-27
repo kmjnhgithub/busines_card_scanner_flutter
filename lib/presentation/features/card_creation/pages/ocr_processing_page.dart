@@ -59,8 +59,8 @@ class _OCRProcessingPageState extends ConsumerState<OCRProcessingPage> {
       await ref
           .read(ocrProcessingViewModelProvider.notifier)
           .loadImage(imageData);
-    } on Exception catch (e) {
-      debugPrint('載入圖片失敗: $e');
+    } on Exception {
+      // Failed to load image - continue with current state
     }
   }
 

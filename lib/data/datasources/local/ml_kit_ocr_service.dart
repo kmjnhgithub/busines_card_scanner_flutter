@@ -27,8 +27,6 @@ class MLKitOCRService implements OCRService {
     final stopwatch = Stopwatch()..start();
 
     try {
-      debugPrint('MLKitOCRService: 開始 OCR 處理');
-
       // 建立 InputImage
       final inputImage = InputImage.fromBytes(
         bytes: imageData,
@@ -47,13 +45,9 @@ class MLKitOCRService implements OCRService {
         stopwatch.elapsedMilliseconds,
       );
 
-      debugPrint('MLKitOCRService: OCR 完成，信心度: ${result.confidence}');
-      debugPrint('MLKitOCRService: 識別文字: ${result.rawText}');
-
       return result;
-    } on Exception catch (e) {
+    } on Exception {
       stopwatch.stop();
-      debugPrint('MLKitOCRService: OCR 處理失敗: $e');
 
       // 返回空結果但保留錯誤資訊
       return OCRResult(
@@ -89,7 +83,6 @@ class MLKitOCRService implements OCRService {
   @override
   Future<void> setPreferredEngine(String engineId) async {
     // ML Kit 只有一個引擎，不需要切換
-    debugPrint('MLKitOCRService: 引擎設定 - $engineId');
   }
 
   @override
@@ -128,7 +121,6 @@ class MLKitOCRService implements OCRService {
     ImagePreprocessOptions? options,
   }) async {
     // ML Kit 自動處理圖片預處理，直接返回原圖
-    debugPrint('MLKitOCRService: 圖片預處理（ML Kit 自動處理）');
     return imageData;
   }
 
@@ -280,6 +272,5 @@ class MLKitOCRService implements OCRService {
   /// 釋放資源
   void dispose() {
     _textRecognizer.close();
-    debugPrint('MLKitOCRService: 資源已釋放');
   }
 }

@@ -56,35 +56,26 @@ class _CameraPageState extends ConsumerState<CameraPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    debugPrint('AppLifecycleState changed to: $state');
-
     // 只在從背景返回時重新初始化
     // 不要在權限請求時重新初始化（權限請求不會觸發 paused）
     if (state == AppLifecycleState.resumed) {
       // 檢查相機是否已經初始化
       final currentState = ref.read(cameraViewModelProvider);
       if (!currentState.isInitialized && !currentState.isLoading) {
-        debugPrint('App resumed - camera not initialized, initializing now');
         _initializeCamera();
-      } else {
-        debugPrint('App resumed - camera already initialized or loading');
-      }
+      } else {}
     }
   }
 
   /// 初始化相機
   Future<void> _initializeCamera() async {
     try {
-      debugPrint('開始初始化相機...');
-
       // 檢查相機權限狀態
       final status = await Permission.camera.status;
-      debugPrint('相機權限狀態: $status');
 
       if (!status.isGranted) {
         // 請求相機權限
         final requestStatus = await Permission.camera.request();
-        debugPrint('請求權限結果: $requestStatus');
 
         if (requestStatus != PermissionStatus.granted) {
           if (mounted) {
@@ -95,9 +86,7 @@ class _CameraPageState extends ConsumerState<CameraPage>
       }
 
       // 獲取可用相機
-      debugPrint('獲取可用相機列表...');
       _cameras = await availableCameras();
-      debugPrint('可用相機數量: ${_cameras.length}');
 
       if (_cameras.isEmpty) {
         if (mounted) {
@@ -107,13 +96,10 @@ class _CameraPageState extends ConsumerState<CameraPage>
       }
 
       // 初始化相機 ViewModel
-      debugPrint('初始化相機 ViewModel...');
       await ref
           .read(cameraViewModelProvider.notifier)
           .initializeCamera(_cameras);
-      debugPrint('相機初始化完成');
     } on Exception catch (e) {
-      debugPrint('初始化相機失敗: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('相機初始化失敗: $e'), backgroundColor: Colors.red),
@@ -169,7 +155,6 @@ class _CameraPageState extends ConsumerState<CameraPage>
         await _processImage(image.path);
       }
     } on Exception catch (e) {
-      debugPrint('選擇相簿圖片失敗: $e');
       if (mounted) {
         ScaffoldMessenger.of(
           context,
@@ -368,33 +353,22 @@ class _CameraPageState extends ConsumerState<CameraPage>
         builder: (context, ref, child) {
           final state = ref.watch(cameraViewModelProvider);
 
-          debugPrint(
-            'CameraPage build - isLoading: ${state.isLoading}, isInitialized: ${state.isInitialized}, hasController: ${state.cameraController != null}, error: ${state.error}',
-          );
-
           // 載入中狀態
           if (state.isLoading) {
-            debugPrint('CameraPage: 顯示載入中視圖');
             return _buildLoadingView();
           }
 
           // 錯誤狀態
           if (state.error != null) {
-            debugPrint('CameraPage: 顯示錯誤視圖 - ${state.error}');
             return _buildErrorView(state.error!);
           }
 
           // 正常相機預覽
           if (state.isInitialized && state.cameraController != null) {
-            debugPrint('CameraPage: 顯示相機視圖');
-            debugPrint(
-              'CameraPage: Controller 狀態 - ${state.cameraController!.value.isInitialized}',
-            );
             return _buildCameraView(state);
           }
 
           // 預設狀態
-          debugPrint('CameraPage: 顯示預設載入視圖');
           return _buildLoadingView();
         },
       ),
@@ -451,23 +425,17 @@ class _CameraPageState extends ConsumerState<CameraPage>
 
   /// 建立相機視圖
   Widget _buildCameraView(CameraState state) {
-    debugPrint('_buildCameraView: 開始建立相機視圖');
-
     if (state.cameraController == null) {
-      debugPrint('_buildCameraView: 錯誤 - cameraController 為 null');
       return const Center(
         child: Text('相機控制器未初始化', style: TextStyle(color: Colors.white)),
       );
     }
 
     if (!state.cameraController!.value.isInitialized) {
-      debugPrint('_buildCameraView: 錯誤 - cameraController 未初始化');
       return const Center(
         child: Text('相機控制器未初始化', style: TextStyle(color: Colors.white)),
       );
     }
-
-    debugPrint('_buildCameraView: 相機控制器正常，開始建立 UI');
 
     return Stack(
       children: [
@@ -491,17 +459,8 @@ class _CameraPageState extends ConsumerState<CameraPage>
 
   /// 建立相機預覽
   Widget _buildCameraPreview(CameraController controller) {
-    debugPrint('_buildCameraPreview: 建立 CameraPreview widget');
-    debugPrint(
-      '_buildCameraPreview: controller.value.isInitialized = ${controller.value.isInitialized}',
-    );
-    debugPrint(
-      '_buildCameraPreview: aspectRatio = ${controller.value.aspectRatio}',
-    );
-
     // 確保控制器已初始化
     if (!controller.value.isInitialized) {
-      debugPrint('_buildCameraPreview: 控制器未初始化！');
       return const Center(
         child: CircularProgressIndicator(color: Colors.white),
       );

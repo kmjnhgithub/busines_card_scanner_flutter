@@ -57,8 +57,6 @@ class CameraViewModel extends StateNotifier<CameraState> {
 
   /// 初始化相機
   Future<void> initializeCamera(List<CameraDescription> cameras) async {
-    debugPrint('CameraViewModel: 開始初始化相機，相機數量: ${cameras.length}');
-
     if (cameras.isEmpty) {
       _updateError('沒有可用的相機');
       _toastPresenter.showError('沒有可用的相機');
@@ -66,54 +64,34 @@ class CameraViewModel extends StateNotifier<CameraState> {
     }
 
     try {
-      debugPrint('CameraViewModel: 設定載入狀態');
       state = state.copyWith(isLoading: true, error: null);
 
-      debugPrint('CameraViewModel: 創建 CameraController');
       final controller = CameraController(
         cameras.first,
         ResolutionPreset.high,
         enableAudio: false,
       );
 
-      debugPrint('CameraViewModel: 初始化 CameraController');
       await controller.initialize();
 
-      debugPrint(
-        'CameraViewModel: 控制器初始化狀態: ${controller.value.isInitialized}',
-      );
-
       if (controller.value.isInitialized) {
-        debugPrint('CameraViewModel: 更新狀態 - 相機已初始化');
-
         // 設定初始對焦模式為連續自動對焦
         // iOS 原生相機預設就是連續自動對焦模式
         await controller.setFocusMode(FocusMode.auto);
-        debugPrint('CameraViewModel: 設定對焦模式為自動（iOS 原生連續對焦）');
 
         state = state.copyWith(
           cameraController: controller,
           isInitialized: true,
           isLoading: false,
         );
-        debugPrint(
-          'CameraViewModel: 狀態更新完成 - isInitialized: ${state.isInitialized}, hasController: ${state.cameraController != null}',
-        );
-
-        debugPrint('CameraViewModel: 使用原生連續自動對焦模式');
       } else {
-        debugPrint('CameraViewModel: 控制器初始化失敗 - isInitialized 為 false');
         _updateError('相機控制器初始化失敗');
       }
     } on CameraException catch (e) {
-      debugPrint(
-        'CameraViewModel: CameraException - ${e.code}: ${e.description}',
-      );
       _updateError('相機初始化失敗: ${e.description}');
       _toastPresenter.showError('相機初始化失敗');
       state = state.copyWith(isLoading: false);
     } on Exception catch (e) {
-      debugPrint('CameraViewModel: Exception - $e');
       _updateError('相機初始化失敗: $e');
       _toastPresenter.showError('相機初始化失敗');
       state = state.copyWith(isLoading: false);
@@ -251,18 +229,13 @@ class CameraViewModel extends StateNotifier<CameraState> {
       await controller.setFocusPoint(point);
       await controller.setExposurePoint(point);
 
-      debugPrint('手動對焦點設定: $point');
-
       // iOS 會自動在幾秒後恢復連續自動對焦
       // 不需要手動管理計時器
     } on CameraException catch (e) {
-      debugPrint('相機對焦錯誤 - ${e.code}: ${e.description}');
       // 如果 setFocusPoint 不支援，回退到原生自動對焦
-      if (e.code == 'setFocusPointFailed') {
-        debugPrint('此設備不支援手動對焦點設定，使用原生自動對焦');
-      }
-    } on Exception catch (e) {
-      debugPrint('設定焦點失敗: $e');
+      if (e.code == 'setFocusPointFailed') {}
+    } on Exception {
+      // Camera disposal failed - continue silently
     }
   }
 
@@ -288,8 +261,8 @@ class CameraViewModel extends StateNotifier<CameraState> {
     // 這時不會再存取 state，只使用之前儲存的參考
     try {
       controller?.dispose();
-    } on Exception catch (e) {
-      debugPrint('Camera controller dispose error: $e');
+    } on Exception {
+      // Camera disposal failed - continue silently
     }
   }
 
@@ -308,7 +281,6 @@ class CameraViewModel extends StateNotifier<CameraState> {
       // 1. 解碼圖片
       final image = img.decodeImage(imageData);
       if (image == null) {
-        debugPrint('無法解碼圖片');
         return imageData; // 返回原圖
       }
 
@@ -320,13 +292,6 @@ class CameraViewModel extends StateNotifier<CameraState> {
         screenFrame: scanFrame,
         screenSize: screenSize,
         imageSize: Size(image.width.toDouble(), image.height.toDouble()),
-      );
-
-      debugPrint(
-        '螢幕裁剪框: ${scanFrame.left.toInt()}, ${scanFrame.top.toInt()}, ${scanFrame.width.toInt()}, ${scanFrame.height.toInt()}',
-      );
-      debugPrint(
-        '圖片裁剪框: ${cropRect.left.toInt()}, ${cropRect.top.toInt()}, ${cropRect.width.toInt()}, ${cropRect.height.toInt()}',
       );
 
       // 4. 執行裁剪
@@ -343,14 +308,8 @@ class CameraViewModel extends StateNotifier<CameraState> {
         img.encodeJpg(cropped, quality: 90),
       );
 
-      debugPrint(
-        '裁剪完成: 原圖 ${image.width}x${image.height} -> 裁剪後 ${cropped.width}x${cropped.height}',
-      );
-      debugPrint('檔案大小: ${imageData.length} -> ${croppedBytes.length} bytes');
-
       return croppedBytes;
-    } on Exception catch (e) {
-      debugPrint('裁剪圖片失敗: $e');
+    } on Exception {
       return imageData; // 裁剪失敗時返回原圖
     }
   }
@@ -371,16 +330,6 @@ class CameraViewModel extends StateNotifier<CameraState> {
     final imageWidth = screenFrame.width * scaleX;
     final imageHeight = screenFrame.height * scaleY;
 
-    debugPrint(
-      '直接映射 - 縮放比例: X=${scaleX.toStringAsFixed(2)}, Y=${scaleY.toStringAsFixed(2)}',
-    );
-    debugPrint(
-      '螢幕框: ${screenFrame.left.toInt()}, ${screenFrame.top.toInt()}, ${screenFrame.width.toInt()}, ${screenFrame.height.toInt()}',
-    );
-    debugPrint(
-      '圖片框: ${imageLeft.toInt()}, ${imageTop.toInt()}, ${imageWidth.toInt()}, ${imageHeight.toInt()}',
-    );
-
     return Rect.fromLTWH(imageLeft, imageTop, imageWidth, imageHeight);
   }
 }
@@ -389,8 +338,6 @@ class CameraViewModel extends StateNotifier<CameraState> {
 /// 使用 autoDispose 確保頁面離開時釋放資源
 final cameraViewModelProvider =
     StateNotifierProvider.autoDispose<CameraViewModel, CameraState>((ref) {
-      debugPrint('Creating new CameraViewModel instance');
-
       final processImageUseCase = ref.watch(processImageUseCaseProvider);
       final loadingPresenter = ref.watch(loadingPresenterProvider.notifier);
       final toastPresenter = ref.watch(toastPresenterProvider.notifier);
@@ -403,9 +350,7 @@ final cameraViewModelProvider =
 
       // Riverpod 會自動呼叫 StateNotifier 的 dispose
       // 不需要手動呼叫
-      ref.onDispose(() {
-        debugPrint('CameraViewModel provider being disposed');
-      });
+      ref.onDispose(() {});
 
       return viewModel;
     });

@@ -276,21 +276,17 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     CardListViewModel viewModel,
   ) {
     if (state.isLoading && state.cards.isEmpty) {
-      debugPrint('UI 顯示載入狀態');
       return _buildLoadingState();
     }
 
     if (state.error != null) {
-      debugPrint('UI 顯示錯誤狀態: ${state.error}');
       return _buildErrorState(state.error!, viewModel);
     }
 
     if (state.filteredCards.isEmpty) {
-      debugPrint('UI 顯示空狀態 - 搜尋中: ${state.searchQuery.isNotEmpty}');
       return _buildEmptyState(context, state.searchQuery.isNotEmpty);
     }
 
-    debugPrint('UI 準備顯示名片列表 - 卡片數: ${state.filteredCards.length}');
     return RefreshIndicator(
       onRefresh: () => viewModel.refresh(),
       color: AppColors.primary,
@@ -580,8 +576,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       } else {
         return _buildDefaultCardImage();
       }
-    } on Exception catch (e) {
-      debugPrint('CardListPage - 處理圖片時發生錯誤: $e');
+    } on Exception {
       return _buildDefaultCardImage();
     }
   }
@@ -892,8 +887,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
           '${AppRoutes.ocrProcessing}/${Uri.encodeComponent(image.path)}',
         );
       }
-    } on Exception catch (e) {
-      debugPrint('選擇相簿圖片失敗: $e');
+    } on Exception {
       if (context.mounted) {
         ToastHelper.showSnackBar(context, '選擇圖片失敗，請重試', type: ToastType.error);
       }

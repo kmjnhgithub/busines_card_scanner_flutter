@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
@@ -172,11 +174,11 @@ class CardListActions extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
         border: Border.all(color: AppColors.separator, width: 0.5),
       ),
-      child: card.imageUrl != null && card.imageUrl!.isNotEmpty
+      child: card.imagePath != null && card.imagePath!.isNotEmpty
           ? ClipRRect(
               borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
-              child: Image.network(
-                card.imageUrl!,
+              child: Image.file(
+                File(card.imagePath!),
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(

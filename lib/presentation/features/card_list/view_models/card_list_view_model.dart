@@ -89,9 +89,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      debugPrint('開始從資料庫載入名片列表...');
       final cards = await _cardRepository.getCards(limit: 100);
-      debugPrint('從資料庫載入了 ${cards.length} 張名片');
 
       state = state.copyWith(isLoading: false, cards: cards, error: null);
       _applyFiltersAndSort();
@@ -99,7 +97,6 @@ class CardListViewModel extends StateNotifier<CardListState> {
       final errorMessage = error is DomainFailure
           ? error.userMessage
           : error.toString();
-      debugPrint('載入名片列表失敗: $errorMessage');
       state = state.copyWith(isLoading: false, error: errorMessage);
     }
   }

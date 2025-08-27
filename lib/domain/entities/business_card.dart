@@ -1,7 +1,6 @@
 import 'package:busines_card_scanner_flutter/core/services/security_service.dart';
 import 'package:busines_card_scanner_flutter/core/services/validation_service.dart';
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 
 /// 名片業務實體
 ///
@@ -22,8 +21,7 @@ class BusinessCard extends Equatable {
   final String? address;
   final String? website;
   final String? notes;
-  final String? imageUrl;
-  final String? imagePath;
+  final String? imagePath; // 本地圖片路徑
   final List<String> tags;
   final bool isFavorite;
   final DateTime createdAt;
@@ -53,7 +51,6 @@ class BusinessCard extends Equatable {
     String? address,
     String? website,
     String? notes,
-    this.imageUrl,
     this.imagePath,
     List<String>? tags,
     this.isFavorite = false,
@@ -86,7 +83,6 @@ class BusinessCard extends Equatable {
     this.address,
     this.website,
     this.notes,
-    this.imageUrl,
     this.imagePath,
     this.updatedAt,
   });
@@ -165,7 +161,6 @@ class BusinessCard extends Equatable {
     return urlResult.fold(
       (failure) {
         // 如果驗證失敗，記錄警告並返回 null
-        debugPrint('警告：無效的網址格式被忽略: $cleaned');
         return null;
       },
       (validUrl) => validUrl, // 返回有效的網址
@@ -224,7 +219,6 @@ class BusinessCard extends Equatable {
     String? address,
     String? website,
     String? notes,
-    String? imageUrl,
     String? imagePath,
     List<String>? tags,
     bool? isFavorite,
@@ -242,7 +236,6 @@ class BusinessCard extends Equatable {
       address: address ?? this.address,
       website: website ?? this.website,
       notes: notes ?? this.notes,
-      imageUrl: imageUrl ?? this.imageUrl,
       imagePath: imagePath ?? this.imagePath,
       tags: tags ?? this.tags,
       isFavorite: isFavorite ?? this.isFavorite,
@@ -263,7 +256,6 @@ class BusinessCard extends Equatable {
     address,
     website,
     notes,
-    imageUrl,
     imagePath,
     tags,
     isFavorite,

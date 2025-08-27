@@ -89,10 +89,6 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
     final viewModel = ref.read(cardDetailViewModelBasicProvider.notifier);
 
     // 除錯資訊
-    debugPrint('CardDetailPage 初始化:');
-    debugPrint('  mode: ${widget.mode}');
-    debugPrint('  cardId: ${widget.cardId}');
-    debugPrint('  ocrParsedCard: ${widget.ocrParsedCard?.name ?? '無'}');
 
     switch (widget.mode) {
       case CardDetailMode.viewing:
@@ -115,7 +111,6 @@ class _CardDetailPageState extends ConsumerState<CardDetailPage> {
           viewModel.initializeCreating(widget.ocrParsedCard!);
         } else {
           // 如果沒有 OCR 資料，切換到手動建立模式
-          debugPrint('CardDetailPage: OCR 資料為空，切換到手動建立模式');
           viewModel.initializeManual();
         }
         break;

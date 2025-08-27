@@ -2,7 +2,6 @@ import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart'
 import 'package:busines_card_scanner_flutter/domain/repositories/card_repository.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_detail/view_models/card_detail_state.dart';
 import 'package:busines_card_scanner_flutter/presentation/providers/data_providers.dart';
-import 'package:flutter/foundation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -26,7 +25,6 @@ class CardDetailViewModelBasic extends _$CardDetailViewModelBasic {
       final card = await _cardRepository.getCardById(cardId);
       state = CardDetailState.viewing(card: card);
     } on Exception catch (e) {
-      debugPrint('載入名片失敗: $e');
       state = CardDetailState.error(message: '載入名片失敗：${e.toString()}');
     }
   }
@@ -153,7 +151,6 @@ class CardDetailViewModelBasic extends _$CardDetailViewModelBasic {
     );
 
     if (cardToSave == null || cardToSave!.name.trim().isEmpty) {
-      debugPrint('沒有可儲存的名片資料或姓名為空');
       return false;
     }
 
@@ -170,14 +167,10 @@ class CardDetailViewModelBasic extends _$CardDetailViewModelBasic {
       );
 
       // 真正儲存到資料庫
-      final savedCard = await _cardRepository.saveCard(cardToSaveWithId);
-
-      debugPrint('名片已成功儲存到資料庫：${savedCard.name} (ID: ${savedCard.id})');
-      debugPrint('儲存的名片圖片路徑：${savedCard.imagePath}');
+      await _cardRepository.saveCard(cardToSaveWithId);
 
       return true;
-    } on Exception catch (e) {
-      debugPrint('儲存名片到資料庫失敗：${e.toString()}');
+    } on Exception {
       return false;
     }
   }

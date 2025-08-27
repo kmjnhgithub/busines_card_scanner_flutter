@@ -22,7 +22,7 @@ void main() {
           address: '123 Main St, Tech City',
           website: 'https://johndoe.com',
           notes: 'Met at tech conference',
-          imageUrl: '/path/to/card/image.jpg',
+          imagePath: '/path/to/card/image.jpg',
           createdAt: testDateTime,
           updatedAt: testDateTime,
         );
@@ -37,7 +37,7 @@ void main() {
         expect(card.address, '123 Main St, Tech City');
         expect(card.website, 'https://johndoe.com');
         expect(card.notes, 'Met at tech conference');
-        expect(card.imageUrl, '/path/to/card/image.jpg');
+        expect(card.imagePath, '/path/to/card/image.jpg');
         expect(card.createdAt, testDateTime);
         expect(card.updatedAt, testDateTime);
       });
@@ -61,7 +61,7 @@ void main() {
         expect(card.address, isNull);
         expect(card.website, isNull);
         expect(card.notes, isNull);
-        expect(card.imageUrl, isNull);
+        expect(card.imagePath, isNull);
         expect(card.updatedAt, isNull);
       });
 

@@ -26,15 +26,11 @@ class PlatformOCRService implements OCRService {
     if (Platform.isIOS) {
       _activeService = IOSVisionOCRService();
       _platformName = 'iOS Vision Framework';
-      debugPrint('PlatformOCRService: 已選擇 iOS Vision Framework');
     } else {
       _activeService = MLKitOCRService();
       _platformName = Platform.isAndroid
           ? 'Android ML Kit'
           : 'Cross-platform ML Kit';
-      debugPrint(
-        'PlatformOCRService: 已選擇 Google ML Kit (${Platform.operatingSystem})',
-      );
     }
   }
 
@@ -43,8 +39,6 @@ class PlatformOCRService implements OCRService {
     Uint8List imageData, {
     OCROptions? options,
   }) async {
-    debugPrint('PlatformOCRService: 開始 OCR 處理 ($_platformName)');
-
     try {
       final result = await _activeService.recognizeText(
         imageData,
@@ -65,16 +59,10 @@ class PlatformOCRService implements OCRService {
         ocrEngine: '$_platformName (${result.ocrEngine})',
       );
 
-      debugPrint(
-        'PlatformOCRService: OCR 完成 ($_platformName) - 信心度: ${result.confidence}',
-      );
       return updatedResult;
-    } on Exception catch (e) {
-      debugPrint('PlatformOCRService: OCR 處理失敗 ($_platformName): $e');
-
+    } on Exception {
       // 如果是 iOS 服務失敗，可以考慮 fallback 到 ML Kit
       if (Platform.isIOS && _activeService is IOSVisionOCRService) {
-        debugPrint('PlatformOCRService: iOS Vision 失敗，嘗試 fallback 到 ML Kit');
         try {
           final fallbackService = MLKitOCRService();
           final result = await fallbackService.recognizeText(
@@ -95,8 +83,7 @@ class PlatformOCRService implements OCRService {
             processingTimeMs: result.processingTimeMs,
             ocrEngine: 'ML Kit (iOS Vision Fallback)',
           );
-        } on Exception catch (fallbackError) {
-          debugPrint('PlatformOCRService: Fallback 也失敗: $fallbackError');
+        } on Exception {
           rethrow;
         }
       }
@@ -121,13 +108,10 @@ class PlatformOCRService implements OCRService {
 
   @override
   Future<void> setPreferredEngine(String engineId) async {
-    debugPrint('PlatformOCRService: 設定偏好引擎 - $engineId');
-
     // 如果在 iOS 上要切換到 ML Kit
     if (Platform.isIOS && engineId == 'ml_kit') {
       _activeService = MLKitOCRService();
       _platformName = 'ML Kit (iOS)';
-      debugPrint('PlatformOCRService: 已切換到 ML Kit');
       return;
     }
 
@@ -135,7 +119,6 @@ class PlatformOCRService implements OCRService {
     if (Platform.isIOS && engineId == 'ios_vision') {
       _activeService = IOSVisionOCRService();
       _platformName = 'iOS Vision Framework';
-      debugPrint('PlatformOCRService: 已切換到 iOS Vision Framework');
       return;
     }
 
@@ -161,15 +144,12 @@ class PlatformOCRService implements OCRService {
 
   @override
   Future<OCREngineHealth> testEngine({String? engineId}) async {
-    debugPrint('PlatformOCRService: 測試引擎健康狀態 ($_platformName)');
-
     final health = await _activeService.testEngine(engineId: engineId);
 
     // 如果當前引擎不健康且在 iOS 上，測試 fallback 選項
     if (!health.isHealthy &&
         Platform.isIOS &&
         _activeService is IOSVisionOCRService) {
-      debugPrint('PlatformOCRService: 當前引擎不健康，測試 ML Kit fallback');
       try {
         final fallbackService = MLKitOCRService();
         final fallbackHealth = await fallbackService.testEngine();
@@ -183,8 +163,8 @@ class PlatformOCRService implements OCRService {
             error: 'Primary engine failed, fallback available',
           );
         }
-      } on Exception catch (e) {
-        debugPrint('PlatformOCRService: Fallback 引擎測試失敗: $e');
+      } on Exception {
+        // Fallback health check failed - continue with original health status
       }
     }
 
@@ -196,7 +176,6 @@ class PlatformOCRService implements OCRService {
     Uint8List imageData, {
     ImagePreprocessOptions? options,
   }) async {
-    debugPrint('PlatformOCRService: 圖片預處理 ($_platformName)');
     return _activeService.preprocessImage(imageData, options: options);
   }
 
@@ -224,7 +203,6 @@ class PlatformOCRService implements OCRService {
     }
 
     if (_activeService is IOSVisionOCRService) {
-      debugPrint('PlatformOCRService: 手動切換到 ML Kit fallback');
       _activeService = MLKitOCRService();
       _platformName = 'ML Kit (Manual Fallback)';
     }
@@ -232,14 +210,11 @@ class PlatformOCRService implements OCRService {
 
   /// 重設為預設服務
   Future<void> resetToDefault() async {
-    debugPrint('PlatformOCRService: 重設為預設服務');
     _initializePlatformService();
   }
 
   /// 釋放資源
   void dispose() {
-    debugPrint('PlatformOCRService: 釋放資源 ($_platformName)');
-
     // 如果當前服務有 dispose 方法則呼叫
     if (_activeService is MLKitOCRService) {
       _activeService.dispose();
