@@ -176,7 +176,7 @@ class ParsedCardData {
   });
 
   /// 轉換為 BusinessCard 實體
-  BusinessCard toBusinessCard({String? id}) {
+  BusinessCard toBusinessCard({String? id, String? imagePath}) {
     return BusinessCard(
       id: id ?? '',
       name: name ?? '',
@@ -187,6 +187,7 @@ class ParsedCardData {
       address: address,
       website: website,
       notes: notes,
+      imagePath: imagePath,
       createdAt: parsedAt,
     );
   }

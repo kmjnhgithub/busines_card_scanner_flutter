@@ -242,6 +242,7 @@ class CardRepositoryImpl implements CardRepository {
           address: Value(newCard.address),
           website: Value(newCard.website),
           notes: Value(newCard.notes),
+          photoPath: Value(newCard.imagePath),
         );
 
         final insertedId = await _database.cardDao.insertBusinessCard(

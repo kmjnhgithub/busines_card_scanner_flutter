@@ -173,6 +173,7 @@ class CardDetailViewModelBasic extends _$CardDetailViewModelBasic {
       final savedCard = await _cardRepository.saveCard(cardToSaveWithId);
 
       debugPrint('名片已成功儲存到資料庫：${savedCard.name} (ID: ${savedCard.id})');
+      debugPrint('儲存的名片圖片路徑：${savedCard.imagePath}');
 
       return true;
     } on Exception catch (e) {

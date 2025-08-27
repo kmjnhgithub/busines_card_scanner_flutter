@@ -170,6 +170,11 @@ class _CameraPageState extends ConsumerState<CameraPage>
       }
     } on Exception catch (e) {
       debugPrint('選擇相簿圖片失敗: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('選擇相簿圖片失敗: $e')));
+      }
     }
   }
 

@@ -42,6 +42,9 @@ class BusinessCards extends Table {
   /// 備註（可選）
   TextColumn get notes => text().withLength(max: 1000).nullable()();
 
+  /// 照片路徑（可選）
+  TextColumn get photoPath => text().withLength(max: 500).nullable()();
+
   /// 建立時間（自動設定）
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
 
@@ -120,6 +123,7 @@ class CardDao extends DatabaseAccessor<CleanAppDatabase> with _$CardDaoMixin {
             address: Value(card.address),
             website: Value(card.website),
             notes: Value(card.notes),
+            photoPath: Value(card.imagePath),
             updatedAt: Value(DateTime.now()),
           ),
         );
@@ -154,6 +158,7 @@ class CardDao extends DatabaseAccessor<CleanAppDatabase> with _$CardDaoMixin {
       address: dbCard.address,
       website: dbCard.website,
       notes: dbCard.notes,
+      imagePath: dbCard.photoPath,
       createdAt: dbCard.createdAt,
       updatedAt: dbCard.updatedAt,
     );
@@ -179,7 +184,7 @@ class CleanAppDatabase extends _$CleanAppDatabase {
   }
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   /// 建立原生 SQLite 執行器
   static LazyDatabase _createNativeExecutor(String fileName) {

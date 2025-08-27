@@ -116,3 +116,11 @@ ios/build/
 **/PIFCache/
 /.editorconfig
 /CLAUDE.local.md
+  # Build outputs
+build_output.txt
+*.build.log
+
+# 備份和臨時檔案
+*.backup
+*.bak
+*.future

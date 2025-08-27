@@ -82,7 +82,7 @@ class BusinessCardModel with _$BusinessCardModel {
       address: entity.address,
       website: entity.website,
       notes: entity.notes,
-      photoPath: entity.imageUrl, // Domain 的 imageUrl 對應到 Data 的 photoPath
+      photoPath: entity.imagePath, // Domain 的 imagePath 對應到 Data 的 photoPath
       createdAt: entity.createdAt,
       updatedAt:
           entity.updatedAt ?? entity.createdAt, // 如果 updatedAt 為空，使用 createdAt
@@ -104,7 +104,7 @@ extension BusinessCardModelExtension on BusinessCardModel {
       address: address,
       website: website,
       notes: notes,
-      imageUrl: photoPath, // photoPath 對應到 Domain 的 imageUrl
+      imagePath: photoPath, // photoPath 對應到 Domain 的 imagePath
       createdAt: createdAt,
       updatedAt: updatedAt,
     );

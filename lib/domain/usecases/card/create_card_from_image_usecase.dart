@@ -94,7 +94,10 @@ class CreateCardFromImageUseCase {
       }
 
       // 7. 建立名片實體
-      final card = _createBusinessCardFromParsedData(finalParsedData);
+      final card = _createBusinessCardFromParsedData(
+        finalParsedData,
+        imagePath: params.imagePath,
+      );
 
       // 8. 儲存名片（除非是乾執行模式）
       BusinessCard savedCard = card;
@@ -256,10 +259,13 @@ class CreateCardFromImageUseCase {
   }
 
   /// 從解析資料建立 BusinessCard 實體
-  BusinessCard _createBusinessCardFromParsedData(ParsedCardData parsedData) {
+  BusinessCard _createBusinessCardFromParsedData(
+    ParsedCardData parsedData, {
+    String? imagePath,
+  }) {
     // 生成臨時 ID，儲存時會由 Repository 分配實際的持久化 ID
     final tempId = 'temp-${DateTime.now().millisecondsSinceEpoch}';
-    return parsedData.toBusinessCard(id: tempId);
+    return parsedData.toBusinessCard(id: tempId, imagePath: imagePath);
   }
 
   /// 儲存名片
@@ -271,6 +277,7 @@ class CreateCardFromImageUseCase {
 /// 建立名片參數
 class CreateCardFromImageParams {
   final Uint8List imageData;
+  final String? imagePath;
   final OCROptions? ocrOptions;
   final ImagePreprocessOptions? preprocessOptions;
   final ParseHints? parseHints;
@@ -284,6 +291,7 @@ class CreateCardFromImageParams {
 
   const CreateCardFromImageParams({
     required this.imageData,
+    this.imagePath,
     this.ocrOptions,
     this.preprocessOptions,
     this.parseHints,

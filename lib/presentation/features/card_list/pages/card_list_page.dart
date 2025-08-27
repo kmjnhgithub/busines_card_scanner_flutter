@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:busines_card_scanner_flutter/core/utils/debouncer.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/view_models/card_list_view_model.dart';
@@ -274,17 +276,21 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     CardListViewModel viewModel,
   ) {
     if (state.isLoading && state.cards.isEmpty) {
+      debugPrint('UI 顯示載入狀態');
       return _buildLoadingState();
     }
 
     if (state.error != null) {
+      debugPrint('UI 顯示錯誤狀態: ${state.error}');
       return _buildErrorState(state.error!, viewModel);
     }
 
     if (state.filteredCards.isEmpty) {
+      debugPrint('UI 顯示空狀態 - 搜尋中: ${state.searchQuery.isNotEmpty}');
       return _buildEmptyState(context, state.searchQuery.isNotEmpty);
     }
 
+    debugPrint('UI 準備顯示名片列表 - 卡片數: ${state.filteredCards.length}');
     return RefreshIndicator(
       onRefresh: () => viewModel.refresh(),
       color: AppColors.primary,
@@ -561,8 +567,23 @@ class _CardListPageState extends ConsumerState<CardListPage> {
 
   /// 建立名片圖片內容
   Widget _buildCardImageContent(String imagePath) {
-    // 由於是假資料路徑，暫時使用預設圖片
-    return _buildDefaultCardImage();
+    try {
+      final imageFile = File(imagePath);
+      if (imageFile.existsSync()) {
+        return Image.file(
+          imageFile,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildDefaultCardImage();
+          },
+        );
+      } else {
+        return _buildDefaultCardImage();
+      }
+    } on Exception catch (e) {
+      debugPrint('CardListPage - 處理圖片時發生錯誤: $e');
+      return _buildDefaultCardImage();
+    }
   }
 
   /// 建立預設名片圖片

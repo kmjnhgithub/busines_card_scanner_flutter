@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
@@ -206,21 +208,23 @@ class _CardListItemState extends State<CardListItem>
 
   /// 建立縮圖內容
   Widget _buildThumbnailContent() {
-    if (widget.card.imageUrl != null && widget.card.imageUrl!.isNotEmpty) {
-      return Image.network(
-        widget.card.imageUrl!,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return _buildDefaultThumbnail();
-        },
-        loadingBuilder: (context, child, loadingProgress) {
-          if (loadingProgress == null) {
-            return child;
-          }
-          return _buildLoadingThumbnail();
-        },
-      );
-    }
+    // 優先顯示本地圖片
+    if (widget.card.imagePath != null && widget.card.imagePath!.isNotEmpty) {
+      final imageFile = File(widget.card.imagePath!);
+
+      // 確認檔案存在
+      if (imageFile.existsSync()) {
+        return Image.file(
+          imageFile,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return _buildDefaultThumbnail();
+          },
+        );
+      } else {}
+    } else {}
+
+    // 沒有圖片時顯示預設圖示
     return _buildDefaultThumbnail();
   }
 
@@ -230,20 +234,6 @@ class _CardListItemState extends State<CardListItem>
       Icons.credit_card,
       color: AppColors.placeholder,
       size: AppDimensions.iconSmall,
-    );
-  }
-
-  /// 建立載入中縮圖
-  Widget _buildLoadingThumbnail() {
-    return const Center(
-      child: SizedBox(
-        width: 16,
-        height: 16,
-        child: CircularProgressIndicator(
-          strokeWidth: 2,
-          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-        ),
-      ),
     );
   }
 
