@@ -115,7 +115,7 @@ class CardListViewModel extends StateNotifier<CardListState> {
   Future<bool> deleteCard(String cardId) async {
     try {
       final result = await _deleteCardUseCase.execute(
-        DeleteCardParams(cardId: cardId, deleteType: DeleteType.soft),
+        DeleteCardParams(cardId: cardId, deleteType: DeleteType.hard),
       );
 
       if (result.isSuccess) {

@@ -774,8 +774,8 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       context: context,
       builder: (BuildContext context) {
         return CupertinoAlertDialog(
-          title: const Text('刪除名片'),
-          content: Text('確定要刪除「${card.name}」的名片嗎？此操作可以復原。'),
+          title: const Text('永久刪除名片'),
+          content: Text('⚠️ 確定要永久刪除「${card.name}」的名片嗎？\n\n此操作無法復原。'),
           actions: [
             CupertinoDialogAction(
               child: const Text('取消'),
@@ -783,7 +783,7 @@ class _CardListPageState extends ConsumerState<CardListPage> {
             ),
             CupertinoDialogAction(
               isDestructiveAction: true,
-              child: const Text('刪除'),
+              child: const Text('永久刪除'),
               onPressed: () => Navigator.of(context).pop(true),
             ),
           ],
@@ -800,40 +800,16 @@ class _CardListPageState extends ConsumerState<CardListPage> {
       }
 
       if (success) {
-        // 顯示成功提示並提供 Undo 功能
-        _showDeleteSuccessWithUndo(context, card, viewModel);
+        // 顯示永久刪除成功提示
+        ToastHelper.showSnackBar(context, '名片已永久刪除', type: ToastType.success);
       } else {
         // 顯示錯誤提示
-        ToastHelper.showSnackBar(context, '刪除失敗，請稍後重試');
+        ToastHelper.showSnackBar(context, '刪除失敗，請稍後重試', type: ToastType.error);
       }
 
       return success;
     }
 
     return false; // 用戶取消
-  }
-
-  /// 顯示刪除成功提示和 Undo 功能
-  void _showDeleteSuccessWithUndo(
-    BuildContext context,
-    BusinessCard card,
-    CardListViewModel viewModel,
-  ) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('已刪除「${card.name}」的名片'),
-        backgroundColor: AppColors.success,
-        duration: const Duration(seconds: 5),
-        action: SnackBarAction(
-          label: '復原',
-          textColor: Colors.white,
-          onPressed: () {
-            // TODO: 實作復原功能
-            // 這需要在 ViewModel 中加入復原方法
-            ToastHelper.showSnackBar(context, '復原功能即將推出');
-          },
-        ),
-      ),
-    );
   }
 }
