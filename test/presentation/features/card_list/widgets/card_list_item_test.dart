@@ -30,8 +30,10 @@ void main() {
       VoidCallback? onTap,
       VoidCallback? onLongPress,
       VoidCallback? onMoreActions,
+      Future<bool> Function()? onDelete,
       bool showMoreButton = true,
       bool isSelected = false,
+      bool enableSwipeToDelete = true,
     }) {
       return MaterialApp(
         home: Scaffold(
@@ -40,8 +42,10 @@ void main() {
             onTap: onTap,
             onLongPress: onLongPress,
             onMoreActions: onMoreActions,
+            onDelete: onDelete,
             showMoreButton: showMoreButton,
             isSelected: isSelected,
+            enableSwipeToDelete: enableSwipeToDelete,
           ),
         ),
       );
@@ -172,6 +176,163 @@ void main() {
         expect(find.textContaining('這是一個非常非常長的姓名'), findsOneWidget);
         expect(find.textContaining('這是一個非常非常長的職稱'), findsOneWidget);
         expect(find.textContaining('這是一個非常非常長的公司名稱'), findsOneWidget);
+      });
+    });
+
+    group('滑動刪除功能', () {
+      testWidgets(
+        'enableSwipeToDelete = true 且有 onDelete 回調時應該顯示 Dismissible',
+        (tester) async {
+          bool deleteCallbackCalled = false;
+
+          await tester.pumpWidget(
+            createTestWidget(
+              card: testCard,
+              enableSwipeToDelete: true,
+              onDelete: () async {
+                deleteCallbackCalled = true;
+                return true;
+              },
+            ),
+          );
+
+          // 應該找到 Dismissible Widget
+          expect(find.byType(Dismissible), findsOneWidget);
+        },
+      );
+
+      testWidgets('enableSwipeToDelete = false 時不應該顯示 Dismissible', (
+        tester,
+      ) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            enableSwipeToDelete: false,
+            onDelete: () async => true,
+          ),
+        );
+
+        // 不應該找到 Dismissible Widget
+        expect(find.byType(Dismissible), findsNothing);
+      });
+
+      testWidgets('沒有 onDelete 回調時不應該顯示 Dismissible', (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            enableSwipeToDelete: true,
+            onDelete: null,
+          ),
+        );
+
+        // 不應該找到 Dismissible Widget
+        expect(find.byType(Dismissible), findsNothing);
+      });
+
+      testWidgets('Dismissible 應該配置正確的屬性', (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            enableSwipeToDelete: true,
+            onDelete: () async => true,
+          ),
+        );
+
+        final dismissible = tester.widget<Dismissible>(
+          find.byType(Dismissible),
+        );
+
+        // 檢查 key 是否正確
+        expect(dismissible.key, equals(Key('card_${testCard.id}')));
+
+        // 檢查方向是否為從右到左
+        expect(dismissible.direction, equals(DismissDirection.endToStart));
+
+        // 檢查滑動閾值
+        expect(
+          dismissible.dismissThresholds?[DismissDirection.endToStart],
+          equals(0.4),
+        );
+      });
+
+      testWidgets('應該顯示滑動刪除背景', (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            enableSwipeToDelete: true,
+            onDelete: () async => true,
+          ),
+        );
+
+        // 開始滑動來觸發背景顯示
+        await tester.drag(find.byType(Dismissible), const Offset(-100, 0));
+        await tester.pumpAndSettle();
+
+        // 檢查背景中的刪除圖標和文字
+        expect(find.byIcon(Icons.delete_outline), findsOneWidget);
+        expect(find.text('刪除'), findsOneWidget);
+      });
+
+      testWidgets('滑動距離不足時不應該觸發刪除', (tester) async {
+        bool deleteCallbackCalled = false;
+
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            enableSwipeToDelete: true,
+            onDelete: () async {
+              deleteCallbackCalled = true;
+              return true;
+            },
+          ),
+        );
+
+        // 滑動距離不足（小於 40%）
+        await tester.drag(find.byType(Dismissible), const Offset(-50, 0));
+        await tester.pumpAndSettle();
+
+        // 刪除回調不應該被調用
+        expect(deleteCallbackCalled, isFalse);
+      });
+
+      testWidgets('滑動距離足夠時應該觸發確認刪除', (tester) async {
+        bool deleteCallbackCalled = false;
+
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            enableSwipeToDelete: true,
+            onDelete: () async {
+              deleteCallbackCalled = true;
+              return true;
+            },
+          ),
+        );
+
+        // 滑動足夠距離（超過 40%）
+        await tester.drag(find.byType(Dismissible), const Offset(-300, 0));
+        await tester.pumpAndSettle();
+
+        // 刪除回調應該被調用
+        expect(deleteCallbackCalled, isTrue);
+      });
+
+      testWidgets('onDelete 返回 false 時項目不應該被移除', (tester) async {
+        await tester.pumpWidget(
+          createTestWidget(
+            card: testCard,
+            enableSwipeToDelete: true,
+            onDelete: () async => false, // 返回 false 表示刪除失敗
+          ),
+        );
+
+        // 滑動觸發刪除
+        await tester.drag(find.byType(Dismissible), const Offset(-300, 0));
+        await tester.pumpAndSettle();
+
+        // 項目應該仍然存在（因為 onDelete 返回 false）
+        expect(find.byType(CardListItem), findsOneWidget);
+        expect(find.text(testCard.name), findsOneWidget);
       });
     });
   });

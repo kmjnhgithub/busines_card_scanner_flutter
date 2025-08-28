@@ -22,10 +22,12 @@ class CardListItem extends StatefulWidget {
     this.onTap,
     this.onLongPress,
     this.onMoreActions,
+    this.onDelete,
     this.showMoreButton = true,
     this.isSelected = false,
     this.elevation,
     this.margin,
+    this.enableSwipeToDelete = true,
   });
 
   /// 名片實體
@@ -40,6 +42,9 @@ class CardListItem extends StatefulWidget {
   /// 更多操作回調
   final VoidCallback? onMoreActions;
 
+  /// 刪除回調
+  final Future<bool> Function()? onDelete;
+
   /// 是否顯示更多操作按鈕
   final bool showMoreButton;
 
@@ -51,6 +56,9 @@ class CardListItem extends StatefulWidget {
 
   /// 自定義外邊距
   final EdgeInsets? margin;
+
+  /// 是否啟用滑動刪除功能
+  final bool enableSwipeToDelete;
 
   @override
   State<CardListItem> createState() => _CardListItemState();
@@ -120,7 +128,7 @@ class _CardListItemState extends State<CardListItem>
     );
     final imageSize = AppResponsiveCardList.calculateImageSize(containerHeight);
 
-    return AnimatedBuilder(
+    final cardWidget = AnimatedBuilder(
       animation: _animationController,
       builder: (context, child) {
         return Transform.scale(
@@ -187,6 +195,28 @@ class _CardListItemState extends State<CardListItem>
         );
       },
     );
+
+    // 如果啟用滑動刪除功能，則包裝在 Dismissible 中
+    if (widget.enableSwipeToDelete && widget.onDelete != null) {
+      return Dismissible(
+        key: Key('card_${widget.card.id}'),
+        direction: DismissDirection.endToStart,
+        dismissThresholds: const {
+          DismissDirection.endToStart: 0.4, // 需要滑動40%才觸發
+        },
+        background: _buildSwipeBackground(),
+        confirmDismiss: (direction) async {
+          if (direction == DismissDirection.endToStart &&
+              widget.onDelete != null) {
+            return widget.onDelete!();
+          }
+          return false;
+        },
+        child: cardWidget,
+      );
+    }
+
+    return cardWidget;
   }
 
   /// 建立名片圖片（響應式尺寸，黃金比例）
@@ -352,6 +382,45 @@ class _CardListItemState extends State<CardListItem>
       onPressed: widget.onMoreActions,
       padding: const EdgeInsets.all(AppDimensions.space1),
       constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+    );
+  }
+
+  /// 建立滑動時的背景效果
+  Widget _buildSwipeBackground() {
+    return Container(
+      margin:
+          widget.margin ??
+          const EdgeInsets.symmetric(
+            horizontal: AppDimensions.space4,
+            vertical: AppResponsiveCardList.verticalMargin / 2,
+          ),
+      decoration: BoxDecoration(
+        color: Colors.red,
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+        gradient: const LinearGradient(
+          colors: [
+            Color(0xFFFF6B6B), // 較淺的紅色
+            Color(0xFFFF4757), // 較深的紅色
+          ],
+        ),
+      ),
+      alignment: Alignment.centerRight,
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.space6),
+      child: const Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          Icon(Icons.delete_outline, color: Colors.white, size: 28),
+          SizedBox(width: AppDimensions.space2),
+          Text(
+            '刪除',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w600,
+              fontSize: 16,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

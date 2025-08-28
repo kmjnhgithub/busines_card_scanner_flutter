@@ -1,8 +1,7 @@
-import 'dart:io';
-
 import 'package:busines_card_scanner_flutter/core/utils/debouncer.dart';
 import 'package:busines_card_scanner_flutter/domain/entities/business_card.dart';
 import 'package:busines_card_scanner_flutter/presentation/features/card_list/view_models/card_list_view_model.dart';
+import 'package:busines_card_scanner_flutter/presentation/features/card_list/widgets/card_list_item.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/dialog_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/presenters/toast_presenter.dart';
 import 'package:busines_card_scanner_flutter/presentation/router/app_routes.dart';
@@ -10,6 +9,7 @@ import 'package:busines_card_scanner_flutter/presentation/theme/app_colors.dart'
 import 'package:busines_card_scanner_flutter/presentation/theme/app_dimensions.dart';
 import 'package:busines_card_scanner_flutter/presentation/theme/app_text_styles.dart';
 import 'package:busines_card_scanner_flutter/presentation/widgets/shared/themed_button.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -497,160 +497,12 @@ class _CardListPageState extends ConsumerState<CardListPage> {
     BusinessCard card,
     CardListViewModel viewModel,
   ) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final state = ref.watch(cardListViewModelProvider);
-
-    return Container(
-      margin: EdgeInsets.only(
-        bottom: screenWidth * 0.02, // 2% 螢幕寬度作為間距
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
-          onTap: () => _navigateToCardDetail(context, card),
-          onLongPress: () => _showCardOptions(context, card, viewModel),
-          child: Padding(
-            padding: EdgeInsets.all(screenWidth * 0.03), // 3% 螢幕寬度內邊距
-            child: Row(
-              children: [
-                // 左側名片圖片
-                _buildCardImage(card),
-                SizedBox(width: screenWidth * 0.03), // 3% 間距
-                // 右側名片資訊（傳遞搜尋查詢用於高亮顯示）
-                Expanded(child: _buildCardInfo(card, state.searchQuery)),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  /// 建立名片圖片
-  Widget _buildCardImage(BusinessCard card) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final imageWidth = screenWidth * 0.25; // 25% 螢幕寬度
-        final imageHeight = imageWidth * 0.63; // 保持名片比例 (約 5:8)
-
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
-          child: Container(
-            width: imageWidth,
-            height: imageHeight,
-            color: AppColors.secondaryBackground,
-            child: card.imagePath != null && card.imagePath!.isNotEmpty
-                ? _buildCardImageContent(card.imagePath!)
-                : _buildDefaultCardImage(),
-          ),
-        );
-      },
-    );
-  }
-
-  /// 建立名片圖片內容
-  Widget _buildCardImageContent(String imagePath) {
-    try {
-      final imageFile = File(imagePath);
-      if (imageFile.existsSync()) {
-        return Image.file(
-          imageFile,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return _buildDefaultCardImage();
-          },
-        );
-      } else {
-        return _buildDefaultCardImage();
-      }
-    } on Exception {
-      return _buildDefaultCardImage();
-    }
-  }
-
-  /// 建立預設名片圖片
-  Widget _buildDefaultCardImage() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppColors.primary.withValues(alpha: 0.8),
-            AppColors.primary.withValues(alpha: 0.6),
-          ],
-        ),
-      ),
-      child: const Center(
-        child: Icon(Icons.credit_card, color: Colors.white, size: 40),
-      ),
-    );
-  }
-
-  /// 建立名片資訊（支援搜尋關鍵字高亮顯示）
-  Widget _buildCardInfo(BusinessCard card, String searchQuery) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final isLargeScreen = screenWidth > 600; // 平板或大螢幕
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // 姓名 - 大標題（支援高亮顯示）
-            Text(
-              card.name,
-              style:
-                  (isLargeScreen
-                          ? AppTextStyles.headline5
-                          : AppTextStyles.headline6)
-                      .copyWith(
-                        color: AppColors.primaryText,
-                        fontWeight: FontWeight.bold,
-                      ),
-            ),
-            SizedBox(height: screenWidth * 0.01), // 1% 螢幕寬度間距
-            // 公司名稱 - 主要副標題（支援高亮顯示）
-            if (card.company != null) ...[
-              Text(
-                card.company!,
-                style:
-                    (isLargeScreen
-                            ? AppTextStyles.bodyLarge
-                            : AppTextStyles.bodyMedium)
-                        .copyWith(color: AppColors.secondaryText),
-              ),
-              SizedBox(height: screenWidth * 0.005), // 0.5% 間距
-            ],
-
-            // 職稱 - 次要副標題（支援高亮顯示）
-            if (card.jobTitle != null) ...[
-              Text(
-                card.jobTitle!,
-                style:
-                    (isLargeScreen
-                            ? AppTextStyles.bodyMedium
-                            : AppTextStyles.bodySmall)
-                        .copyWith(color: AppColors.secondaryText),
-              ),
-            ],
-          ],
-        );
-      },
+    return CardListItem(
+      card: card,
+      onTap: () => _navigateToCardDetail(context, card),
+      onLongPress: () => _showCardOptions(context, card, viewModel),
+      onMoreActions: () => _showCardOptions(context, card, viewModel),
+      onDelete: () => _handleSwipeToDelete(context, card, viewModel),
     );
   }
 
@@ -909,5 +761,79 @@ class _CardListPageState extends ConsumerState<CardListPage> {
   void _shareCard(BuildContext context, BusinessCard card) {
     // TODO: 實作名片分享功能
     ToastHelper.showSnackBar(context, '分享功能尚未實作');
+  }
+
+  /// 處理滑動刪除
+  Future<bool> _handleSwipeToDelete(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) async {
+    // 使用 iOS 風格的確認對話框
+    final confirmed = await showCupertinoDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+          title: const Text('刪除名片'),
+          content: Text('確定要刪除「${card.name}」的名片嗎？此操作可以復原。'),
+          actions: [
+            CupertinoDialogAction(
+              child: const Text('取消'),
+              onPressed: () => Navigator.of(context).pop(false),
+            ),
+            CupertinoDialogAction(
+              isDestructiveAction: true,
+              child: const Text('刪除'),
+              onPressed: () => Navigator.of(context).pop(true),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      // 執行刪除操作
+      final success = await viewModel.deleteCard(card.id);
+
+      if (!context.mounted) {
+        return success;
+      }
+
+      if (success) {
+        // 顯示成功提示並提供 Undo 功能
+        _showDeleteSuccessWithUndo(context, card, viewModel);
+      } else {
+        // 顯示錯誤提示
+        ToastHelper.showSnackBar(context, '刪除失敗，請稍後重試');
+      }
+
+      return success;
+    }
+
+    return false; // 用戶取消
+  }
+
+  /// 顯示刪除成功提示和 Undo 功能
+  void _showDeleteSuccessWithUndo(
+    BuildContext context,
+    BusinessCard card,
+    CardListViewModel viewModel,
+  ) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('已刪除「${card.name}」的名片'),
+        backgroundColor: AppColors.success,
+        duration: const Duration(seconds: 5),
+        action: SnackBarAction(
+          label: '復原',
+          textColor: Colors.white,
+          onPressed: () {
+            // TODO: 實作復原功能
+            // 這需要在 ViewModel 中加入復原方法
+            ToastHelper.showSnackBar(context, '復原功能即將推出');
+          },
+        ),
+      ),
+    );
   }
 }

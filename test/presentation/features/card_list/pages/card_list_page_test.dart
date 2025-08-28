@@ -438,5 +438,113 @@ void main() {
         expect(TestFinders.errorMessage('Exception: 載入失敗'), findsOneWidget);
       });
     });
+
+    group('滑動刪除功能測試', () {
+      setUp(() {
+        // 設定成功的 UseCase 模擬
+        when(
+          () => mockGetCardsUseCase.execute(any()),
+        ).thenAnswer((_) async => GetCardsResult.success(mockCards));
+
+        when(() => mockDeleteCardUseCase.execute(any())).thenAnswer(
+          (_) async => const DeleteCardResult(
+            isSuccess: true,
+            deletedCardId: '1',
+            deleteType: DeleteType.soft,
+            isReversible: true,
+            processingSteps: ['刪除成功'],
+            warnings: [],
+          ),
+        );
+      });
+
+      testWidgets('滑動刪除時應該顯示確認對話框', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
+
+        // 尋找第一個名片項目並開始滑動
+        final cardItem = find.byType(CardListItem).first;
+        expect(cardItem, findsOneWidget);
+
+        // 滑動觸發刪除
+        await tester.drag(cardItem, const Offset(-300, 0));
+        await tester.pumpAndSettle();
+
+        // 應該顯示 iOS 風格的確認對話框
+        expect(find.text('刪除名片'), findsOneWidget);
+        expect(find.text('確定要刪除「張三」的名片嗎？此操作可以復原。'), findsOneWidget);
+        expect(find.text('取消'), findsOneWidget);
+        expect(find.text('刪除'), findsOneWidget);
+      });
+
+      testWidgets('確認刪除後應該執行刪除操作', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
+
+        // 滑動觸發刪除
+        final cardItem = find.byType(CardListItem).first;
+        await tester.drag(cardItem, const Offset(-300, 0));
+        await tester.pumpAndSettle();
+
+        // 點擊刪除按鈕
+        await tester.tap(find.text('刪除'));
+        await tester.pumpAndSettle();
+
+        // 驗證 DeleteCardUseCase 被調用
+        verify(() => mockDeleteCardUseCase.execute(any())).called(1);
+
+        // 應該顯示成功提示
+        expect(find.text('已刪除「張三」的名片'), findsOneWidget);
+        expect(find.text('復原'), findsOneWidget);
+      });
+
+      testWidgets('取消刪除時不應該執行刪除操作', (tester) async {
+        await tester.pumpWidget(createTestWidget());
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
+
+        // 滑動觸發刪除
+        final cardItem = find.byType(CardListItem).first;
+        await tester.drag(cardItem, const Offset(-300, 0));
+        await tester.pumpAndSettle();
+
+        // 點擊取消按鈕
+        await tester.tap(find.text('取消'));
+        await tester.pumpAndSettle();
+
+        // 驗證 DeleteCardUseCase 沒有被調用
+        verifyNever(() => mockDeleteCardUseCase.execute(any()));
+
+        // 名片項目應該仍然存在
+        expect(find.text('張三'), findsOneWidget);
+      });
+
+      testWidgets('刪除失敗時應該顯示錯誤提示', (tester) async {
+        // 設定失敗的刪除結果
+        when(() => mockDeleteCardUseCase.execute(any())).thenAnswer(
+          (_) async => const DeleteCardResult(
+            isSuccess: false,
+            deletedCardId: '1',
+            deleteType: DeleteType.soft,
+            isReversible: true,
+            processingSteps: ['刪除失敗'],
+            warnings: ['刪除失敗'],
+          ),
+        );
+
+        await tester.pumpWidget(createTestWidget());
+        await TestHelpers.pumpAndSettleWithTimeout(tester);
+
+        // 滑動觸發刪除並確認
+        final cardItem = find.byType(CardListItem).first;
+        await tester.drag(cardItem, const Offset(-300, 0));
+        await tester.pumpAndSettle();
+
+        await tester.tap(find.text('刪除'));
+        await tester.pumpAndSettle();
+
+        // 應該顯示錯誤提示
+        expect(find.text('刪除失敗，請稍後重試'), findsOneWidget);
+      });
+    });
   });
 }
